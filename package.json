@@ -2,13 +2,14 @@
   "name": "p2pix-front-end",
   "version": "0.0.0",
   "scripts": {
-    "start": "vite",
+    "start": "vite --host=0.0.0.0 --port 3000",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "serve": "vue-cli-service serve",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --fix"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.3",

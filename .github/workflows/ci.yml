@@ -1,0 +1,41 @@
+name: CI script
+
+on: push 
+ 
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+
+      - name: 🏗 Install dependencies
+        run: npm ci
+
+      - name: 📦 Lint with eslint
+        run: npm run lint
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+  
+      - name: 📦 Build docker image
+        run: |
+          docker build -t p2pix:$GITHUB_SHA .
+          docker save -o image_$GITHUB_SHA p2pix:$GITHUB_SHA
+
+      - name: 📦 Put docker image in cache
+        uses: actions/cache@v3
+        with:
+          key: p2pix
+          path: image_${{ github.sha }}
+
+  # test job

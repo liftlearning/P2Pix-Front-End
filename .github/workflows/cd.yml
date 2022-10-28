@@ -1,16 +1,16 @@
 name: Deploy FrontEnd
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 on:
   push:
     branches: [ main, develop ]
 
 jobs:
-  deploy-preview:
+  deploy-staging:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID_STAGING }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3
@@ -18,18 +18,21 @@ jobs:
       - name: 🏗 Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: 🏗 Pull preview vercel environment
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+      - name: 🏗 Pull staging app from vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
-      - name: 📦 Build app artifacts
-        run: vercel build --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+      - name: 📦 Build staging app artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
-      - name: 📦 Deploy preview app artifacts to vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+      - name: 📦 Deploy staging app artifacts to vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3

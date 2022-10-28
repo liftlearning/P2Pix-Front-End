@@ -2,26 +2,49 @@ name: Deploy FrontEnd
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  deploy-frontend:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID_STAGING }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3
 
-      - name: 🏗 Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: 'npm'
+      - name: 🏗 Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: 🏗 Install dependencies
-        run: npm ci
+      - name: 🏗 Pull staging app from vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
-      - name: 📦 Build app bundle
-        run: npm run build --if-present
+      - name: 📦 Build staging app artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
-      - name: 📦 Deploy to netlify
-        run: netlify deploy --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site p2pix --prod
+      - name: 📦 Deploy staging app artifacts to vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: 🏗 Pull production vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+
+      - name: 📦 Build app artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+
+      - name: 📦 Deploy app artifacts to vercel in production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_AUTH_TOKEN }}

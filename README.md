@@ -21,26 +21,37 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
 
-## Project Setup
+## Project Setup (with yarn)
 
 ```sh
-npm install
+yarn
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+yarn lint
 ```
 
 ### Type-Check, Compile and Minify for Production
 
 ```sh
-npm run build
+yarn build
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
-npm run lint
+yarn lint
+```
+## Project Setup (with docker-compose)
+### Dependencies
+
+1. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/);
+2. Install [Docker Compose](https://docs.docker.com/compose/install/).
+
+### In the main project folder, build and start the application with the command:
+
+```sh
+docker-compose up
 ```

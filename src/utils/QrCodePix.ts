@@ -14,7 +14,7 @@ interface PixParams {
   countryCode?: string;
 }
 
-const Pix = ({
+const pix = ({
   pixKey,
   merchantCity,
   merchantName,
@@ -42,8 +42,8 @@ const Pix = ({
   }
 
   payload.push(formatEMV("58", countryCode.toUpperCase())); // Country Code
-  payload.push(formatEMV("59", merchantName)); // Merchant merchantName
-  payload.push(formatEMV("60", merchantCity)); // Merchant merchantCity
+  payload.push(formatEMV("59", merchantName)); // Merchant Name
+  payload.push(formatEMV("60", merchantCity)); // Merchant City
 
   if (cep) {
     payload.push(formatEMV("61", cep)); // Postal Code
@@ -84,4 +84,4 @@ const formatEMV = (id: string, param: string): string => {
   return `${id}${len}${param}`;
 };
 
-export { type PixParams, Pix };
+export { type PixParams, pix };

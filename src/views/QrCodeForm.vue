@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Pix } from "../utils/QrCodePix";
+import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 
-const PixModel = ref({
+const pixModel = ref({
   pixKey: "",
   name: "",
   city: "",
@@ -23,9 +23,9 @@ const errors = ref({
 });
 
 const submit = () => {
-  errors.value["pixRequiredError"] = PixModel.value["pixKey"] == "";
-  errors.value["nameRequiredError"] = PixModel.value["name"] == "";
-  errors.value["cityRequiredError"] = PixModel.value["city"] == "";
+  errors.value["pixRequiredError"] = pixModel.value["pixKey"] == "";
+  errors.value["nameRequiredError"] = pixModel.value["name"] == "";
+  errors.value["cityRequiredError"] = pixModel.value["city"] == "";
 
   if (
     errors.value["pixRequiredError"] ||
@@ -34,20 +34,20 @@ const submit = () => {
   )
     return;
 
-  const pix = Pix({
-    pixKey: PixModel.value["pixKey"],
-    merchantName: PixModel.value["name"],
-    merchantCity: PixModel.value["city"],
-    transactionId: PixModel.value["transactionId"],
-    message: PixModel.value["message"],
-    value: PixModel.value["value"],
+  const pixQrCode = pix({
+    pixKey: pixModel.value.pixKey,
+    merchantName: pixModel.value.name,
+    merchantCity: pixModel.value.city,
+    transactionId: pixModel.value.transactionId,
+    message: pixModel.value.message,
+    value: pixModel.value["value"],
   });
 
-  pix.base64QrCode().then((code) => {
+  pixQrCode.base64QrCode().then((code: string) => {
     qrCode.value = code;
   });
 
-  qrCodePayload.value = pix.payload();
+  qrCodePayload.value = pixQrCode.payload();
 
   toggleModal.value = true;
 };
@@ -56,7 +56,7 @@ const submit = () => {
 <template>
   <div class="container">
     <h2 class="text-center font-bold text-emerald-50 text-2xl">
-      PixModel QR Code
+      pixModel QR Code
     </h2>
     <form>
       <div class="grid gap-4 grid-cols-1 p-2">
@@ -72,7 +72,7 @@ const submit = () => {
             name="pixKey"
             id="pixKey"
             class="form-input"
-            v-model="PixModel['pixKey']"
+            v-model="pixModel.pixKey"
           />
         </div>
         <div class="col-div">
@@ -87,7 +87,7 @@ const submit = () => {
             name="name"
             id="name"
             class="form-input"
-            v-model="PixModel['name']"
+            v-model="pixModel.name"
           />
         </div>
         <div class="col-div">
@@ -102,7 +102,7 @@ const submit = () => {
             name="city"
             id="city"
             class="form-input"
-            v-model="PixModel['city']"
+            v-model="pixModel.city"
           />
         </div>
         <div class="col-div">
@@ -114,7 +114,7 @@ const submit = () => {
             name="value"
             id="value"
             class="form-input"
-            v-model="PixModel['value']"
+            v-model="pixModel.value"
           />
         </div>
         <div class="col-div">
@@ -126,7 +126,7 @@ const submit = () => {
             name="code"
             id="code"
             class="form-input"
-            v-model="PixModel['transactionId']"
+            v-model="pixModel.transactionId"
           />
         </div>
         <div class="col-div">
@@ -136,7 +136,7 @@ const submit = () => {
             name="message"
             id="message"
             class="form-input"
-            v-model="PixModel['message']"
+            v-model="pixModel.message"
           />
         </div>
         <button type="button" class="button" @click="submit">
@@ -155,20 +155,20 @@ const submit = () => {
         >
           <img v-if="qrCode != ''" :src="qrCode" alt="QR code image" />
           <div>
-            <span class="text-black font-semibold mr-1">Chave PixModel:</span>
-            <span class="text-gray-700">{{ PixModel["pixKey"] }}</span>
+            <span class="text-black font-semibold mr-1">Chave pixModel:</span>
+            <span class="text-gray-700">{{ pixModel.pixKey }}</span>
           </div>
           <div>
             <span class="text-black font-semibold mr-1"
               >Nome do Beneficiário:</span
             >
-            <span class="text-gray-700">{{ PixModel["name"] }}</span>
+            <span class="text-gray-700">{{ pixModel.name }}</span>
           </div>
-          <div v-if="PixModel['value'] != 0">
+          <div v-if="pixModel.value != 0">
             <span class="text-black font-semibold mr-1"
               >Valor da transferência:</span
             >
-            <span class="text-gray-700">{{ PixModel["value"] }}</span>
+            <span class="text-gray-700">{{ pixModel.value }}</span>
           </div>
           <div
             class="flex flex-col w-auto break-all justify-center items-center"
@@ -189,7 +189,7 @@ const submit = () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .container {
   background-color: var(--color-background-indigo);
   @apply rounded-md p-2 mt-8;

@@ -24,21 +24,16 @@ const errors = ref({
 
 const submit = () => {
   errors.value["pixRequiredError"] = pixModel.value["pixKey"] == "";
-  errors.value["nameRequiredError"] = pixModel.value["name"] == "";
-  errors.value["cityRequiredError"] = pixModel.value["city"] == "";
 
-  if (
-    errors.value["pixRequiredError"] ||
-    errors.value["nameRequiredError"] ||
-    errors.value["cityRequiredError"]
-  )
-    return;
+  if (errors.value["pixRequiredError"]) return;
 
   const pixQrCode = pix({
     pixKey: pixModel.value.pixKey,
     merchantName: pixModel.value.name,
     merchantCity: pixModel.value.city,
-    transactionId: pixModel.value.transactionId,
+    transactionId: pixModel.value.transactionId.trim()
+      ? pixModel.value.transactionId
+      : "***",
     message: pixModel.value.message,
     value: pixModel.value["value"],
   });

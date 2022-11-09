@@ -21,7 +21,7 @@ const pix = ({
   value,
   message,
   cep,
-  transactionId = "",
+  transactionId = "***",
   currency = 986,
   countryCode = "BR",
 }: PixParams) => {

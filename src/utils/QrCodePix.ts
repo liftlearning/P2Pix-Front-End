@@ -4,8 +4,8 @@ import { crc16ccitt } from "crc";
 
 interface PixParams {
   pixKey: string;
-  merchantCity: string;
-  merchantName: string;
+  merchantCity?: string;
+  merchantName?: string;
   value?: number;
   transactionId?: string;
   message?: string;
@@ -16,8 +16,8 @@ interface PixParams {
 
 const pix = ({
   pixKey,
-  merchantCity,
-  merchantName,
+  merchantCity = "city",
+  merchantName = "name",
   value,
   message,
   cep,

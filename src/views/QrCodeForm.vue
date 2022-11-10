@@ -29,8 +29,12 @@ const submit = () => {
 
   const pixQrCode = pix({
     pixKey: pixModel.value.pixKey,
-    merchantName: pixModel.value.name,
-    merchantCity: pixModel.value.city,
+    merchantName: pixModel.value.name.trim()
+      ? pixModel.value.name
+      : "name",
+    merchantCity: pixModel.value.city.trim()
+      ? pixModel.value.city
+      : "city",
     transactionId: pixModel.value.transactionId.trim()
       ? pixModel.value.transactionId
       : "***",
@@ -150,10 +154,10 @@ const submit = () => {
         >
           <img v-if="qrCode != ''" :src="qrCode" alt="QR code image" />
           <div>
-            <span class="text-black font-semibold mr-1">Chave pixModel:</span>
+            <span class="text-black font-semibold mr-1">Chave pix:</span>
             <span class="text-gray-700">{{ pixModel.pixKey }}</span>
           </div>
-          <div>
+          <div v-if="pixModel.name.trim() != ''">
             <span class="text-black font-semibold mr-1"
               >Nome do Beneficiário:</span
             >

@@ -1,43 +1,53 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "./components/HelloWorld.vue";
+import ethers from "./ethers";
+
+const connectMetaMask = () => {
+  ethers.getProvider().then((web3Provider) => {
+    console.log(web3Provider);
+  });
+};
 </script>
 
 <template>
   <header>
     <img
-      alt="Vue logo"
+      alt="P2Pix logo"
       class="logo"
       src="@/assets/logo.svg"
-      width="125"
-      height="125"
+      width="75"
+      height="75"
     />
-
-    <div class="wrapper">
+    <div class="flex gap-4">
+      <button type="button" class="p-2 text-gray-50">Quero vender</button>
+      <button
+        type="button"
+        class="p-2 border-amber-400 border-2 rounded text-gray-50"
+        @click="connectMetaMask()"
+      >
+        Conectar carteira
+      </button>
+    </div>
+    <!-- <div class="wrapper">
       <HelloWorld msg="You did it!" />
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/pix">QrCode Pix</RouterLink>
         <RouterLink to="/ethers">Ethers</RouterLink>
       </nav>
-    </div>
+    </div> -->
   </header>
-
-  <RouterView />
 </template>
 
 <style scoped>
 header {
-  line-height: 1.5;
-  max-height: 100vh;
+  @apply flex flex-row justify-between w-full items-center;
 }
 
 .logo {
   display: block;
-  margin: 0 auto 2rem;
 }
 
-nav {
+/* nav {
   width: 100%;
   font-size: 12px;
   text-align: center;
@@ -66,7 +76,6 @@ nav a:first-of-type {
   header {
     display: flex;
     place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
   }
 
   .logo {
@@ -87,5 +96,5 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
-}
+} */
 </style>

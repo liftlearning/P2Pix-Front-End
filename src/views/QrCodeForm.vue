@@ -29,12 +29,8 @@ const submit = () => {
 
   const pixQrCode = pix({
     pixKey: pixModel.value.pixKey,
-    merchantName: pixModel.value.name.trim()
-      ? pixModel.value.name
-      : "name",
-    merchantCity: pixModel.value.city.trim()
-      ? pixModel.value.city
-      : "city",
+    merchantName: pixModel.value.name.trim() ? pixModel.value.name : "name",
+    merchantCity: pixModel.value.city.trim() ? pixModel.value.city : "city",
     transactionId: pixModel.value.transactionId.trim()
       ? pixModel.value.transactionId
       : "***",

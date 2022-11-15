@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import ethers from "./ethers";
+import { storeToRefs } from "pinia";
+import { useEtherStore } from "./store/ether";
+import ethers from "./utils/ethers";
+
+const etherStore = useEtherStore();
+
+const { walletAddress } = storeToRefs(etherStore);
 
 const connectMetaMask = () => {
-  ethers.getProvider().then((web3Provider) => {
-    console.log(web3Provider);
-  });
+  ethers.getProvider();
 };
 </script>
 
@@ -17,15 +21,19 @@ const connectMetaMask = () => {
       width="75"
       height="75"
     />
-    <div class="flex gap-4">
+    <div class="flex gap-4 items-center">
       <button type="button" class="p-2 text-gray-50">Quero vender</button>
       <button
         type="button"
+        v-if="!walletAddress"
         class="p-2 border-amber-400 border-2 rounded text-gray-50"
         @click="connectMetaMask()"
       >
         Conectar carteira
       </button>
+      <span v-if="walletAddress">
+        {{ walletAddress[0] }}
+      </span>
     </div>
     <!-- <div class="wrapper">
       <HelloWorld msg="You did it!" />

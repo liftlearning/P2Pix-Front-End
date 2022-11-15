@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ethers from "../ethers";
+import ethers from "../utils/ethers";
 
 const connectMetaMask = () => {
   ethers.getProvider().then((web3Provider) => {

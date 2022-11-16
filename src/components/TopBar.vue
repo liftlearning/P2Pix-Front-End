@@ -8,7 +8,7 @@ const etherStore = useEtherStore();
 const { walletAddress } = storeToRefs(etherStore);
 
 const connectMetaMask = () => {
-  ethers.getProvider();
+  ethers.connectProvider();
 };
 
 const formatWalletAddress = (): string => {

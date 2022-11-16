@@ -5,7 +5,7 @@ import ethers from "../utils/ethers";
 
 const etherStore = useEtherStore();
 
-const { walletAddress } = storeToRefs(etherStore);
+const { walletAddress, balance } = storeToRefs(etherStore);
 
 const connectMetaMask = () => {
   ethers.connectProvider();
@@ -19,6 +19,13 @@ const formatWalletAddress = (): string => {
     walletAddressLength - 1
   );
   return `${initialText} ... ${finalText}`;
+};
+
+const formatWalletBalance = (): string => {
+  const formattedBalance = ethers.formatEther(balance.value);
+  const fixed = formattedBalance.substring(0, 8);
+
+  return fixed;
 };
 </script>
 
@@ -41,9 +48,12 @@ const formatWalletAddress = (): string => {
       >
         Conectar carteira
       </button>
-      <span v-if="walletAddress" class="text-gray-50">
-        {{ formatWalletAddress() }}
-      </span>
+      <div v-if="walletAddress" class="flex gap-4">
+        <span class="text-gray-50">
+          {{ formatWalletAddress() }}
+        </span>
+        <span class="text-gray-50"> ETH: {{ formatWalletBalance() }} </span>
+      </div>
     </div>
   </header>
 </template>

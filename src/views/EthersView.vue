@@ -2,9 +2,7 @@
 import ethers from "../utils/ethers";
 
 const connectMetaMask = () => {
-  ethers.connectProvider().then((web3Provider) => {
-    console.log(web3Provider);
-  });
+  ethers.connectProvider();
 };
 </script>
 

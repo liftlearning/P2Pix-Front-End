@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import TopBar from './components/TopBar.vue';
-
+import TopBar from "./components/TopBar.vue";
 </script>
 
 <template>
-  <TopBar/>
+  <TopBar />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

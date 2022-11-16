@@ -5,8 +5,10 @@
 
 #app {
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 4rem;
   height: 100vh;
+  background-image: url( './bg.svg' );
+  background-size: cover;
 
   font-weight: normal;
 }

@@ -14,9 +14,12 @@ const connectMetaMask = () => {
 const formatWalletAddress = (): string => {
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
-  const finalText = walletAddress.value.substring(walletAddressLength - 6, walletAddressLength - 1);
+  const finalText = walletAddress.value.substring(
+    walletAddressLength - 6,
+    walletAddressLength - 1
+  );
   return `${initialText} ... ${finalText}`;
-}
+};
 </script>
 
 <template>
@@ -39,7 +42,7 @@ const formatWalletAddress = (): string => {
         Conectar carteira
       </button>
       <span v-if="walletAddress" class="text-gray-50">
-        {{formatWalletAddress()}}
+        {{ formatWalletAddress() }}
       </span>
     </div>
   </header>

@@ -11,11 +11,16 @@ const connectMetaMask = () => {
   ethers.connectProvider();
 };
 
+const makeTransaction = () => {
+  ethers.makeTransaction()
+  alert("oi")
+};
+
 const formatWalletAddress = (): string => {
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
   const finalText = walletAddress.value.substring(
-    walletAddressLength - 6,
+    walletAddressLength - 5,
     walletAddressLength - 1
   );
   return `${initialText} ... ${finalText}`;
@@ -39,7 +44,15 @@ const formatWalletBalance = (): string => {
       height="75"
     />
     <div class="flex gap-4 items-center">
-      <button type="button" class="p-2 text-gray-50">Quero vender</button>
+
+      <button 
+        type="button" 
+        class="p-2 rounded text-gray-50"
+        @click="makeTransaction()"
+      >
+        Quero vender
+      </button>
+
       <button
         type="button"
         v-if="!walletAddress"
@@ -52,7 +65,7 @@ const formatWalletBalance = (): string => {
         <span class="text-gray-50">
           {{ formatWalletAddress() }}
         </span>
-        <span class="text-gray-50"> ETH: {{ formatWalletBalance() }} </span>
+        <span class="text-gray-50"> MBRZ: {{ formatWalletBalance() }} </span>
       </div>
     </div>
   </header>

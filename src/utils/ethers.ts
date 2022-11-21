@@ -8,12 +8,9 @@ import addresses from "../../../p2pix-smart-contracts/deploys/localhost.json"
 
 const updateWalletStatus = async (walletAddress: string) => {
   const etherStore = useEtherStore();
-  const window_ = window as any;
-  const connection = window_.ethereum;
-
-  if (!connection) return;
-
-  const provider = new ethers.providers.Web3Provider(connection);
+  const provider = getProvider();
+  if(!provider) return;
+  
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mocktoken.abi, signer);
 
@@ -29,33 +26,27 @@ const connectProvider = async () => {
   const connection = window_.ethereum;
   let provider: ethers.providers.Web3Provider | null = null;
 
-  if (connection) {
+  if (!connection) return;
+  provider = new ethers.providers.Web3Provider(connection);
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.token, mocktoken.abi, signer);
 
-    provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(addresses.token, mocktoken.abi, signer);
+  const walletAddress = await provider.send("eth_requestAccounts", []);
+  const balance = await contract.balanceOf(walletAddress[0]);
 
-    const walletAddress = await provider.send("eth_requestAccounts", []);
-    const balance = await contract.balanceOf(walletAddress[0]);
+  etherStore.setWalletAddress(walletAddress[0]);
+  etherStore.setBalance(String(balance));
 
-    etherStore.setWalletAddress(walletAddress[0]);
-    etherStore.setBalance(String(balance));
-
-    connection.on("accountsChanged", (accounts: string[]) => {
-      updateWalletStatus(accounts[0]);
-    });
-  }
+  connection.on("accountsChanged", (accounts: string[]) => {
+    updateWalletStatus(accounts[0]);
+  });
 };
 
 const makeTransaction = async () => {
   const etherStore = useEtherStore();
-  const window_ = window as any;
-  const connection = window_.ethereum;
-  let provider: ethers.providers.Web3Provider | null = null;
+  const provider = getProvider();
+  if(!provider) return;
 
-  if (!connection) return;
-
-  provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mocktoken.abi, signer);
 
@@ -70,5 +61,14 @@ const formatEther = (balance: string) => {
   const formatted = ethers.utils.formatEther(balance);
   return formatted;
 };
+
+const getProvider = (): ethers.providers.Web3Provider | null => {
+  const window_ = window as any;
+  const connection = window_.ethereum;
+
+  if (!connection) return null;
+
+  return new ethers.providers.Web3Provider(connection);
+}
 
 export default { connectProvider, formatEther, makeTransaction };

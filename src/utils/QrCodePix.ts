@@ -1,18 +1,7 @@
 import qrcode from "qrcode";
 import type { QRCodeToDataURLOptions } from "qrcode";
 import { crc16ccitt } from "crc";
-
-interface PixParams {
-  pixKey: string;
-  merchantCity?: string;
-  merchantName?: string;
-  value?: number;
-  transactionId?: string;
-  message?: string;
-  cep?: string;
-  currency?: number;
-  countryCode?: string;
-}
+import {type Pix } from "@/model/Pix";
 
 const pix = ({
   pixKey,
@@ -24,7 +13,7 @@ const pix = ({
   transactionId = "***",
   currency = 986,
   countryCode = "BR",
-}: PixParams) => {
+}: Pix) => {
   const payloadKeyString = generatePixKey(pixKey, message);
 
   const payload: string[] = [
@@ -84,4 +73,4 @@ const formatEMV = (id: string, param: string): string => {
   return `${id}${len}${param}`;
 };
 
-export { type PixParams, pix };
+export { pix };

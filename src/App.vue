@@ -4,6 +4,8 @@ import TopBar from "./components/TopBar.vue";
 
 <template>
   <TopBar />
+
+  <RouterView/>
 </template>
 
 <style scoped></style>

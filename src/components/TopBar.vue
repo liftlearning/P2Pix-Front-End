@@ -11,19 +11,14 @@ const connectMetaMask = () => {
   ethers.connectProvider();
 };
 
-const makeTransaction = () => {
-  ethers.makeTransaction()
-  alert("oi")
-};
-
-const formatWalletAddress = (): string => {
+const formatWalletAddress = (): string => { 
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
   const finalText = walletAddress.value.substring(
     walletAddressLength - 5,
     walletAddressLength - 1
   );
-  return `${initialText} ... ${finalText}`;
+  return `${initialText}...${finalText}`;
 };
 
 const formatWalletBalance = (): string => {
@@ -44,28 +39,49 @@ const formatWalletBalance = (): string => {
       height="75"
     />
     <div class="flex gap-4 items-center">
-
       <button 
         type="button" 
-        class="p-2 rounded text-gray-50"
-        @click="makeTransaction()"
+        class="default-button"
       >
         Quero vender
       </button>
-
       <button
         type="button"
         v-if="!walletAddress"
-        class="p-2 border-amber-400 border-2 rounded text-gray-50"
+        class="border-amber-500 border-2 rounded default-button"
         @click="connectMetaMask()"
       >
         Conectar carteira
       </button>
-      <div v-if="walletAddress" class="flex gap-4">
-        <span class="text-gray-50">
-          {{ formatWalletAddress() }}
-        </span>
-        <span class="text-gray-50"> MBRZ: {{ formatWalletBalance() }} </span>
+      <div v-if="walletAddress" class="account-info">
+        <div class="top-bar-info">
+          <img
+            alt="Ethereum image"
+            src="@/assets/ethereum.svg"
+          />
+          <span class="default-text">
+            Ethereum
+          </span>
+          <img
+            alt="Chevron Down"
+            src="@/assets/chevronDown.svg"
+          />
+        </div>
+        <div class="top-bar-info">
+          <img
+            alt="Account image"
+            src="@/assets/account.svg"
+          />
+          <span class="default-text text-sm">{{ formatWalletAddress() }}</span>
+          <img
+            alt="Chevron Down"
+            src="@/assets/chevronDown.svg"
+          />  
+        </div>
+        <div class="top-bar-info"> 
+          <span class="default-text text-sm"> MBRZ: {{ formatWalletBalance() }} </span>
+        </div>
+        <!-- Temporary div, just to show a wallet's balance -->
       </div>
     </div>
   </header>
@@ -76,7 +92,18 @@ header {
   @apply flex flex-row justify-between w-full items-center;
 }
 
-.logo {
-  display: block;
+.default-button{
+  @apply px-4 py-2 rounded text-gray-50 font-semibold text-base
+}
+.account-info{
+  @apply flex items-center gap-6
+}
+
+.default-text{
+  @apply text-gray-50 font-semibold text-base
+}
+
+.top-bar-info{
+  @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 rounded
 }
 </style>

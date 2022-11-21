@@ -88,7 +88,9 @@ const submit = () => {
           </div>
           <div class="col-div">
             <div class="mb-2">
-              <label for="city" class="form-label">Cidade do beneficiário</label>
+              <label for="city" class="form-label"
+                >Cidade do beneficiário</label
+              >
               <span v-if="errors['cityRequiredError']" class="required-error"
                 >(Esse campo é obrigatório)</span
               >
@@ -167,9 +169,7 @@ const submit = () => {
           >
           <span class="text-gray-700">{{ pixModel.value }}</span>
         </div>
-        <div
-          class="flex flex-col w-auto break-all justify-center items-center"
-        >
+        <div class="flex flex-col w-auto break-all justify-center items-center">
           <span class="text-black font-semibold mb-2">Código QR Code:</span>
           <span class="text-gray-700">{{ qrCodePayload }}</span>
         </div>
@@ -179,10 +179,7 @@ const submit = () => {
       </div>
     </div>
   </div>
-  <div
-    v-if="toggleModal"
-    class="fixed z-40 inset-0 opacity-25 bg-black"
-  ></div>
+  <div v-if="toggleModal" class="fixed z-40 inset-0 opacity-25 bg-black"></div>
 </template>
 
 <style scoped>
@@ -190,9 +187,9 @@ const submit = () => {
   @apply mt-8 w-full flex justify-center self-center;
 }
 
-.form-container{
+.form-container {
   background-color: var(--color-background-indigo);
-  @apply rounded-md w-full p-2 w-1/2
+  @apply rounded-md w-full p-2 w-1/2;
 }
 
 .col-div {

@@ -2,16 +2,15 @@ import { useEtherStore } from "@/store/ether";
 import { ethers } from "ethers";
 
 // smart contract imports
-import mockToken from "./smart_contract_files/MockToken.json"
-import p2pix from "./smart_contract_files/P2PIX.json"
-import addresses from "./smart_contract_files/localhost.json"
-
+import mockToken from "./smart_contract_files/MockToken.json";
+//import p2pix from "./smart_contract_files/P2PIX.json";
+import addresses from "./smart_contract_files/localhost.json";
 
 const updateWalletStatus = async (walletAddress: string) => {
   const etherStore = useEtherStore();
   const provider = getProvider();
-  if(!provider) return;
-  
+  if (!provider) return;
+
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
 
@@ -46,14 +45,17 @@ const connectProvider = async () => {
 const makeTransaction = async () => {
   const etherStore = useEtherStore();
   const provider = getProvider();
-  if(!provider) return;
+  if (!provider) return;
 
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
 
-  const fixedAccount1Address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-  const tx = await contract.transfer(fixedAccount1Address, ethers.utils.parseEther("100.0"));
-  await tx.wait()
+  const fixedAccount1Address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+  const tx = await contract.transfer(
+    fixedAccount1Address,
+    ethers.utils.parseEther("100.0")
+  );
+  await tx.wait();
 
   updateWalletStatus(etherStore.walletAddress);
 };
@@ -70,6 +72,6 @@ const getProvider = (): ethers.providers.Web3Provider | null => {
   if (!connection) return null;
 
   return new ethers.providers.Web3Provider(connection);
-}
+};
 
 export default { connectProvider, formatEther, makeTransaction };

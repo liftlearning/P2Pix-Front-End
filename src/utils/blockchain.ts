@@ -42,7 +42,10 @@ const connectProvider = async () => {
   });
 };
 
-const makeTransaction = async () => {
+const makeTransaction = async (
+  receiverAccountAddress = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+  ammount = "100.0"
+) => {
   const etherStore = useEtherStore();
   const provider = getProvider();
   if (!provider) return;
@@ -50,10 +53,9 @@ const makeTransaction = async () => {
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
 
-  const fixedAccount1Address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
   const tx = await contract.transfer(
-    fixedAccount1Address,
-    ethers.utils.parseEther("100.0")
+    receiverAccountAddress,
+    ethers.utils.parseEther(ammount)
   );
   await tx.wait();
 

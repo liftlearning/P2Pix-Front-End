@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
-import ethers from "../utils/ethers";
+import blockchain from "../utils/blockchain";
 
 const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
 
 const connectMetaMask = () => {
-  ethers.connectProvider();
+  blockchain.connectProvider();
 };
 
 const formatWalletAddress = (): string => {
@@ -22,7 +22,7 @@ const formatWalletAddress = (): string => {
 };
 
 const formatWalletBalance = (): string => {
-  const formattedBalance = ethers.formatEther(balance.value);
+  const formattedBalance = blockchain.formatEther(balance.value);
   const fixed = formattedBalance.substring(0, 8);
 
   return fixed;

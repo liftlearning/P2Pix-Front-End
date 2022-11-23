@@ -49,137 +49,36 @@ const submit = () => {
 </script>
 
 <template>
-  <div class="page">
-    <div class="form-container">
-      <h2 class="text-center font-bold text-emerald-50 text-2xl">
-        pixModel QR Code
-      </h2>
-      <form>
-        <div class="grid gap-4 grid-cols-1 p-2">
-          <div class="col-div">
-            <div class="mb-2">
-              <label for="pixKey" class="form-label">Chave PIX</label>
-              <span v-if="errors['pixRequiredError']" class="required-error"
-                >(Esse campo é obrigatório)</span
-              >
-            </div>
-            <input
-              type="text"
-              name="pixKey"
-              id="pixKey"
-              class="form-input"
-              v-model="pixModel.pixKey"
-            />
-          </div>
-          <div class="col-div">
-            <div class="mb-2">
-              <label for="name" class="form-label">Nome do beneficiário</label>
-              <span v-if="errors['nameRequiredError']" class="required-error"
-                >(Esse campo é obrigatório)</span
-              >
-            </div>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              class="form-input"
-              v-model="pixModel.name"
-            />
-          </div>
-          <div class="col-div">
-            <div class="mb-2">
-              <label for="city" class="form-label"
-                >Cidade do beneficiário</label
-              >
-              <span v-if="errors['cityRequiredError']" class="required-error"
-                >(Esse campo é obrigatório)</span
-              >
-            </div>
-            <input
-              type="text"
-              name="city"
-              id="city"
-              class="form-input"
-              v-model="pixModel.city"
-            />
-          </div>
-          <div class="col-div">
-            <label for="value" class="form-label"
-              >Valor de transferência (Opcional)</label
-            >
-            <input
-              type="number"
-              name="value"
-              id="value"
-              class="form-input"
-              v-model="pixModel.value"
-            />
-          </div>
-          <div class="col-div">
-            <label for="code" class="form-label"
-              >Código da transferência (Opcional)</label
-            >
-            <input
-              type="text"
-              name="code"
-              id="code"
-              class="form-input"
-              v-model="pixModel.transactionId"
-            />
-          </div>
-          <div class="col-div">
-            <label for="message" class="form-label">Mensagem (Opcional)</label>
-            <input
-              type="text"
-              name="message"
-              id="message"
-              class="form-input"
-              v-model="pixModel.message"
-            />
-          </div>
-          <button type="button" class="button" @click="submit">
-            Gerar QR code
-          </button>
-        </div>
-      </form>
+  <div class="content">
+    <h2 class="text-center font-bold text-emerald-50 text-2xl">
+        Utilize o QR Code ou copie o código
+    </h2>
+    <h2 class="text-center font-bold text-emerald-50 text-2xl">
+        para realizar o Pix
+    </h2>
+    <h4 class="text-center">
+      Após realizar o Pix no banco de sua preferência, insira o código de
+    </h4>
+    <h4 class="text-center">
+      autenticação para enviar a transação para a rede.
+    </h4>
+    <div class="white-box-content">
+      <div class="black-box-content"></div>
+      <span class="text-center">
+        Código pix
+      </span>
+      <span2 class="text-center">
+        c02942far7047f6shri5ifh371908973
+      </span2>
+      <span3 class="text-center">
+        <strong>ATENÇÃO!</strong> A transação só será processada após inserir o código de autenticação. Caso contrário não conseguiremos comprovar o seu depósito e não será possível transferir os tokens para sua carteira. Confira aqui como encontrar o código no comprovante.
+      </span3>
     </div>
-  </div>
-  <div
-    v-if="toggleModal"
-    class="fixed overflow-x-hidden overflow-y-auto inset-0 flex justify-center items-center z-50"
-  >
-    <div class="relative mx-auto w-auto max-w-2xl">
-      <div
-        class="bg-white w-[500px] p-2 rounded shadow-2xl flex flex-col justify-center items-center gap-2"
-      >
-        <img v-if="qrCode != ''" :src="qrCode" alt="QR code image" />
-        <div>
-          <span class="text-black font-semibold mr-1">Chave pix:</span>
-          <span class="text-gray-700">{{ pixModel.pixKey }}</span>
-        </div>
-        <div v-if="pixModel.name.trim() != ''">
-          <span class="text-black font-semibold mr-1"
-            >Nome do Beneficiário:</span
-          >
-          <span class="text-gray-700">{{ pixModel.name }}</span>
-        </div>
-        <div v-if="pixModel.value != 0">
-          <span class="text-black font-semibold mr-1"
-            >Valor da transferência:</span
-          >
-          <span class="text-gray-700">{{ pixModel.value }}</span>
-        </div>
-        <div class="flex flex-col w-auto break-all justify-center items-center">
-          <span class="text-black font-semibold mb-2">Código QR Code:</span>
-          <span class="text-gray-700">{{ qrCodePayload }}</span>
-        </div>
-        <button type="button" class="button" @click="toggleModal = false">
-          Fechar
-        </button>
-      </div>
+    <div class="white-box-content2">
+      <input type="text" placeholder="Digite o código do comprovante PIX">
     </div>
+    <button type="button">Enviar para a rede</button>
   </div>
-  <div v-if="toggleModal" class="fixed z-40 inset-0 opacity-25 bg-black"></div>
 </template>
 
 <style scoped>
@@ -194,6 +93,85 @@ const submit = () => {
 
 .col-div {
   @apply flex flex-col;
+}
+
+span {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 0.3cm;
+}
+
+span3 {
+  font-size: 11px;
+  margin-top: 0.6cm;
+  text-align: justify;
+  text-align-last: justify;
+}
+.content {
+  margin-top: 2cm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.black-box-content {
+  background-color: #0e0d0d;
+  width: 200px;
+  height: 200px;
+}
+
+.white-box-content {
+  background-color: #f9f8f8;
+  width: 400px;
+  height: 410px;
+  margin-top: 1cm;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 1cm;
+}
+
+.white-box-content2 {
+  background-color: #f9f8f8;
+  width: 400px;
+  height: 60px;
+  margin-top: 0.2cm;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 0.4cm;
+}
+
+button {
+  background-color: #FBBF24;
+  width: 400px;
+  height: 60px;
+  margin-top: 0.2cm;
+  border-radius: 8px;
+}
+
+input {
+  background-color: #f9f8f8;
+  padding:3px;
+  width: 350px;
+  align-items: center;
+  margin-bottom: 3cm;
+}
+
+::placeholder { /* Most modern browsers support this now. */
+   color:    #9CA3AF;
+}
+
+h4 {
+  color: #080808;
+  font-size: 14px;
+}
+
+h2 {
+  color: #080808
 }
 
 .form-input {

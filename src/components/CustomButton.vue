@@ -1,16 +1,22 @@
 <script setup lang="ts">
 const props = defineProps({
   text: String,
-  isDisabled: Boolean
-})
+  isDisabled: Boolean,
+});
 
-const emit = defineEmits(['clicked'])
+const emit = defineEmits(["clicked"]);
 </script>
 
 <template>
-    <button type="button" class="button" @click="emit('clicked')" v-bind:class="{'opacity-70': isDisabled}" :disabled="isDisabled">
-        {{ text }}
-    </button>
+  <button
+    type="button"
+    class="button"
+    @click="emit('clicked')"
+    v-bind:class="{ 'opacity-70': isDisabled }"
+    :disabled="isDisabled"
+  >
+    {{ text }}
+  </button>
 </template>
 
 <style scoped>

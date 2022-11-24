@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import CustomButton from "../components/CustomButton.vue";
 const searchClick = () => {
-  console.log("oferta selecionada");
+  console.log(value);
 };
+
+const value = ref<Number>()
 </script>
 
 <template>
@@ -20,27 +23,29 @@ const searchClick = () => {
       class="flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-1/3 mt-10"
     >
       <div
-        class="flex justify-between w-full bg-white px-10 py-5 rounded-lg border-y-10 relative"
+        class="flex justify-between w-full bg-white px-10 py-5 rounded-lg border-y-10 relative gap-1"
       >
+        <p class="text-xl font-normal text-gray-900 mr-1" v-if="value != undefined && value.toString() != ''">R$</p>
         <input
           type="number"
-          class="border-none outline-none text-lg"
+          class="border-none outline-none text-lg text-gray-900 w-full"
+          v-bind:class="{ 'font-semibold': value != undefined, 'text-xl': value != undefined}"
           placeholder="Digite o valor que deseja pagar"
+          v-model="value"
         />
-        <p class="text-lg font-bold">R$</p>
+        <p class="text-xl font-normal text-gray-900" v-if="value == undefined || value.toString() == ''">R$</p>
       </div>
-
       <div
         class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
       >
         <div
-          class="bg-emerald-400 px-4 py-3 rounded-lg absolute bottom-position"
+          class="bg-emerald-400 px-3 py-2.5 rounded-lg absolute bottom-position w-8 h-8"
         >
-          <img alt="Ethereum image" src="@/assets/arrow.svg" />
+          <img alt="Ethereum image" src="@/assets/arrow.svg"/>
         </div>
 
         <div class="flex justify-between w-full items-center">
-          <p class="text-3xl">0</p>
+          <p class="text-3xl text-gray-900">0</p>
           <div class="flex flex-row p-2 px-3 bg-gray-300 rounded-full">
             <img alt="Ethereum image" class="mr-3" src="@/assets/brz.svg" />
             <p class="text-gray-900 text-lg">BRZ</p>
@@ -48,11 +53,17 @@ const searchClick = () => {
         </div>
 
         <div class="custom-divide py-2"></div>
-        <p class="text-gray-500 text-lg pt-2">~ ETH 0,00 (+0,121%)</p>
+        <div class="flex justify-between pt-2">
+          <p class="text-gray-500 font-normal text-sm  w-fit">~ ETH 0,00 (+0,121%)</p>
+          <div class="flex gap-2">
+            <img alt="Polygon image" src="@/assets/polygon.svg" width="24px" height="24px"/>
+            <img alt="Ethereum image" src="@/assets/ethereum.svg" width="24px" height="24px"/>
+          </div>
+        </div>
       </div>
       <CustomButton
         :text="'Selecionar Oferta'"
-        :is-disabled="true"
+        :is-disabled="false"
         @clicked="searchClick()"
       />
     </div>
@@ -80,5 +91,14 @@ const searchClick = () => {
 
 .text {
   @apply text-gray-800 text-center;
+}
+
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
 }
 </style>

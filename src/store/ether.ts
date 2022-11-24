@@ -4,6 +4,7 @@ export const useEtherStore = defineStore("ether", {
   state: () => ({
     walletAddress: "",
     balance: "",
+    depositList: {},
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -11,6 +12,9 @@ export const useEtherStore = defineStore("ether", {
     },
     setBalance(balance: string) {
       this.balance = balance;
+    },
+    setDepositList(depositList: {}) {
+      this.depositList = depositList;
     },
   },
 });

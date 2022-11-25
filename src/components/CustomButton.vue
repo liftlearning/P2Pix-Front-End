@@ -4,18 +4,18 @@ const props = defineProps({
   isDisabled: Boolean,
 });
 
-const emit = defineEmits(["clicked"]);
+const emit = defineEmits(["buttonClicked"]);
 </script>
 
 <template>
   <button
     type="button"
     class="button"
-    @click="emit('clicked')"
-    v-bind:class="{ 'opacity-70': isDisabled }"
-    :disabled="isDisabled"
+    @click="emit('buttonClicked')"
+    v-bind:class="{ 'opacity-70': props.isDisabled }"
+    :disabled="props.isDisabled ? props.isDisabled : false"
   >
-    {{ text }}
+    {{ props.text }}
   </button>
 </template>
 

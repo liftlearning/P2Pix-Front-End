@@ -1,5 +1,5 @@
 import { useEtherStore } from "@/store/ether";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 // smart contract imports
 import mockToken from "./smart_contract_files/MockToken.json";
@@ -55,13 +55,9 @@ const connectProvider = async () => {
 
 const splitTokens = async () => {
   const etherStore = useEtherStore();
-  const window_ = window as any;
-  const connection = window_.ethereum;
-  let provider: ethers.providers.Web3Provider | null = null;
+  const provider = getProvider();
+  if (!provider) return;
 
-  if (!connection) return;
-
-  provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
 
@@ -73,27 +69,23 @@ const splitTokens = async () => {
   
 };
 
-const mockDeposit = async () => {
+const mockDeposit = async (tokenQty = "1000.0", pixKey = "00011122233") => {
   const etherStore = useEtherStore();
-  const window_ = window as any;
-  const connection = window_.ethereum;
-  let provider: ethers.providers.Web3Provider | null = null;
+  const provider = getProvider();
+  if (!provider) return;
 
-  if (!connection) return;
-
-  provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
 
   const tokenContract = new ethers.Contract(addresses.token, mockToken.abi, signer);
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   // first get the approval
-  const apprv = await tokenContract.approve(addresses.p2pix, ethers.utils.parseEther("1000.0"));
+  const apprv = await tokenContract.approve(addresses.p2pix, ethers.utils.parseEther(tokenQty));
   await apprv.wait();
 
+
   // deposit
-  const mockPixKey = "00011122233";
-  const deposit = await p2pContract.deposit(addresses.token, ethers.utils.parseEther("1000.0"), mockPixKey);
+  const deposit = await p2pContract.deposit(addresses.token, ethers.utils.parseEther(tokenQty), pixKey);
   await deposit.wait();
 
   updateWalletStatus(etherStore.walletAddress);
@@ -109,19 +101,27 @@ const mockDeposit = async () => {
 
 
 const countDeposit = async () => {
-  const window_ = window as any;
-  const connection = window_.ethereum;
-  let provider: ethers.providers.Web3Provider | null = null;
+  const provider = getProvider();
+  if (!provider) return;
 
-  if (!connection) return;
-
-  provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   const count = await contract.depositCount();
 
   console.log(Number(count))
+};
+
+const mapDeposits = async (depositId: BigNumber) => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const deposit = await contract.mapDeposits(depositId);
+
+  console.log(deposit)
 };
 
 const formatEther = (balance: string) => {
@@ -138,4 +138,4 @@ const getProvider = (): ethers.providers.Web3Provider | null => {
   return new ethers.providers.Web3Provider(connection);
 };
 
-export default { connectProvider, formatEther, splitTokens, mockDeposit, countDeposit };
+export default { connectProvider, formatEther, splitTokens, mockDeposit, countDeposit, mapDeposits };

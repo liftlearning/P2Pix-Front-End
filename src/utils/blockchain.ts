@@ -45,7 +45,6 @@ const connectProvider = async () => {
   const events = await p2pContract.queryFilter(filter);
 
   console.log(events)
-
   etherStore.setDepositList(events);
 
   connection.on("accountsChanged", (accounts: string[]) => {
@@ -129,6 +128,11 @@ const formatEther = (balance: string) => {
   return formatted;
 };
 
+const verifyDepositAmmount = (ammountBigNumber: BigNumber) => {
+  return ethers.utils.formatEther(ammountBigNumber)
+}
+
+
 const getProvider = (): ethers.providers.Web3Provider | null => {
   const window_ = window as any;
   const connection = window_.ethereum;
@@ -138,4 +142,4 @@ const getProvider = (): ethers.providers.Web3Provider | null => {
   return new ethers.providers.Web3Provider(connection);
 };
 
-export default { connectProvider, formatEther, splitTokens, mockDeposit, countDeposit, mapDeposits };
+export default { connectProvider, formatEther, splitTokens, mockDeposit, countDeposit, mapDeposits, verifyDepositAmmount };

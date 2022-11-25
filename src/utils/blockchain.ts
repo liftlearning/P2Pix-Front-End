@@ -128,7 +128,7 @@ const formatEther = (balance: string) => {
   return formatted;
 };
 
-const verifyDepositAmmount = (ammountBigNumber: BigNumber) => {
+const verifyDepositAmmount = (ammountBigNumber: BigNumber): string => {
   return ethers.utils.formatEther(ammountBigNumber)
 }
 

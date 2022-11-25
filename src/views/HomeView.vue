@@ -16,6 +16,11 @@ const searchClick = () => {
   console.log("pass the deposit and token value ammount to next screen")
 };
 
+const valueToToken = ref<Number>(0);
+const enableSelectButton = ref(false);
+const hasLiquidity = ref(true);
+const selectedDeposit = ref();
+
 const valueConversion = (event: any) => {
   const { value } = event.target
 
@@ -27,17 +32,18 @@ const valueConversion = (event: any) => {
   depositList.value.forEach((deposit) => {
     const p2pixTokenValue = blockchain.verifyDepositAmmount(deposit.args.amount);
 
-    if(valueToToken.value!! <= Number(p2pixTokenValue)){
+    if(valueToToken.value!! <= Number(p2pixTokenValue) && valueToToken.value!! != 0){
       enableSelectButton.value = true;
-      selectedDeposit.value = deposit
+      hasLiquidity.value = true;
+      selectedDeposit.value = deposit;
       return;
     }
   })
-}
 
-const valueToToken = ref<Number>(0);
-const enableSelectButton = ref(false);
-const selectedDeposit = ref();
+  if(!enableSelectButton.value){
+    hasLiquidity.value = false
+  }
+}
 </script>
 
 <template>
@@ -64,6 +70,7 @@ const selectedDeposit = ref();
           v-bind:class="{ 'font-semibold': valueToToken != undefined, 'text-xl': valueToToken != undefined}"
           placeholder="Digite o valor que deseja pagar"
           @input="debounce(valueConversion, 500)($event)"
+          step=".01"
         />
         <p class="text-xl font-normal text-gray-900" v-if="valueToToken == undefined || valueToToken == 0">R$</p>
       </div>
@@ -85,12 +92,15 @@ const selectedDeposit = ref();
         </div>
 
         <div class="custom-divide py-2"></div>
-        <div class="flex justify-between pt-2">
+        <div class="flex justify-between pt-2" v-if="hasLiquidity">
           <p class="text-gray-500 font-normal text-sm  w-fit">~ ETH 0,00 (+0,121%)</p>
           <div class="flex gap-2">
             <img alt="Polygon image" src="@/assets/polygon.svg" width="24px" height="24px"/>
             <img alt="Ethereum image" src="@/assets/ethereum.svg" width="24px" height="24px"/>
           </div>
+        </div>
+        <div class="flex pt-2 justify-center" v-if="!hasLiquidity">
+          <span class="text-red-500 font-normal text-sm">Atualmente não há liquidez nas redes para sua demanda</span>
         </div>
       </div>
       <CustomButton

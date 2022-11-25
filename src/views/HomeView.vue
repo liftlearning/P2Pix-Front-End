@@ -1,11 +1,43 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import CustomButton from "../components/CustomButton.vue";
+import { debounce } from "@/utils/debounce";
+import { ethers } from "ethers";
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import blockchain from "../utils/blockchain";
+
+const TAX_CONVERSION = 1.005
+const etherStore = useEtherStore();
+
+const { depositList } = storeToRefs(etherStore);
+
 const searchClick = () => {
-  console.log(value);
+  console.log("pass the deposit and token value ammount to next screen")
 };
 
-const value = ref<Number>()
+const valueConversion = (event: any) => {
+  const { value } = event.target
+
+  valueToToken.value =  Number(value) / TAX_CONVERSION
+
+  enableSelectButton.value = false;
+  selectedDeposit.value = null;
+
+  depositList.value.forEach((deposit) => {
+    const p2pixTokenValue = blockchain.verifyDepositAmmount(deposit.args.amount);
+
+    if(valueToToken.value!! <= Number(p2pixTokenValue)){
+      enableSelectButton.value = true;
+      selectedDeposit.value = deposit
+      return;
+    }
+  })
+}
+
+const valueToToken = ref<Number>(0);
+const enableSelectButton = ref(false);
+const selectedDeposit = ref();
 </script>
 
 <template>
@@ -23,17 +55,17 @@ const value = ref<Number>()
       class="flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-1/3 mt-10"
     >
       <div
-        class="flex justify-between w-full bg-white px-10 py-5 rounded-lg border-y-10 relative gap-1"
+        class="flex justify-between w-full bg-white px-8 py-5 rounded-lg border-y-10 relative gap-2"
       >
-        <p class="text-xl font-normal text-gray-900 mr-1" v-if="value != undefined && value.toString() != ''">R$</p>
+        <p class="text-xl font-normal text-gray-900" v-if="valueToToken != undefined && valueToToken != 0">R$</p>
         <input
           type="number"
           class="border-none outline-none text-lg text-gray-900 w-full"
-          v-bind:class="{ 'font-semibold': value != undefined, 'text-xl': value != undefined}"
+          v-bind:class="{ 'font-semibold': valueToToken != undefined, 'text-xl': valueToToken != undefined}"
           placeholder="Digite o valor que deseja pagar"
-          v-model="value"
+          @input="debounce(valueConversion, 500)($event)"
         />
-        <p class="text-xl font-normal text-gray-900" v-if="value == undefined || value.toString() == ''">R$</p>
+        <p class="text-xl font-normal text-gray-900" v-if="valueToToken == undefined || valueToToken == 0">R$</p>
       </div>
       <div
         class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
@@ -45,7 +77,7 @@ const value = ref<Number>()
         </div>
 
         <div class="flex justify-between w-full items-center">
-          <p class="text-3xl text-gray-900">0</p>
+          <p class="text-3xl text-gray-900">{{valueToToken.toFixed(3)}}</p>
           <div class="flex flex-row p-2 px-3 bg-gray-300 rounded-full">
             <img alt="Ethereum image" class="mr-3" src="@/assets/brz.svg" />
             <p class="text-gray-900 text-lg">BRZ</p>
@@ -63,7 +95,7 @@ const value = ref<Number>()
       </div>
       <CustomButton
         :text="'Selecionar Oferta'"
-        :is-disabled="false"
+        :is-disabled="!enableSelectButton"
         @clicked="searchClick()"
       />
     </div>

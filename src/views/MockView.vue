@@ -7,7 +7,7 @@ import blockchain from "../utils/blockchain";
 
 const etherStore = useEtherStore();
 
-const { walletAddress, balance, depositList } = storeToRefs(etherStore);
+const { depositList } = storeToRefs(etherStore);
 
 const depositValue = ref<Number>();
 const depositPixKey = ref<string>("");
@@ -17,7 +17,7 @@ const splitTokens = () => {
 };
 
 const mockDeposit = () => {
-  if(!depositValue.value || !depositPixKey.value) return;
+  if (!depositValue.value || !depositPixKey.value) return;
   blockchain.mockDeposit(depositValue.value.toString(), depositPixKey.value);
 };
 
@@ -25,38 +25,15 @@ const countDeposit = () => {
   blockchain.countDeposit();
 };
 
-const formatWalletAddress = (): string => {
-  const walletAddressLength = walletAddress.value.length;
-  const initialText = walletAddress.value.substring(0, 5);
-  const finalText = walletAddress.value.substring(
-    walletAddressLength - 5,
-    walletAddressLength - 1
-  );
-  return `${initialText} ... ${finalText}`;
-};
-
 const mapDeposit = (depositId: BigNumber) => {
-  blockchain.mapDeposits(depositId)
-}
-
-const formatWalletBalance = (): string => {
-  const formattedBalance = blockchain.formatEther(balance.value);
-  const fixed = formattedBalance.substring(0, 8);
-
-  return fixed;
+  blockchain.mapDeposits(depositId);
 };
 </script>
 
 <template>
-  
   <div class="page">
-
     <div class="flex flex-col gap-4 justify-start items-start w-2/3">
-      <button 
-        type="button" 
-        class="default-button"
-        @click="countDeposit()"
-      >
+      <button type="button" class="default-button" @click="countDeposit()">
         Contar depósitos
       </button>
 
@@ -74,27 +51,27 @@ const formatWalletBalance = (): string => {
           placeholder="Chave pix"
           v-model="depositPixKey"
         />
-        
-        <button 
-          type="button" 
-          class="default-button"
-          @click="mockDeposit()"
-        >
+
+        <button type="button" class="default-button" @click="mockDeposit()">
           Mockar depósitos
         </button>
       </div>
 
-      <button 
-        type="button" 
-        class="default-button"
-        @click="splitTokens()"
-      >
+      <button type="button" class="default-button" @click="splitTokens()">
         Dividir tokens
       </button>
     </div>
 
     <ul class="flex flex-col justify-center items-center gap-4">
-      <li class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"  v-for="deposit in depositList" :key="deposit['blockNumber']" @click="mapDeposit(deposit['args']['depositID'])">{{deposit['args']['0']}} : MRBZ {{blockchain.formatEther(deposit['args']['amount'])}} </li>
+      <li
+        class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
+        v-for="deposit in depositList"
+        :key="deposit['blockNumber']"
+        @click="mapDeposit(deposit['args']['depositID'])"
+      >
+        {{ deposit["args"]["0"] }} : MRBZ
+        {{ blockchain.formatEther(deposit["args"]["amount"]) }}
+      </li>
     </ul>
   </div>
 </template>
@@ -104,22 +81,21 @@ header {
   @apply flex flex-row justify-between w-full items-center;
 }
 
-.default-button{
-  @apply p-2 rounded border-2 border-amber-400 text-gray-50 font-extrabold text-base w-full
+.default-button {
+  @apply p-2 rounded border-2 border-amber-400 text-gray-50 font-extrabold text-base w-full;
 }
 
-.default-input{
-  @apply border-none outline-none text-lg text-gray-900 w-64 p-2 rounded-lg
+.default-input {
+  @apply border-none outline-none text-lg text-gray-900 w-64 p-2 rounded-lg;
 }
 
-.page{
-  @apply flex gap-8 mt-24
+.page {
+  @apply flex gap-8 mt-24;
 }
 
 @media (max-width: 1024px) {
   .page {
-    @apply flex-wrap
+    @apply flex-wrap;
   }
 }
-
 </style>

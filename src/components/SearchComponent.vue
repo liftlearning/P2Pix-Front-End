@@ -17,8 +17,8 @@ const selectedDeposit = ref();
 
 const connectAccount = async () => {
   await blockchain.connectProvider();
-  verifyLiquidity()
-}
+  verifyLiquidity();
+};
 
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
@@ -31,7 +31,7 @@ const verifyLiquidity = () => {
   enableSelectButton.value = false;
   selectedDeposit.value = null;
 
-  if (!walletAddress.value) return;
+  if (!walletAddress.value || tokenValue.value == 0) return;
 
   depositList.value.forEach((deposit) => {
     const p2pixTokenValue = blockchain.verifyDepositAmmount(
@@ -68,9 +68,7 @@ const emit = defineEmits(["tokenBuy"]);
         tokens após realizar o Pix</span
       >
     </div>
-    <div
-      class="blur-container"
-    >
+    <div class="blur-container">
       <div
         class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
       >
@@ -86,7 +84,9 @@ const emit = defineEmits(["tokenBuy"]);
             placeholder="0  "
             step=".01"
           />
-          <div class="flex flex-row p-2 px-3 bg-gray-300 rounded-3xl min-w-fit gap-1">
+          <div
+            class="flex flex-row p-2 px-3 bg-gray-300 rounded-3xl min-w-fit gap-1"
+          >
             <img alt="Token image" class="w-fit" src="@/assets/brz.svg" />
             <span class="text-gray-900 text-lg w-fit" id="brz">BRZ</span>
           </div>
@@ -127,7 +127,7 @@ const emit = defineEmits(["tokenBuy"]);
         v-if="walletAddress"
         :text="'Confirmar compra'"
         :is-disabled="!enableSelectButton"
-        @buttonClicked="emit('tokenBuy')"
+        @buttonClicked="emit('tokenBuy', { selectedDeposit, tokenValue })"
       />
     </div>
   </div>
@@ -157,7 +157,7 @@ const emit = defineEmits(["tokenBuy"]);
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
 }
 
 input[type="number"] {

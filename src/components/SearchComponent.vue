@@ -13,6 +13,7 @@ const { walletAddress, depositList } = storeToRefs(etherStore);
 const tokenValue = ref(0);
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
+const validDecimals = ref(true)
 const selectedDeposit = ref();
 
 const connectAccount = async () => {
@@ -24,8 +25,24 @@ const handleInputEvent = (event: any) => {
   const { value } = event.target;
 
   tokenValue.value = Number(value);
+
+  if (decimalCount(tokenValue.value) > 2){
+    validDecimals.value = false;
+    enableSelectButton.value = false;
+    return;
+  }
+  validDecimals.value = true;
+
   verifyLiquidity();
 };
+
+const decimalCount = (num: Number) => {
+   const numStr = String(num);
+   if (numStr.includes('.')) {
+      return numStr.split('.')[1].length;
+   };
+   return 0;
+}
 
 const verifyLiquidity = () => {
   enableSelectButton.value = false;
@@ -112,7 +129,12 @@ const emit = defineEmits(["tokenBuy"]);
             />
           </div>
         </div>
-        <div class="flex pt-2 justify-center" v-if="!hasLiquidity">
+        <div class="flex pt-2 justify-center" v-if="!validDecimals">
+          <span class="text-red-500 font-normal text-sm"
+            >Por favor utilize no máximo 2 casas decimais</span
+          >
+        </div>
+        <div class="flex pt-2 justify-center" v-else-if="!hasLiquidity">
           <span class="text-red-500 font-normal text-sm"
             >Atualmente não há liquidez nas redes para sua demanda</span
           >

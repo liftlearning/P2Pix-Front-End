@@ -15,6 +15,11 @@ const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
 const selectedDeposit = ref();
 
+const connectAccount = async () => {
+  await blockchain.connectProvider();
+  verifyLiquidity()
+}
+
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
 
@@ -64,7 +69,7 @@ const emit = defineEmits(["tokenBuy"]);
       >
     </div>
     <div
-      class="flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-1/3 mt-10"
+      class="blur-container"
     >
       <div
         class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
@@ -72,17 +77,18 @@ const emit = defineEmits(["tokenBuy"]);
         <div class="flex justify-between w-full items-center">
           <input
             type="number"
-            class="border-none outline-none text-lg text-gray-900 w-auto"
+            class="border-none outline-none text-lg text-gray-900 w-fit"
             v-bind:class="{
               'font-semibold': tokenValue != undefined,
               'text-xl': tokenValue != undefined,
             }"
             @input="debounce(handleInputEvent, 500)($event)"
+            placeholder="0  "
             step=".01"
           />
-          <div class="flex flex-row p-2 px-3 bg-gray-300 rounded-full w-fit">
-            <img alt="Ethereum image" class="mr-3" src="@/assets/brz.svg" />
-            <p class="text-gray-900 text-lg">BRZ</p>
+          <div class="flex flex-row p-2 px-3 bg-gray-300 rounded-3xl min-w-fit gap-1">
+            <img alt="Token image" class="w-fit" src="@/assets/brz.svg" />
+            <span class="text-gray-900 text-lg w-fit" id="brz">BRZ</span>
           </div>
         </div>
 
@@ -115,7 +121,7 @@ const emit = defineEmits(["tokenBuy"]);
       <CustomButton
         v-if="!walletAddress"
         :text="'Conectar carteira'"
-        @buttonClicked="blockchain.connectProvider()"
+        @buttonClicked="connectAccount()"
       />
       <CustomButton
         v-if="walletAddress"
@@ -148,6 +154,10 @@ const emit = defineEmits(["tokenBuy"]);
 
 .text {
   @apply text-gray-800 text-center;
+}
+
+.blur-container {
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10
 }
 
 input[type="number"] {

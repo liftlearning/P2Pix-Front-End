@@ -69,8 +69,8 @@ const mapDeposit = (depositId: BigNumber) => {
         :key="deposit['blockNumber']"
         @click="mapDeposit(deposit['args']['depositID'])"
       >
-        {{ deposit["args"]["0"] }} : MRBZ
-        {{ blockchain.formatEther(deposit["args"]["amount"]) }}
+        Address:<br>{{ deposit["args"]["0"] }}<br>
+        MRBZ: {{ blockchain.formatEther(deposit["args"]["amount"]) }}
       </li>
     </ul>
   </div>

@@ -13,7 +13,7 @@ const { walletAddress, depositList } = storeToRefs(etherStore);
 const tokenValue = ref(0);
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
-const validDecimals = ref(true)
+const validDecimals = ref(true);
 const selectedDeposit = ref();
 
 const connectAccount = async () => {
@@ -26,7 +26,7 @@ const handleInputEvent = (event: any) => {
 
   tokenValue.value = Number(value);
 
-  if (decimalCount(tokenValue.value) > 2){
+  if (decimalCount(tokenValue.value) > 2) {
     validDecimals.value = false;
     enableSelectButton.value = false;
     return;
@@ -37,12 +37,12 @@ const handleInputEvent = (event: any) => {
 };
 
 const decimalCount = (num: Number) => {
-   const numStr = String(num);
-   if (numStr.includes('.')) {
-      return numStr.split('.')[1].length;
-   };
-   return 0;
-}
+  const numStr = String(num);
+  if (numStr.includes(".")) {
+    return numStr.split(".")[1].length;
+  }
+  return 0;
+};
 
 const verifyLiquidity = () => {
   enableSelectButton.value = false;

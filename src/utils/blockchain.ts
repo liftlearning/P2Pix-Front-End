@@ -131,6 +131,7 @@ const mapDeposits = async (depositId: BigNumber) => {
   const deposit = await contract.mapDeposits(depositId);
 
   console.log(deposit);
+  return deposit;
 };
 
 const formatEther = (balance: string) => {

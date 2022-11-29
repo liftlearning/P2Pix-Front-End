@@ -15,8 +15,8 @@ const formatWalletAddress = (): string => {
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
   const finalText = walletAddress.value.substring(
-    walletAddressLength - 5,
-    walletAddressLength - 1
+    walletAddressLength - 4,
+    walletAddressLength
   );
   return `${initialText}...${finalText}`;
 };

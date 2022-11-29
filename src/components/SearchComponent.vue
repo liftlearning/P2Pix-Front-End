@@ -50,20 +50,22 @@ const verifyLiquidity = () => {
 
   if (!walletAddress.value || tokenValue.value == 0) return;
 
-  depositList.value.forEach((deposit) => {
+  const found = depositList.value.find((element) => {
     const p2pixTokenValue = blockchain.verifyDepositAmmount(
-      deposit.args.amount
+      element.args.amount
     );
-
     if (
       tokenValue.value!! <= Number(p2pixTokenValue) &&
-      tokenValue.value!! != 0
+      tokenValue.value!! != 0 &&
+      element.args.seller !== walletAddress.value
     ) {
       enableSelectButton.value = true;
       hasLiquidity.value = true;
-      selectedDeposit.value = deposit;
-      return;
+      selectedDeposit.value = element;
+      console.log("Selected is :", blockchain.verifyDepositAmmount(element.args.amount))
+      return true;
     }
+    return false;
   });
 
   if (!enableSelectButton.value) {
@@ -72,6 +74,19 @@ const verifyLiquidity = () => {
 };
 
 const emit = defineEmits(["tokenBuy"]);
+
+const confirmPurchase = async () => {
+  
+  const buyInfo = {
+    "buyer":"",
+    "seller":"",
+    "amount":"",
+    "depositID":"",
+    "pixKey":""
+  }
+  
+};
+
 </script>
 
 <template>

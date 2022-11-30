@@ -1,7 +1,7 @@
 import qrcode from "qrcode";
 import type { QRCodeToDataURLOptions } from "qrcode";
 import { crc16ccitt } from "crc";
-import { type Pix } from "@/model/Pix";
+import type { Pix } from "@/model/Pix";
 
 const pix = ({
   pixKey,

@@ -1,28 +1,30 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
-import ethers from "../utils/ethers";
+import blockchain from "../utils/blockchain";
 
+// Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
 
+//Methods
 const connectMetaMask = () => {
-  ethers.connectProvider();
+  blockchain.connectProvider();
 };
 
 const formatWalletAddress = (): string => {
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
   const finalText = walletAddress.value.substring(
-    walletAddressLength - 5,
-    walletAddressLength - 1
+    walletAddressLength - 4,
+    walletAddressLength
   );
   return `${initialText}...${finalText}`;
 };
 
 const formatWalletBalance = (): string => {
-  const formattedBalance = ethers.formatEther(balance.value);
+  const formattedBalance = blockchain.formatEther(balance.value);
   const fixed = formattedBalance.substring(0, 8);
 
   return fixed;
@@ -37,6 +39,7 @@ const formatWalletBalance = (): string => {
       src="@/assets/logo.svg"
       width="75"
       height="75"
+      @load="connectMetaMask()"
     />
     <div class="flex gap-4 items-center">
       <button type="button" class="default-button">Quero vender</button>

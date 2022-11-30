@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
+import ValidationComponent from "../components/ValidationComponent.vue";
 import blockchain from "../utils/blockchain";
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
@@ -15,7 +16,8 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 </script>
 
 <template>
-  <SearchComponent @token-buy="confirmBuyClick" />
+  <!-- <SearchComponent @token-buy="confirmBuyClick" /> -->
+  <ValidationComponent />
 </template>
 
 <style scoped></style>

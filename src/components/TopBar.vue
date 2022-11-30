@@ -3,10 +3,12 @@ import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import blockchain from "../utils/blockchain";
 
+// Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
 
+//Methods
 const connectMetaMask = () => {
   blockchain.connectProvider();
 };

@@ -6,16 +6,22 @@ import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
 
+// Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, depositList } = storeToRefs(etherStore);
 
+// Reactive state
 const tokenValue = ref(0);
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
 const validDecimals = ref(true);
 const selectedDeposit = ref();
 
+// Emits
+const emit = defineEmits(["tokenBuy"]);
+
+// Methods
 const connectAccount = async () => {
   await blockchain.connectProvider();
   verifyLiquidity();
@@ -72,9 +78,6 @@ const verifyLiquidity = () => {
     hasLiquidity.value = false;
   }
 };
-
-const emit = defineEmits(["tokenBuy"]);
-
 </script>
 
 <template>

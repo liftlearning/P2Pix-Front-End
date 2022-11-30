@@ -75,18 +75,6 @@ const verifyLiquidity = () => {
 
 const emit = defineEmits(["tokenBuy"]);
 
-const confirmPurchase = async () => {
-  
-  const buyInfo = {
-    "buyer":"",
-    "seller":"",
-    "amount":"",
-    "depositID":"",
-    "pixKey":""
-  }
-  
-};
-
 </script>
 
 <template>

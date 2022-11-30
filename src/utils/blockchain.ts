@@ -5,6 +5,7 @@ import { BigNumber, ethers } from "ethers";
 import mockToken from "./smart_contract_files/MockToken.json";
 import p2pix from "./smart_contract_files/P2PIX.json";
 import addresses from "./smart_contract_files/localhost.json";
+import p2pEventsAndErrors from "./smart_contract_files/EventAndErrors.json"
 
 import { wallets } from "./smart_contract_files/wallets.json";
 
@@ -19,7 +20,7 @@ const updateWalletStatus = async (walletAddress: string) => {
   const balance = await contract.balanceOf(walletAddress);
 
   etherStore.setBalance(String(balance));
-  etherStore.setWalletAddress(walletAddress);
+  etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress));
 };
 
 const connectProvider = async () => {
@@ -36,10 +37,10 @@ const connectProvider = async () => {
   const walletAddress = await provider.send("eth_requestAccounts", []);
   const balance = await contract.balanceOf(walletAddress[0]);
 
-  etherStore.setWalletAddress(walletAddress[0]);
+  etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
   etherStore.setBalance(String(balance));
 
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pEventsAndErrors.abi, signer);
 
   const filter = p2pContract.filters.DepositAdded(null);
   const events = await p2pContract.queryFilter(filter);
@@ -101,8 +102,10 @@ const mockDeposit = async (tokenQty = "1000.0", pixKey = "00011122233") => {
 
   updateWalletStatus(etherStore.walletAddress);
 
-  const filter = p2pContract.filters.DepositAdded(null);
-  const events = await p2pContract.queryFilter(filter);
+  const p2pEvents = new ethers.Contract(addresses.p2pix, p2pEventsAndErrors.abi, signer);
+
+  const filter = p2pEvents.filters.DepositAdded(null);
+  const events = await p2pEvents.queryFilter(filter);
 
   console.log(events);
 

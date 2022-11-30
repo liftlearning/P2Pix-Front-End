@@ -6,16 +6,22 @@ import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
 
+// Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, depositList } = storeToRefs(etherStore);
 
+// Reactive state
 const tokenValue = ref(0);
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
 const validDecimals = ref(true);
 const selectedDeposit = ref();
 
+// Emits
+const emit = defineEmits(["tokenBuy"]);
+
+// Methods
 const connectAccount = async () => {
   await blockchain.connectProvider();
   verifyLiquidity();
@@ -50,28 +56,28 @@ const verifyLiquidity = () => {
 
   if (!walletAddress.value || tokenValue.value == 0) return;
 
-  depositList.value.forEach((deposit) => {
+  const found = depositList.value.find((element) => {
     const p2pixTokenValue = blockchain.verifyDepositAmmount(
-      deposit.args.amount
+      element.args.amount
     );
-
     if (
       tokenValue.value!! <= Number(p2pixTokenValue) &&
-      tokenValue.value!! != 0
+      tokenValue.value!! != 0 &&
+      element.args.seller !== walletAddress.value
     ) {
       enableSelectButton.value = true;
       hasLiquidity.value = true;
-      selectedDeposit.value = deposit;
-      return;
+      selectedDeposit.value = element;
+      console.log("Selected is :", blockchain.verifyDepositAmmount(element.args.amount))
+      return true;
     }
+    return false;
   });
 
   if (!enableSelectButton.value) {
     hasLiquidity.value = false;
   }
 };
-
-const emit = defineEmits(["tokenBuy"]);
 </script>
 
 <template>

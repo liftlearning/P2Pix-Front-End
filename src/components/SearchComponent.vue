@@ -9,7 +9,7 @@ import blockchain from "../utils/blockchain";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, depositList } = storeToRefs(etherStore);
+const { walletAddress, depositsAddedList } = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
@@ -21,12 +21,13 @@ const selectedDeposit = ref();
 // Emits
 const emit = defineEmits(["tokenBuy"]);
 
-// Methods
+// Blockchain methods
 const connectAccount = async () => {
   await blockchain.connectProvider();
   verifyLiquidity();
 };
 
+// Debounce methods
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
 
@@ -42,6 +43,8 @@ const handleInputEvent = (event: any) => {
   verifyLiquidity();
 };
 
+// Enable button methods
+// Check if has more than 2 decimal places
 const decimalCount = (num: Number) => {
   const numStr = String(num);
   if (numStr.includes(".")) {
@@ -49,15 +52,15 @@ const decimalCount = (num: Number) => {
   }
   return 0;
 };
-
+// Verify if there is a valid deposit to buy
 const verifyLiquidity = () => {
   enableSelectButton.value = false;
   selectedDeposit.value = null;
 
-  if (!walletAddress.value || tokenValue.value == 0) return;
+  if (!walletAddress.value || tokenValue.value <= 0) return;
 
-  const found = depositList.value.find((element) => {
-    const p2pixTokenValue = blockchain.verifyDepositAmmount(
+  const found = depositsAddedList.value.find((element) => {
+    const p2pixTokenValue = blockchain.formatBigNumber(
       element.args.amount
     );
     if (
@@ -68,7 +71,7 @@ const verifyLiquidity = () => {
       enableSelectButton.value = true;
       hasLiquidity.value = true;
       selectedDeposit.value = element;
-      console.log("Selected is :", blockchain.verifyDepositAmmount(element.args.amount))
+      console.log("Selected is :", blockchain.formatBigNumber(element.args.amount))
       return true;
     }
     return false;
@@ -78,6 +81,7 @@ const verifyLiquidity = () => {
     hasLiquidity.value = false;
   }
 };
+
 </script>
 
 <template>

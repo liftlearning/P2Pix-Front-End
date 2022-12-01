@@ -2,6 +2,12 @@
 import SearchComponent from "../components/SearchComponent.vue";
 import blockchain from "../utils/blockchain";
 
+// (TO DO) Tirar isso tudo daqui
+import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import addresses from "../utils/smart_contract_files/localhost.json";
+import { useEtherStore } from "@/store/ether";
+import { ethers } from "ethers";
+
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
   console.log(selectedDeposit);
@@ -11,6 +17,31 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     .then((deposit) => (depositDetail = deposit));
   console.log(tokenValue);
   console.log(depositDetail);
+
+  // Makes lock with deposit ID and the Amount
+  if (depositDetail){
+    const lock = await blockchain.addLock(depositDetail.args.depositID, tokenValue);
+    console.log(lock);
+
+    // (TO DO) Tirar isso daqui
+    const window_ = window as any;
+    const connection = window_.ethereum;
+    let provider: ethers.providers.Web3Provider | null = null;
+    if (!connection) return;
+    provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+    const etherStore = useEtherStore();
+    const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+    const filterLocks = p2pContract.filters.LockAdded(null);
+    const eventsLocks = await p2pContract.queryFilter(filterLocks);
+    etherStore.setLocksAddedList(eventsLocks);
+
+    // Data to QRCode
+    // Chave Pix = depositDetail.pixTarget
+    // Valor = tokenValue
+
+  }
+  
 };
 </script>
 

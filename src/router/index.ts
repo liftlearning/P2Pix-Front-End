@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import QrCodeFormVue from "../views/QrCodeForm.vue";
 import MockView from "../views/MockView.vue";
-import ListView from "@/views/ListView.vue";
+import ListView from "../components/ListComponent.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -1,5 +1,25 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
+type Deposit = {
+  'id': string,
+  'ammount': string,
+  'date': string,
+  'etherscanLink': string
+}
+
+
+const lastDeposits: Deposit[] = [
+  {
+    'id': 'massa',
+    'ammount': '100 BRZ',
+    'date': '20 out 2022',
+    'etherscanLink': 'Etherscan'
+  }
+];
+const props = defineProps({
+  tokenAmmount: Number,
+});
+
 </script>
 
 <template>
@@ -16,7 +36,7 @@ import CustomButton from "@/components/CustomButton.vue";
       >
         <div>
           <p>Tokens recebidos</p>
-          <p class="text-2xl text-gray-900">100 BRZ</p>
+          <p class="text-2xl text-gray-900">{{props.tokenAmmount}} BRZ</p>
         </div>
         <div class="my-5">
           <p>
@@ -52,17 +72,20 @@ import CustomButton from "@/components/CustomButton.vue";
       </span>
     </div>
     <div class="blur-container">
-      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg">
-        <p>100 BRZ</p>
-        <p>20 out 2022</p>
-        <p>Etherscan</p>
+      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg" v-for="deposit in lastDeposits" :key="deposit.id">
+        <p class="last-deposit-info">{{deposit.ammount}}</p>
+        <p class="last-deposit-info">{{deposit.date}}</p>
+        <p class="last-deposit-info">{{deposit.etherscanLink}}</p>
       </div>
-      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg">
-        <p>100 BRZ</p>
-        <p>20 out 2022</p>
-        <p>Etherscan</p>
-      </div>
-      <p class="text-white mt-2 cursor-pointer">Carregar mais</p>
+      <button
+        type="button"
+        class="text-white mt-2"
+        @click="() => {}"
+        v-if="(lastDeposits.length != 0)"
+      >
+        Carregar mais
+      </button>
+      <p class="font-bold" v-if="(lastDeposits.length == 0)">Não há nenhuma transação anterior</p>
     </div>
   </div>
 </template>
@@ -70,6 +93,10 @@ import CustomButton from "@/components/CustomButton.vue";
 <style scoped>
 .page {
   @apply flex flex-col items-center justify-center w-full mt-16;
+}
+
+p {
+  @apply text-gray-900
 }
 
 .text-container {
@@ -85,6 +112,10 @@ import CustomButton from "@/components/CustomButton.vue";
 
 .blur-container {
   @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
+}
+
+.last-deposit-info{
+  @apply font-medium text-base
 }
 
 input[type="number"] {

@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
 import blockchain from "../utils/blockchain";
+import ListComponent from "@/components/ListComponent.vue";
+import { ref } from "vue";
+
+enum Step {
+  Search,
+  Buy,
+  List
+}
+
+const flowStep = ref<Step>(Step.Search)
+const tokenAmmount = ref()
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
@@ -10,12 +21,15 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     .mapDeposits(selectedDeposit["args"]["depositID"])
     .then((deposit) => (depositDetail = deposit));
   console.log(tokenValue);
+  tokenAmmount.value = tokenValue
+  flowStep.value = Step.List
   console.log(depositDetail);
 };
 </script>
 
 <template>
-  <SearchComponent @token-buy="confirmBuyClick" />
+  <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
+  <ListComponent v-if="(flowStep == Step.List)" :tokenAmmount="tokenAmmount" />
 </template>
 
 <style scoped></style>

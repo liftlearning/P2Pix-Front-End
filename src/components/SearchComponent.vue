@@ -59,10 +59,8 @@ const verifyLiquidity = () => {
 
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
-  const found = depositsAddedList.value.find((element) => {
-    const p2pixTokenValue = blockchain.formatBigNumber(
-      element.args.amount
-    );
+  depositsAddedList.value.find((element) => {
+    const p2pixTokenValue = blockchain.formatBigNumber(element.args.amount);
     if (
       tokenValue.value!! <= Number(p2pixTokenValue) &&
       tokenValue.value!! != 0 &&
@@ -71,7 +69,10 @@ const verifyLiquidity = () => {
       enableSelectButton.value = true;
       hasLiquidity.value = true;
       selectedDeposit.value = element;
-      console.log("Selected is :", blockchain.formatBigNumber(element.args.amount))
+      console.log(
+        "Selected is :",
+        blockchain.formatBigNumber(element.args.amount)
+      );
       return true;
     }
     return false;
@@ -81,7 +82,6 @@ const verifyLiquidity = () => {
     hasLiquidity.value = false;
   }
 };
-
 </script>
 
 <template>

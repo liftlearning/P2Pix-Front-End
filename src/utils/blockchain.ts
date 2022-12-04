@@ -18,7 +18,11 @@ const connectProvider = async () => {
   if (!connection) return;
   provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
-  const tokenContract = new ethers.Contract(addresses.token, mockToken.abi, signer);
+  const tokenContract = new ethers.Contract(
+    addresses.token,
+    mockToken.abi,
+    signer
+  );
 
   const walletAddress = await provider.send("eth_requestAccounts", []);
   const balance = await tokenContract.balanceOf(walletAddress[0]);
@@ -35,7 +39,7 @@ const connectProvider = async () => {
 
   const filterLocks = p2pEvents.filters.LockAdded(null);
   const eventsLocks = await p2pEvents.queryFilter(filterLocks);
-  console.log("Locks Added: ", eventsLocks)
+  console.log("Locks Added: ", eventsLocks);
   etherStore.setLocksAddedList(eventsLocks);
 
   const filterExpiredLocks = p2pEvents.filters.LockReturned(null);
@@ -149,7 +153,7 @@ const mapDeposits = async (depositId: BigNumber) => {
 
 // Lock methods
 // Gets value from user's form to create a lock in the blockchain
-const addLock = async(depositId: Number, amount: Number) => {
+const addLock = async (depositId: Number, amount: Number) => {
   const etherStore = useEtherStore();
   const provider = getProvider();
 
@@ -158,7 +162,7 @@ const addLock = async(depositId: Number, amount: Number) => {
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   // Make lock
-  const lockTx = await p2pContract.lock(
+  await p2pContract.lock(
     depositId,
     etherStore.walletAddress,
     ethers.constants.AddressZero,
@@ -170,12 +174,6 @@ const addLock = async(depositId: Number, amount: Number) => {
   const filterLocks = p2pContract.filters.LockAdded(null);
   const eventsLocks = await p2pContract.queryFilter(filterLocks);
   etherStore.setLocksAddedList(eventsLocks);
-
-  {
-
-    
-  }
-
 };
 
 // Get specific lock data by its ID
@@ -194,7 +192,7 @@ const mapLocks = async (lockId: string) => {
 
 // Releases lock by specific ID and other additional data
 // (TO DO)
-const releaseLock = async() => {
+const releaseLock = async () => {
   return;
 };
 

@@ -19,8 +19,11 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   console.log(depositDetail);
 
   // Makes lock with deposit ID and the Amount
-  if (depositDetail){
-    const lock = await blockchain.addLock(depositDetail.args.depositID, tokenValue);
+  if (depositDetail) {
+    const lock = await blockchain.addLock(
+      depositDetail.args.depositID,
+      tokenValue
+    );
     console.log(lock);
 
     // (TO DO) Tirar isso daqui
@@ -39,9 +42,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     // Data to QRCode
     // Chave Pix = depositDetail.pixTarget
     // Valor = tokenValue
-
   }
-  
 };
 </script>
 

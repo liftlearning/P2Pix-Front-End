@@ -53,6 +53,8 @@ const releaseLock = () => {
 const mapLock = (lockId: string) => {
   blockchain.mapLocks(lockId);
 };
+
+console.log(depositsAddedList)
 </script>
 
 <template>

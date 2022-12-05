@@ -4,7 +4,14 @@ export const useEtherStore = defineStore("ether", {
   state: () => ({
     walletAddress: "",
     balance: "",
-    depositList: [{}],
+    // Depósitos válidos para compra
+    depositsValidList: [{}],
+    // Depósitos adicionados na blockchain
+    depositsAddedList: [{}],
+    // Depósitos expirados na blockchain
+    depositsExpiredList: [{}],
+    // Locks adicionados na blockchain
+    locksAddedList: [{}],
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -13,8 +20,17 @@ export const useEtherStore = defineStore("ether", {
     setBalance(balance: string) {
       this.balance = balance;
     },
-    setDepositList(depositList: any[]) {
-      this.depositList = depositList;
+    setDepositsValidList(depositsValidList: any[]) {
+      this.depositsValidList = depositsValidList;
+    },
+    setDepositsAddedList(depositsAddedList: any[]) {
+      this.depositsAddedList = depositsAddedList;
+    },
+    setDepositsExpiredList(depositsExpiredList: any[]) {
+      this.depositsExpiredList = depositsExpiredList;
+    },
+    setLocksAddedList(locksAddedList: any[]) {
+      this.locksAddedList = locksAddedList;
     },
   },
 });

@@ -12,22 +12,21 @@ import { ethers } from "ethers";
 import QrCodeForm from "./QrCodeForm.vue";
 import { storeToRefs } from "pinia";
 
-
 enum Step {
   Search,
-  Buy
+  Buy,
 }
 
 // States
 const etherStore = useEtherStore();
 const { loadingLock } = storeToRefs(etherStore);
-const flowStep = ref<Step>(Step.Search)
+const flowStep = ref<Step>(Step.Search);
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
   console.log(selectedDeposit);
   let depositDetail;
-  const depositId = selectedDeposit["args"]["depositID"]
+  const depositId = selectedDeposit["args"]["depositID"];
   await blockchain
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
@@ -36,16 +35,12 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {
-    flowStep.value = Step.Buy
+    flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
-    const lock = await blockchain.addLock(
-      depositId,
-      tokenValue
-    ).catch((_error) => {
-      flowStep.value = Step.Search
-    })
 
-    console.log(lock);
+    await blockchain.addLock(depositId, tokenValue).catch((_error) => {
+      flowStep.value = Step.Search;
+    });
 
     // (TO DO) Tirar isso daqui
     const window_ = window as any;
@@ -68,10 +63,13 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 </script>
 
 <template>
-  <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
-  <div v-if="(flowStep == Step.Buy)">
-    <QrCodeForm v-if="!loadingLock"/>
-    <ValidationComponent v-if="loadingLock"/>
+  <SearchComponent
+    v-if="flowStep == Step.Search"
+    @token-buy="confirmBuyClick"
+  />
+  <div v-if="flowStep == Step.Buy">
+    <QrCodeForm v-if="!loadingLock" />
+    <ValidationComponent v-if="loadingLock" />
   </div>
 </template>
 

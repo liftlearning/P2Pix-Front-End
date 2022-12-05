@@ -54,7 +54,7 @@ const mapLock = (lockId: string) => {
   blockchain.mapLocks(lockId);
 };
 
-console.log(depositsAddedList)
+console.log(depositsAddedList);
 </script>
 
 <template>

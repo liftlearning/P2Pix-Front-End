@@ -174,6 +174,7 @@ const addLock = async (depositId: Number, amount: Number) => {
   const filterLocks = p2pContract.filters.LockAdded(null);
   const eventsLocks = await p2pContract.queryFilter(filterLocks);
   etherStore.setLocksAddedList(eventsLocks);
+  return eventsLocks.pop();
 };
 
 // Get specific lock data by its ID

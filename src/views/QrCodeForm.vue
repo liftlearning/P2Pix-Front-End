@@ -51,10 +51,10 @@ const submit = () => {
 <template>
   <div class="content">
     <h2 class="text-center font-bold text-emerald-50 text-2xl">
-        Utilize o QR Code ou copie o código
+      Utilize o QR Code ou copie o código
     </h2>
     <h2 class="text-center font-bold text-emerald-50 text-2xl">
-        para realizar o Pix
+      para realizar o Pix
     </h2>
     <h4 class="text-center">
       Após realizar o Pix no banco de sua preferência, insira o código de
@@ -64,18 +64,17 @@ const submit = () => {
     </h4>
     <div class="white-box-content">
       <div class="black-box-content"></div>
-      <span class="text-center">
-        Código pix
-      </span>
-      <span2 class="text-center">
-        c02942far7047f6shri5ifh371908973
-      </span2>
+      <span class="text-center"> Código pix </span>
+      <span2 class="text-center"> c02942far7047f6shri5ifh371908973 </span2>
       <span3 class="text-center">
-        <strong>ATENÇÃO!</strong> A transação só será processada após inserir o código de autenticação. Caso contrário não conseguiremos comprovar o seu depósito e não será possível transferir os tokens para sua carteira. Confira aqui como encontrar o código no comprovante.
+        <strong>ATENÇÃO!</strong> A transação só será processada após inserir o
+        código de autenticação. Caso contrário não conseguiremos comprovar o seu
+        depósito e não será possível transferir os tokens para sua carteira.
+        Confira aqui como encontrar o código no comprovante.
       </span3>
     </div>
     <div class="white-box-content2">
-      <input type="text" placeholder="Digite o código do comprovante PIX">
+      <input type="text" placeholder="Digite o código do comprovante PIX" />
     </div>
     <button type="button">Enviar para a rede</button>
   </div>
@@ -146,7 +145,7 @@ span3 {
 }
 
 button {
-  background-color: #FBBF24;
+  background-color: #fbbf24;
   width: 400px;
   height: 60px;
   margin-top: 0.2cm;
@@ -155,14 +154,15 @@ button {
 
 input {
   background-color: #f9f8f8;
-  padding:3px;
+  padding: 3px;
   width: 350px;
   align-items: center;
   margin-bottom: 3cm;
 }
 
-::placeholder { /* Most modern browsers support this now. */
-   color:    #9CA3AF;
+::placeholder {
+  /* Most modern browsers support this now. */
+  color: #9ca3af;
 }
 
 h4 {
@@ -171,7 +171,7 @@ h4 {
 }
 
 h2 {
-  color: #080808
+  color: #080808;
 }
 
 .form-input {

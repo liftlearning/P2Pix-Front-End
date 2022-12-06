@@ -9,7 +9,7 @@ import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import addresses from "../utils/smart_contract_files/localhost.json";
 import { useEtherStore } from "@/store/ether";
 import { ethers } from "ethers";
-import QrCodeForm from "./QrCodeForm.vue";
+import QrCodeForm from "../components/QrCodeForm.vue";
 import { storeToRefs } from "pinia";
 
 
@@ -21,7 +21,9 @@ enum Step {
 // States
 const etherStore = useEtherStore();
 const { loadingLock } = storeToRefs(etherStore);
-const flowStep = ref<Step>(Step.Search)
+const flowStep = ref<Step>(Step.Search);
+const pixTarget = ref<string>("");
+const tokens = ref<number>();
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
@@ -33,6 +35,8 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     .then((deposit) => (depositDetail = deposit));
   console.log(tokenValue);
   console.log(depositDetail);
+  tokens.value = tokenValue;
+  pixTarget.value = depositDetail?.pixTarget;
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {
@@ -70,7 +74,11 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 <template>
   <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
   <div v-if="(flowStep == Step.Buy)">
-    <QrCodeForm v-if="!loadingLock"/>
+    <QrCodeForm
+      :pixTarget="pixTarget"
+      :tokenValue="tokens"
+      v-if="!loadingLock"
+    />
     <ValidationComponent v-if="loadingLock"/>
   </div>
 </template>

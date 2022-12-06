@@ -2,13 +2,20 @@
 import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
-import CustomButton from "../components/CustomButton.vue";
+import CustomButton from "./CustomButton.vue";
+
+const props = defineProps({
+  pixTarget: String,
+  tokenValue: Number,
+});
+
+console.log(props.tokenValue);
 
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const pixQrCode = pix({
-  pixKey: "key_test123456789",
-  value: 100,
+  pixKey: props.pixTarget,
+  value: props.tokenValue,
 });
 const pixIsValid = ref<number>(0);
 const stateButton = ref(false);
@@ -36,7 +43,6 @@ const validatePix = (value: any) => {
   }
 };
 
-console.log(pixIsValid.value, stateButton.value)
 </script>
 
 <template>
@@ -59,7 +65,7 @@ console.log(pixIsValid.value, stateButton.value)
         <img :src="qrCode" class="w-48 h-48" />
         <span class="text-center font-bold">Código pix</span>
         <span class="text-center text-xs">
-          c02942far7047f6shri5ifh371908973
+          {{ pixTarget }}
         </span>
         <img
           alt="Copy PIX code"

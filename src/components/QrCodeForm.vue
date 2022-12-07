@@ -3,6 +3,7 @@ import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
+import axios from "axios";
 
 const props = defineProps({
   pixTarget: String,
@@ -14,7 +15,7 @@ console.log(props.tokenValue);
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const pixQrCode = pix({
-  pixKey: props.pixTarget,
+  pixKey: props.pixTarget ?? "",
   value: props.tokenValue,
 });
 const pixIsValid = ref<number>(0);
@@ -32,17 +33,28 @@ const handleInputEvent = (event: any) => {
   validatePix(value);
 };
 
-const validatePix = (value: any) => {
-  if(value == '123456') {
+const validatePix = async (value: any) => {
+  var sellerPixKey = props.pixTarget;
+  var transactionValue = props.tokenValue;
+
+  var body_req = {
+    e2e_id: value,
+    pix_key: sellerPixKey,
+    pix_value: transactionValue,
+  };
+
+  var resp = await axios.post("http://localhost:8000/validate_pix", body_req);
+  console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
+
+  if (value == "123456") {
     pixIsValid.value = 1;
     stateButton.value = true;
-  } else if(value == '') {
+  } else if (value == "") {
     pixIsValid.value = 0;
   } else {
     pixIsValid.value = 2;
   }
 };
-
 </script>
 
 <template>
@@ -75,7 +87,10 @@ const validatePix = (value: any) => {
           class="pt-2 mb-5 cursor-pointer"
         />
         <span class="text-center text-xs text-start">
-          <strong>ATENÇÃO!</strong> A transação só será processada após inserir o código de autenticação. Caso contrário não conseguiremos comprovar o seu depósito e não será possível transferir os tokens para sua carteira. Confira aqui como encontrar o código no comprovante.
+          <strong>ATENÇÃO!</strong> A transação só será processada após inserir
+          o código de autenticação. Caso contrário não conseguiremos comprovar o
+          seu depósito e não será possível transferir os tokens para sua
+          carteira. Confira aqui como encontrar o código no comprovante.
         </span>
       </div>
       <div
@@ -87,7 +102,7 @@ const validatePix = (value: any) => {
           @input="debounce(handleInputEvent, 500)($event)"
           class="text-md box-border w-full box-border p-2 h-6 mb-2"
         />
-        <div class="flex flex-col w-full" v-if="(pixIsValid == 2)">
+        <div class="flex flex-col w-full" v-if="pixIsValid == 2">
           <div class="custom-divide"></div>
           <div class="flex items-center h-8">
             <img
@@ -101,7 +116,7 @@ const validatePix = (value: any) => {
             >
           </div>
         </div>
-        <div class="flex flex-col w-full" v-else-if="(pixIsValid == 1)">
+        <div class="flex flex-col w-full" v-else-if="pixIsValid == 1">
           <div class="custom-divide"></div>
           <div class="flex items-center h-8">
             <img
@@ -120,7 +135,7 @@ const validatePix = (value: any) => {
         :is-disabled="!(pixIsValid == 1)"
         :text="'Enviar para a rede'"
       />
-      <CustomButton v-if="(pixIsValid == 1)" :text="'Enviar para a rede'" />
+      <CustomButton v-if="pixIsValid == 1" :text="'Enviar para a rede'" />
     </div>
   </div>
 </template>
@@ -130,8 +145,9 @@ const validatePix = (value: any) => {
   @apply flex flex-col items-center justify-center w-full mt-16;
 }
 
-::placeholder { /* Most modern browsers support this now. */
-   color:    #9CA3AF;
+::placeholder {
+  /* Most modern browsers support this now. */
+  color: #9ca3af;
 }
 
 h4 {
@@ -140,7 +156,7 @@ h4 {
 }
 
 h2 {
-  color: #080808
+  color: #080808;
 }
 
 .form-input {

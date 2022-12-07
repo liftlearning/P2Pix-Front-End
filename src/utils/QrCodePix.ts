@@ -69,7 +69,7 @@ const generatePixKey = (pixKey: string, message?: string): string => {
 };
 
 const formatEMV = (id: string, param: string): string => {
-  const len = param.length.toString().padStart(2, "0");
+  const len = param?.length?.toString().padStart(2, "0");
   return `${id}${len}${param}`;
 };
 

@@ -44,6 +44,25 @@ const splitTokens = async () => {
   }
 };
 
+// get wallet transactions
+const listTransactionByWalletAddress = async (walletAddress: string): Promise<any[] | undefined> => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
+  const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
+  const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
+  const eventsReleasedLocks = await p2pContract.queryFilter(filterReleasedLocks);
+
+  return [...eventsDeposits, ...eventsReleasedLocks].sort((a, b) => {
+    return b.blockNumber - a.blockNumber
+  })
+}
+
 // Update store
 const updateStore = async () => {
   const etherStore = useEtherStore();
@@ -200,6 +219,7 @@ const releaseLock = async () => {
   const provider = getProvider();
   if (!provider) return;
 
+  // pass depositId as a param
   const myLock = etherStore.locksAddedList[0];
   const lockId = myLock.args.lockID
   const depositId = myLock.args.depositID
@@ -262,6 +282,7 @@ export default {
   connectProvider,
   formatEther,
   splitTokens,
+  listTransactionByWalletAddress,
   addDeposit,
   mapDeposits,
   formatBigNumber,

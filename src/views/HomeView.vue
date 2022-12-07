@@ -63,7 +63,12 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 
 <template>
   <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
-  <ListComponent v-if="(flowStep == Step.List)" :tokenAmmount="tokenAmmount" />
+  <Suspense>
+    <ListComponent v-if="(flowStep == Step.List)" :tokenAmmount="tokenAmmount" />
+    <template #fallback>
+      Carregando...
+    </template>
+  </Suspense>
 </template>
 
 <style scoped></style>

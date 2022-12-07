@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
-type Deposit = {
-  'id': string,
-  'ammount': string,
-  'date': string,
-  'etherscanLink': string
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import blockchain from "../utils/blockchain";
+// Store reference
+const etherStore = useEtherStore();
+
+const { walletAddress } = storeToRefs(etherStore);
+
+const lastDeposits = await blockchain.listTransactionByWalletAddress(walletAddress.value.toLowerCase())
+
+const openEtherscanUrl = (url: string) => {
+  window.open(url, "_blank")
 }
 
-
-const lastDeposits: Deposit[] = [
-  {
-    'id': 'massa',
-    'ammount': '100 BRZ',
-    'date': '20 out 2022',
-    'etherscanLink': 'Etherscan'
-  }
-];
 const props = defineProps({
   tokenAmmount: Number,
 });
@@ -72,20 +70,23 @@ const props = defineProps({
       </span>
     </div>
     <div class="blur-container">
-      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg" v-for="deposit in lastDeposits" :key="deposit.id">
-        <p class="last-deposit-info">{{deposit.ammount}}</p>
-        <p class="last-deposit-info">{{deposit.date}}</p>
-        <p class="last-deposit-info">{{deposit.etherscanLink}}</p>
+      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg" v-for="deposit in lastDeposits" :key="deposit?.blockNumber">
+        <p class="last-deposit-info">{{blockchain.formatBigNumber(deposit?.args.amount)}} BRZ</p>
+        <p class="last-deposit-info">{{deposit?.event == 'DepositAdded' ? 'Depósito' : 'Compra'}}</p>
+        <div class="flex gap-2 cursor-pointer items-center" @click="openEtherscanUrl(`https://etherscan.io/tx/${deposit?.transactionHash}`)">
+          <p class="last-deposit-info">Etherscan</p>
+          <img alt="Redirect image" src="@/assets/redirect.svg"/>
+        </div>
       </div>
       <button
         type="button"
         class="text-white mt-2"
         @click="() => {}"
-        v-if="(lastDeposits.length != 0)"
+        v-if="(lastDeposits?.length != 0)"
       >
         Carregar mais
       </button>
-      <p class="font-bold" v-if="(lastDeposits.length == 0)">Não há nenhuma transação anterior</p>
+      <p class="font-bold" v-if="(lastDeposits?.length == 0)">Não há nenhuma transação anterior</p>
     </div>
   </div>
 </template>

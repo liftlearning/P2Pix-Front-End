@@ -4,7 +4,6 @@ import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
 import api from "../services/index";
-import { AxiosError } from 'axios';
 
 const props = defineProps({
   pixTarget: String,
@@ -12,6 +11,7 @@ const props = defineProps({
 });
 
 console.log(props.tokenValue);
+console.log(props.pixTarget);
 
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
@@ -20,7 +20,6 @@ const pixQrCode = pix({
   value: props.tokenValue,
 });
 const pixIsValid = ref<number>(0);
-const stateButton = ref(false);
 
 pixQrCode.base64QrCode().then((code: string) => {
   qrCode.value = code;
@@ -35,7 +34,7 @@ const handleInputEvent = (event: any) => {
 };
 
 const validatePix = async (value: any) => {
-  console.log(value)
+  console.log(value);
   if(value == ''){
     pixIsValid.value = 0;
     return;
@@ -43,37 +42,34 @@ const validatePix = async (value: any) => {
   var sellerPixKey = props.pixTarget;
   var transactionValue = props.tokenValue;
 
-  // var body_req = {
-  //   e2e_id: value,
-  //   pix_key: sellerPixKey,
-  //   pix_value: transactionValue,
-  // };
-  var body_req = {
-    e2e_id: value,
-    pix_key: "12345678",
-    pix_value: 100,
-  };
-  var resp = await api.post("http://localhost:8000/validate_pix", body_req)
-    .catch((reason: Error) => {
-      console.log('entrou no erro', reason);
-      pixIsValid.value = 2;
-      return;
-    });
-  console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
-  console.log(resp.status);
+  if(sellerPixKey && transactionValue){
+    var body_req = {
+      e2e_id: value,
+      pix_key: sellerPixKey,
+      pix_value: transactionValue,
+    };
+    var resp = await api.post("http://localhost:8000/validate_pix", body_req)
+      .catch((reason: Error) => {
+        console.log('entrou no erro', reason);
+        pixIsValid.value = 2;
+        return;
+      });
+    console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
+    console.log(resp.status);
 
-  pixIsValid.value = 1;
+    pixIsValid.value = 1;
+  } else {
+    pixIsValid.value = 0;
+  }
 };
 </script>
 
 <template>
   <div class="page">
     <div class="text-container">
-      <!-- <h2 class="text-center font-bold text-emerald-50 text-2xl"></h2> -->
       <span class="text font-extrabold text-2xl max-w-[30rem]">
         Utilize o QR Code ou copie o código para realizar o Pix
       </span>
-      <!-- <h4 class="text-center"> -->
       <span class="text font-medium text-md max-w-[28rem]">
         Após realizar o Pix no banco de sua preferência, insira o código de
         autenticação para enviar a transação para a rede.

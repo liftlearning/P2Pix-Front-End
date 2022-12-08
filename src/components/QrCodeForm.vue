@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
 import api from "../services/index";
+import { AxiosError } from 'axios';
 
 const props = defineProps({
   pixTarget: String,
@@ -34,6 +35,11 @@ const handleInputEvent = (event: any) => {
 };
 
 const validatePix = async (value: any) => {
+  console.log(value)
+  if(value == ''){
+    pixIsValid.value = 0;
+    return;
+  }
   var sellerPixKey = props.pixTarget;
   var transactionValue = props.tokenValue;
 
@@ -47,17 +53,16 @@ const validatePix = async (value: any) => {
     pix_key: "12345678",
     pix_value: 100,
   };
-  var resp = await api.post("http://localhost:8000/validate_pix", body_req);
+  var resp = await api.post("http://localhost:8000/validate_pix", body_req)
+    .catch((reason: Error) => {
+      console.log('entrou no erro', reason);
+      pixIsValid.value = 2;
+      return;
+    });
   console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
+  console.log(resp.status);
 
-  if (value == "123456") {
-    pixIsValid.value = 1;
-    stateButton.value = true;
-  } else if (value == "") {
-    pixIsValid.value = 0;
-  } else {
-    pixIsValid.value = 2;
-  }
+  pixIsValid.value = 1;
 };
 </script>
 
@@ -139,7 +144,6 @@ const validatePix = async (value: any) => {
         :is-disabled="!(pixIsValid == 1)"
         :text="'Enviar para a rede'"
       />
-      <CustomButton v-if="pixIsValid == 1" :text="'Enviar para a rede'" />
     </div>
   </div>
 </template>

@@ -95,7 +95,7 @@ const mapLock = (lockId: string) => {
         @click="mapDeposit(deposit.args.depositID)"
       >
         Seller:<br />{{ formatWalletAddress(deposit.args.seller) }}<br />
-        MRBZ: {{ blockchain.formatEther(deposit.args.amount) }}
+        MRBZ: {{ blockchain.formatBigNumber(deposit.args.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">
@@ -106,7 +106,7 @@ const mapLock = (lockId: string) => {
         @click="mapLock(lock.args.lockID)"
       >
         Buyer:<br />{{ formatWalletAddress(lock.args.buyer) }}<br />
-        MRBZ: {{ blockchain.formatEther(lock.args.amount) }}
+        MRBZ: {{ blockchain.formatBigNumber(lock.args.amount) }}
       </li>
     </ul>
   </div>

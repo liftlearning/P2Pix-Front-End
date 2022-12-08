@@ -24,9 +24,7 @@ const formatWalletAddress = (): string => {
 };
 
 const formatWalletBalance = (): string => {
-  const formattedBalance = blockchain.formatEther(balance.value);
-  const fixed = formattedBalance.substring(0, 8);
-
+  const fixed = balance.value.substring(0, 8);
   return fixed;
 };
 </script>

@@ -72,7 +72,7 @@ const props = defineProps({
     <div class="blur-container">
       <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg" v-for="deposit in lastDeposits" :key="deposit?.blockNumber">
         <p class="last-deposit-info">{{blockchain.formatBigNumber(deposit?.args.amount)}} BRZ</p>
-        <p class="last-deposit-info">{{deposit?.event == 'DepositAdded' ? 'Depósito' : 'Compra'}}</p>
+        <p class="last-deposit-info">{{deposit?.event == 'DepositAdded' ? 'Depósito' : deposit?.event == 'LockAdded' ? 'Reserva' : 'Compra'}}</p>
         <div class="flex gap-2 cursor-pointer items-center" @click="openEtherscanUrl(`https://etherscan.io/tx/${deposit?.transactionHash}`)">
           <p class="last-deposit-info">Etherscan</p>
           <img alt="Redirect image" src="@/assets/redirect.svg"/>

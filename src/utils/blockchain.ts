@@ -55,10 +55,13 @@ const listTransactionByWalletAddress = async (walletAddress: string): Promise<an
   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
+  const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
+  const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
+
   const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
   const eventsReleasedLocks = await p2pContract.queryFilter(filterReleasedLocks);
 
-  return [...eventsDeposits, ...eventsReleasedLocks].sort((a, b) => {
+  return [...eventsDeposits, ...eventsAddedLocks, ...eventsReleasedLocks].sort((a, b) => {
     return b.blockNumber - a.blockNumber
   })
 }
@@ -232,7 +235,7 @@ const mapLocks = async (lockId: string) => {
 };
 
 // Releases lock by specific ID and other additional data
-const releaseLock = async (pixKey: string, amount: Number, e2eId: Number, lockId: string) => {
+const releaseLock = async (pixKey: string, amount: string, e2eId: Number, lockId: string) => {
   const provider = getProvider();
   if (!provider) return;
 
@@ -246,7 +249,7 @@ const releaseLock = async (pixKey: string, amount: Number, e2eId: Number, lockId
     ],
     [
       pixKey,
-      amount,
+      formatEther(amount),
       e2eId
     ]
   )

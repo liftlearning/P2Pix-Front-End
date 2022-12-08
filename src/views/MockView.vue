@@ -44,11 +44,6 @@ const mapDeposit = (depositId: BigNumber) => {
 };
 
 // Lock methods
-// (TO DO) Releases lock by specific ID and other additional data
-const releaseLock = () => {
-  blockchain.releaseLock();
-};
-
 // Get specific lock data by its ID
 const mapLock = (lockId: string) => {
   blockchain.mapLocks(lockId);
@@ -80,10 +75,6 @@ const mapLock = (lockId: string) => {
 
       <button type="button" class="default-button" @click="splitTokens()">
         Dividir tokens
-      </button>
-
-      <button type="button" class="default-button" @click="releaseLock()">
-        Release Lock
       </button>
     </div>
 

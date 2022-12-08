@@ -5,7 +5,9 @@ const defaultConfig = {
   "Content-Type": "application/json",
 };
 
-export const api = axios.create({
+const api = axios.create({
   ...defaultConfig,
   baseURL: "http://localhost:8000",
 });
+
+export default api;

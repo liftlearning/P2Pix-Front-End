@@ -3,7 +3,7 @@ import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
-import axios from "axios";
+import api from "../services/index";
 
 const props = defineProps({
   pixTarget: String,
@@ -37,13 +37,17 @@ const validatePix = async (value: any) => {
   var sellerPixKey = props.pixTarget;
   var transactionValue = props.tokenValue;
 
+  // var body_req = {
+  //   e2e_id: value,
+  //   pix_key: sellerPixKey,
+  //   pix_value: transactionValue,
+  // };
   var body_req = {
     e2e_id: value,
-    pix_key: sellerPixKey,
-    pix_value: transactionValue,
+    pix_key: "12345678",
+    pix_value: 100,
   };
-
-  var resp = await axios.post("http://localhost:8000/validate_pix", body_req);
+  var resp = await api.post("http://localhost:8000/validate_pix", body_req);
   console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
 
   if (value == "123456") {

@@ -3,6 +3,7 @@ import axios from "axios";
 
 const defaultConfig = {
   "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
 };
 
 const api = axios.create({

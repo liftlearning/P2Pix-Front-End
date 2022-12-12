@@ -16,7 +16,8 @@ const pixQrCode = pix({
   pixKey: props.pixTarget ?? "",
   value: props.tokenValue,
 });
-const isPixValid = ref<number>(0);
+const isPixValid = ref<boolean>(false);
+const isCodeInputEmpty = ref<boolean>(true);
 
 pixQrCode.base64QrCode().then((code: string) => {
   qrCode.value = code;
@@ -34,7 +35,8 @@ const handleInputEvent = (event: any) => {
 
 const validatePix = async (e2eid: any) => {
   if(e2eid == ''){
-    isPixValid.value = 0;
+    isPixValid.value = false;
+    isCodeInputEmpty.value = true;
     return;
   }
   var sellerPixKey = props.pixTarget;
@@ -49,15 +51,18 @@ const validatePix = async (e2eid: any) => {
     var resp = await api.post("http://localhost:8000/validate_pix", body_req)
       .catch((reason: Error) => {
         console.log('entrou no erro', reason);
-        isPixValid.value = 2;
+        isPixValid.value = false;
+        isCodeInputEmpty.value = false;
         return;
       });
     console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
     console.log(resp.status);
 
-    isPixValid.value = 1;
+    isCodeInputEmpty.value = false;
+    isPixValid.value = true;
   } else {
-    isPixValid.value = 0;
+    isCodeInputEmpty.value = false;
+    isPixValid.value = false;
   }
 };
 </script>
@@ -107,8 +112,8 @@ const validatePix = async (e2eid: any) => {
           @input="debounce(handleInputEvent, 500)($event)"
           class="text-md w-full box-border p-2 h-6 mb-2 outline-none"
         />
-        <div class="custom-divide" v-if="isPixValid != 0"></div>
-        <div class="flex flex-col w-full" v-if="isPixValid == 2">
+        <div class="custom-divide" v-if="!isCodeInputEmpty"></div>
+        <div class="flex flex-col w-full" v-if="!isPixValid && !isCodeInputEmpty">
           <div class="flex items-center h-8">
             <img
               alt="Invalid Icon"
@@ -121,7 +126,7 @@ const validatePix = async (e2eid: any) => {
             >
           </div>
         </div>
-        <div class="flex flex-col w-full" v-else-if="isPixValid == 1">
+        <div class="flex flex-col w-full" v-else-if="isPixValid == true">
           <div class="flex items-center h-8">
             <img
               alt="Valid Icon"
@@ -136,7 +141,7 @@ const validatePix = async (e2eid: any) => {
         </div>
       </div>
       <CustomButton
-        :is-disabled="isPixValid != 1"
+        :is-disabled="isPixValid == false"
         :text="'Enviar para a rede'"
       />
     </div>

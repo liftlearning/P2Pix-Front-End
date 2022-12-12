@@ -9,7 +9,7 @@ import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import addresses from "../utils/smart_contract_files/localhost.json";
 import { useEtherStore } from "@/store/ether";
 import { ethers } from "ethers";
-import QrCodeForm from "../components/QrCodeForm.vue";
+import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
 
 enum Step {
@@ -33,7 +33,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
   console.log(tokenValue);
-  console.log(depositDetail);
+  console.log('aqui', depositDetail);
   tokens.value = tokenValue;
   pixTarget.value = depositDetail?.pixTarget;
 
@@ -69,7 +69,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 <template>
   <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
   <div v-if="(flowStep == Step.Buy)">
-    <QrCodeForm
+    <QrCodeComponent
       :pixTarget="pixTarget"
       :tokenValue="tokens"
       v-if="!loadingLock"

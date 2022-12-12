@@ -10,16 +10,13 @@ const props = defineProps({
   tokenValue: Number,
 });
 
-console.log(props.tokenValue);
-console.log(props.pixTarget);
-
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const pixQrCode = pix({
   pixKey: props.pixTarget ?? "",
   value: props.tokenValue,
 });
-const pixIsValid = ref<number>(0);
+const isPixValid = ref<number>(0);
 
 pixQrCode.base64QrCode().then((code: string) => {
   qrCode.value = code;
@@ -33,10 +30,9 @@ const handleInputEvent = (event: any) => {
   validatePix(value);
 };
 
-const validatePix = async (value: any) => {
-  console.log(value);
-  if(value == ''){
-    pixIsValid.value = 0;
+const validatePix = async (e2eid: any) => {
+  if(e2eid == ''){
+    isPixValid.value = 0;
     return;
   }
   var sellerPixKey = props.pixTarget;
@@ -44,22 +40,22 @@ const validatePix = async (value: any) => {
 
   if(sellerPixKey && transactionValue){
     var body_req = {
-      e2e_id: value,
+      e2e_id: e2eid,
       pix_key: sellerPixKey,
       pix_value: transactionValue,
     };
     var resp = await api.post("http://localhost:8000/validate_pix", body_req)
       .catch((reason: Error) => {
         console.log('entrou no erro', reason);
-        pixIsValid.value = 2;
+        isPixValid.value = 2;
         return;
       });
     console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
     console.log(resp.status);
 
-    pixIsValid.value = 1;
+    isPixValid.value = 1;
   } else {
-    pixIsValid.value = 0;
+    isPixValid.value = 0;
   }
 };
 </script>
@@ -91,7 +87,7 @@ const validatePix = async (value: any) => {
           height="16"
           class="pt-2 mb-5 cursor-pointer"
         />
-        <span class="text-center text-xs text-start">
+        <span class="text-xs text-start">
           <strong>ATENÇÃO!</strong> A transação só será processada após inserir
           o código de autenticação. Caso contrário não conseguiremos comprovar o
           seu depósito e não será possível transferir os tokens para sua
@@ -105,10 +101,10 @@ const validatePix = async (value: any) => {
           type="text"
           placeholder="Digite o código do comprovante PIX"
           @input="debounce(handleInputEvent, 500)($event)"
-          class="text-md box-border w-full box-border p-2 h-6 mb-2"
+          class="text-md w-full box-border p-2 h-6 mb-2 outline-none"
         />
-        <div class="flex flex-col w-full" v-if="pixIsValid == 2">
-          <div class="custom-divide"></div>
+        <div class="custom-divide" v-if="isPixValid != 0"></div>
+        <div class="flex flex-col w-full" v-if="isPixValid == 2">
           <div class="flex items-center h-8">
             <img
               alt="Invalid Icon"
@@ -121,8 +117,7 @@ const validatePix = async (value: any) => {
             >
           </div>
         </div>
-        <div class="flex flex-col w-full" v-else-if="pixIsValid == 1">
-          <div class="custom-divide"></div>
+        <div class="flex flex-col w-full" v-else-if="isPixValid == 1">
           <div class="flex items-center h-8">
             <img
               alt="Valid Icon"
@@ -137,7 +132,7 @@ const validatePix = async (value: any) => {
         </div>
       </div>
       <CustomButton
-        :is-disabled="!(pixIsValid == 1)"
+        :is-disabled="isPixValid != 1"
         :text="'Enviar para a rede'"
       />
     </div>

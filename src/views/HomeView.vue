@@ -32,8 +32,6 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   await blockchain
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
-  console.log(tokenValue);
-  console.log('aqui', depositDetail);
   tokens.value = tokenValue;
   pixTarget.value = depositDetail?.pixTarget;
 
@@ -42,7 +40,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain.addLock(depositId, tokenValue).catch((_error) => {
+    await blockchain.addLock(depositId, tokenValue).catch(() => {
       flowStep.value = Step.Search;
     });
 
@@ -67,14 +65,17 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
 </script>
 
 <template>
-  <SearchComponent v-if="(flowStep == Step.Search)" @token-buy="confirmBuyClick" />
-  <div v-if="(flowStep == Step.Buy)">
+  <SearchComponent
+    v-if="flowStep == Step.Search"
+    @token-buy="confirmBuyClick"
+  />
+  <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
       :pixTarget="pixTarget"
       :tokenValue="tokens"
       v-if="!loadingLock"
     />
-    <ValidationComponent v-if="loadingLock"/>
+    <ValidationComponent v-if="loadingLock" />
   </div>
 </template>
 

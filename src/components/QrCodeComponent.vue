@@ -32,7 +32,7 @@ const handleInputEvent = (event: any) => {
 };
 
 const validatePix = async (e2eid: any) => {
-  if(e2eid == ''){
+  if (e2eid == "") {
     isPixValid.value = false;
     isCodeInputEmpty.value = true;
     return;
@@ -40,7 +40,7 @@ const validatePix = async (e2eid: any) => {
   var sellerPixKey = props.pixTarget;
   var transactionValue = props.tokenValue;
 
-  if(sellerPixKey && transactionValue){
+  if (sellerPixKey && transactionValue) {
     var body_req = {
       e2e_id: e2eid,
       pix_key: sellerPixKey,
@@ -108,7 +108,10 @@ const validatePix = async (e2eid: any) => {
           class="text-md w-full box-border p-2 h-6 mb-2 outline-none"
         />
         <div class="custom-divide" v-if="!isCodeInputEmpty"></div>
-        <div class="flex flex-col w-full" v-if="!isPixValid && !isCodeInputEmpty">
+        <div
+          class="flex flex-col w-full"
+          v-if="!isPixValid && !isCodeInputEmpty"
+        >
           <div class="flex items-center h-8">
             <img
               alt="Invalid Icon"

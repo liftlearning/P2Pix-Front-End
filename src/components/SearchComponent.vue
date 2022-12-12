@@ -56,7 +56,6 @@ const decimalCount = (num: Number) => {
 const verifyLiquidity = () => {
   enableSelectButton.value = false;
   selectedDeposit.value = null;
-
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
   depositsAddedList.value.find((element) => {
@@ -69,10 +68,6 @@ const verifyLiquidity = () => {
       enableSelectButton.value = true;
       hasLiquidity.value = true;
       selectedDeposit.value = element;
-      console.log(
-        "Selected is :",
-        blockchain.formatBigNumber(element.args.amount)
-      );
       return true;
     }
     return false;

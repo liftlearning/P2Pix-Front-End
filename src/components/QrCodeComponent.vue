@@ -25,8 +25,6 @@ pixQrCode.base64QrCode().then((code: string) => {
 
 qrCodePayload.value = pixQrCode.payload();
 
-console.log(qrCodePayload);
-
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
 
@@ -48,18 +46,15 @@ const validatePix = async (e2eid: any) => {
       pix_key: sellerPixKey,
       pix_value: transactionValue,
     };
-    var resp = await api.post("http://localhost:8000/validate_pix", body_req)
-      .catch((reason: Error) => {
-        console.log('entrou no erro', reason);
-        isPixValid.value = false;
-        isCodeInputEmpty.value = false;
-        return;
-      });
-    console.log("🚀 ~ file: QrCodeForm.vue:47 ~ validatePix ~ resp", resp);
-    console.log(resp.status);
 
     isCodeInputEmpty.value = false;
-    isPixValid.value = true;
+
+    try {
+      await api.post("validate_pix", body_req);
+      isPixValid.value = true;
+    } catch (error) {
+      isPixValid.value = false;
+    }
   } else {
     isCodeInputEmpty.value = false;
     isPixValid.value = false;

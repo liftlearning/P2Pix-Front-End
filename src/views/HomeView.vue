@@ -21,10 +21,11 @@ enum Step {
 
 // States
 const etherStore = useEtherStore();
-const { loadingLock, walletAddress } = storeToRefs(etherStore);
+const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
-const tokenAmmount = ref<number>();
+const tokenAmount = ref<number>();
+const lockTransactionHash = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
 const lastWalletTransactions = ref<any[] | undefined>([]);
 
@@ -36,7 +37,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   await blockchain
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
-  tokenAmmount.value = tokenValue;
+  tokenAmount.value = tokenValue;
   pixTarget.value = depositDetail?.pixTarget;
 
   // Makes lock with deposit ID and the Amount
@@ -44,7 +45,12 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain.addLock(depositId, tokenValue).catch(() => {
+    await blockchain.addLock(depositId, tokenValue)
+    .then((lock) => {
+      console.log(lock)
+      lockTransactionHash.value = lock.hash
+    })
+    .catch(() => {
       flowStep.value = Step.Search;
     });
 
@@ -67,17 +73,24 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   }
 };
 
-const releaseTransaction = async ({ pixE2Eid }: any) => {
-  console.log("release: ", pixE2Eid);
+const releaseTransaction = async ({ e2eId }: any) => {
+  console.log(e2eId);
   flowStep.value = Step.List;
   loadingRelease.value = true;
+  console.log(lockTransactionHash.value);
+  console.log(locksAddedList.value);
+
+  // make lock release
+  // need to find lockId
+  // const release = await blockchain.releaseLock(pixTarget.value, String(tokenAmount.value), Number(e2eId), lockTransactionHash.value)
+  // console.log(release);
 
   lastWalletTransactions.value =
     await blockchain.listTransactionByWalletAddress(
       walletAddress.value.toLowerCase()
     );
 
-  setTimeout(() => (loadingRelease.value = false), 2000);
+  loadingRelease.value = false
 };
 </script>
 
@@ -89,7 +102,7 @@ const releaseTransaction = async ({ pixE2Eid }: any) => {
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
       :pixTarget="pixTarget"
-      :tokenValue="tokenAmmount"
+      :tokenValue="tokenAmount"
       @pix-validated="releaseTransaction"
       v-if="!loadingLock"
     />
@@ -99,7 +112,7 @@ const releaseTransaction = async ({ pixE2Eid }: any) => {
     />
   </div>
   <div v-if="flowStep == Step.List">
-    <ListComponent v-if="!loadingRelease" :tokenAmmount="tokenAmmount" />
+    <ListComponent v-if="!loadingRelease" :tokenAmount="tokenAmount" :last-wallet-transactions="lastWalletTransactions" />
     <ValidationComponent
       v-if="loadingRelease"
       :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"

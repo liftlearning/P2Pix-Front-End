@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
 import { useEtherStore } from "@/store/ether";
-import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
-// Store reference
-const etherStore = useEtherStore();
 
-const { walletAddress } = storeToRefs(etherStore);
-
-const lastDeposits = await blockchain.listTransactionByWalletAddress(walletAddress.value.toLowerCase())
-
-const openEtherscanUrl = (url: string) => {
-  window.open(url, "_blank")
-}
-
+// props and store references
 const props = defineProps({
+  lastWalletTransactions: Array,
   tokenAmmount: Number,
 });
 
+const openEtherscanUrl = (url: string) => {
+  window.open(url, "_blank");
+};
 </script>
 
 <template>
@@ -34,7 +28,7 @@ const props = defineProps({
       >
         <div>
           <p>Tokens recebidos</p>
-          <p class="text-2xl text-gray-900">{{props.tokenAmmount}} BRZ</p>
+          <p class="text-2xl text-gray-900">{{ props.tokenAmmount }} BRZ</p>
         </div>
         <div class="my-5">
           <p>
@@ -70,23 +64,46 @@ const props = defineProps({
       </span>
     </div>
     <div class="blur-container">
-      <div class="flex flex-row justify-between w-full bg-white p-5 rounded-lg" v-for="deposit in lastDeposits" :key="deposit?.blockNumber">
-        <p class="last-deposit-info">{{blockchain.formatBigNumber(deposit?.args.amount)}} BRZ</p>
-        <p class="last-deposit-info">{{deposit?.event == 'DepositAdded' ? 'Depósito' : deposit?.event == 'LockAdded' ? 'Reserva' : 'Compra'}}</p>
-        <div class="flex gap-2 cursor-pointer items-center" @click="openEtherscanUrl(`https://etherscan.io/tx/${deposit?.transactionHash}`)">
+      <div
+        class="flex flex-row justify-between w-full bg-white p-5 rounded-lg"
+        v-for="deposit in lastWalletTransactions"
+        :key="deposit?.blockNumber"
+      >
+        <p class="last-deposit-info">
+          {{ blockchain.formatBigNumber(deposit?.args.amount) }} BRZ
+        </p>
+        <p class="last-deposit-info">
+          {{
+            deposit?.event == "DepositAdded"
+              ? "Depósito"
+              : deposit?.event == "LockAdded"
+              ? "Reserva"
+              : "Compra"
+          }}
+        </p>
+        <div
+          class="flex gap-2 cursor-pointer items-center"
+          @click="
+            openEtherscanUrl(
+              `https://etherscan.io/tx/${deposit?.transactionHash}`
+            )
+          "
+        >
           <p class="last-deposit-info">Etherscan</p>
-          <img alt="Redirect image" src="@/assets/redirect.svg"/>
+          <img alt="Redirect image" src="@/assets/redirect.svg" />
         </div>
       </div>
       <button
         type="button"
         class="text-white mt-2"
         @click="() => {}"
-        v-if="(lastDeposits?.length != 0)"
+        v-if="lastWalletTransactions?.length != 0"
       >
         Carregar mais
       </button>
-      <p class="font-bold" v-if="(lastDeposits?.length == 0)">Não há nenhuma transação anterior</p>
+      <p class="font-bold" v-if="lastWalletTransactions?.length == 0">
+        Não há nenhuma transação anterior
+      </p>
     </div>
   </div>
 </template>
@@ -97,7 +114,7 @@ const props = defineProps({
 }
 
 p {
-  @apply text-gray-900
+  @apply text-gray-900;
 }
 
 .text-container {
@@ -115,8 +132,8 @@ p {
   @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
 }
 
-.last-deposit-info{
-  @apply font-medium text-base
+.last-deposit-info {
+  @apply font-medium text-base;
 }
 
 input[type="number"] {

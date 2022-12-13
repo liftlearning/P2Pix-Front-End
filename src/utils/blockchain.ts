@@ -222,6 +222,7 @@ const addLock = async (depositId: Number, amount: Number) => {
   lock.wait();
 
   updateLockAddedEvents();
+  return lock;
 };
 
 // Get specific lock data by its ID
@@ -270,6 +271,7 @@ const releaseLock = async (
   release.wait();
 
   updateLockReleasedEvents();
+  return release
 };
 
 // Formatting methods

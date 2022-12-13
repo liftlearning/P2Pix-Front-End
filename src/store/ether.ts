@@ -4,7 +4,7 @@ export const useEtherStore = defineStore("ether", {
   state: () => ({
     walletAddress: "",
     balance: "",
-    
+    loadingLock: false,
     // Depósitos válidos para compra
     depositsValidList: [] as any[],
     // Depósitos adicionados na blockchain
@@ -24,6 +24,9 @@ export const useEtherStore = defineStore("ether", {
     },
     setBalance(balance: string) {
       this.balance = balance;
+    },
+    setLoadingLock(isLoadingLock: boolean) {
+      this.loadingLock = isLoadingLock;
     },
     setDepositsValidList(depositsValidList: any[]) {
       this.depositsValidList = depositsValidList;

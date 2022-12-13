@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import QrCodeFormVue from "../views/QrCodeForm.vue";
 import MockView from "../views/MockView.vue";
 import ListView from "../components/ListComponent.vue";
 
@@ -11,11 +10,6 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
-    },
-    {
-      path: "/pix",
-      name: "pix",
-      component: QrCodeFormVue,
     },
     {
       path: "/mock",

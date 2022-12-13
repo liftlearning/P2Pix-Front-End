@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
-import ValidationComponent from "../components/ValidationComponent.vue";
+import ValidationComponent from "../components/LoadingComponent.vue";
+import ListComponent from "@/components/ListComponent.vue";
 import blockchain from "../utils/blockchain";
 import { ref } from "vue";
 
@@ -15,15 +16,17 @@ import { storeToRefs } from "pinia";
 enum Step {
   Search,
   Buy,
-  List
+  List,
 }
 
 // States
 const etherStore = useEtherStore();
-const { loadingLock } = storeToRefs(etherStore);
+const { loadingLock, walletAddress } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
-const tokens = ref<number>();
+const tokenAmmount = ref<number>();
+const loadingRelease = ref<Boolean>(false);
+const lastWalletTransactions = ref<any[] | undefined>([]);
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
@@ -33,7 +36,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   await blockchain
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
-  tokens.value = tokenValue;
+  tokenAmmount.value = tokenValue;
   pixTarget.value = depositDetail?.pixTarget;
 
   // Makes lock with deposit ID and the Amount
@@ -63,6 +66,19 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     // Valor = tokenValue
   }
 };
+
+const releaseTransaction = async ({ pixE2Eid }: any) => {
+  console.log("release: ", pixE2Eid);
+  flowStep.value = Step.List;
+  loadingRelease.value = true;
+
+  lastWalletTransactions.value =
+    await blockchain.listTransactionByWalletAddress(
+      walletAddress.value.toLowerCase()
+    );
+
+  setTimeout(() => (loadingRelease.value = false), 2000);
+};
 </script>
 
 <template>
@@ -73,17 +89,22 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
       :pixTarget="pixTarget"
-      :tokenValue="tokens"
+      :tokenValue="tokenAmmount"
+      @pix-validated="releaseTransaction"
       v-if="!loadingLock"
     />
-    <ValidationComponent v-if="loadingLock" />
+    <ValidationComponent
+      v-if="loadingLock"
+      :message="'A transação está sendo enviada para a rede'"
+    />
   </div>
-  <Suspense>
-    <ListComponent v-if="(flowStep == Step.List)" :tokenAmmount="tokens" />
-    <template #fallback>
-      Carregando...
-    </template>
-  </Suspense>
+  <div v-if="flowStep == Step.List">
+    <ListComponent v-if="!loadingRelease" :tokenAmmount="tokenAmmount" />
+    <ValidationComponent
+      v-if="loadingRelease"
+      :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"
+    />
+  </div>
 </template>
 
 <style scoped></style>

@@ -52,6 +52,7 @@ const decimalCount = (num: Number) => {
   }
   return 0;
 };
+
 // Verify if there is a valid deposit to buy
 const verifyLiquidity = () => {
   enableSelectButton.value = false;

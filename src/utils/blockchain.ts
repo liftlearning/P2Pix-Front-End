@@ -32,7 +32,11 @@ const splitTokens = async () => {
   if (!provider) return;
 
   const signer = provider.getSigner();
-  const tokenContract = new ethers.Contract(addresses.token, mockToken.abi, signer);
+  const tokenContract = new ethers.Contract(
+    addresses.token,
+    mockToken.abi,
+    signer
+  );
 
   for (let i = 0; i < wallets.length; i++) {
     const tx = await tokenContract.transfer(
@@ -45,7 +49,9 @@ const splitTokens = async () => {
 };
 
 // get wallet transactions
-const listTransactionByWalletAddress = async (walletAddress: string): Promise<any[] | undefined> => {
+const listTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<any[] | undefined> => {
   const provider = getProvider();
   if (!provider) return;
 
@@ -59,12 +65,16 @@ const listTransactionByWalletAddress = async (walletAddress: string): Promise<an
   const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
 
   const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
-  const eventsReleasedLocks = await p2pContract.queryFilter(filterReleasedLocks);
+  const eventsReleasedLocks = await p2pContract.queryFilter(
+    filterReleasedLocks
+  );
 
-  return [...eventsDeposits, ...eventsAddedLocks, ...eventsReleasedLocks].sort((a, b) => {
-    return b.blockNumber - a.blockNumber
-  })
-}
+  return [...eventsDeposits, ...eventsAddedLocks, ...eventsReleasedLocks].sort(
+    (a, b) => {
+      return b.blockNumber - a.blockNumber;
+    }
+  );
+};
 
 // Update events at store methods
 const updateDepositAddedEvents = async () => {
@@ -82,7 +92,7 @@ const updateDepositAddedEvents = async () => {
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
   etherStore.setDepositsAddedList(eventsDeposits);
-}
+};
 
 const updateLockAddedEvents = async () => {
   const etherStore = useEtherStore();
@@ -99,7 +109,7 @@ const updateLockAddedEvents = async () => {
   const filterLocks = p2pContract.filters.LockAdded(null);
   const eventsLocks = await p2pContract.queryFilter(filterLocks);
   etherStore.setLocksAddedList(eventsLocks);
-}
+};
 
 const updateLockReleasedEvents = async () => {
   const etherStore = useEtherStore();
@@ -116,7 +126,7 @@ const updateLockReleasedEvents = async () => {
   const filterLocks = p2pContract.filters.LockReleased(null);
   const eventsLocks = await p2pContract.queryFilter(filterLocks);
   etherStore.setLocksReleasedList(eventsLocks);
-}
+};
 
 // Provider methods
 const connectProvider = async () => {
@@ -155,11 +165,7 @@ const addDeposit = async (tokenQty: string, pixKey: string) => {
     mockToken.abi,
     signer
   );
-  const p2pContract = new ethers.Contract(
-    addresses.p2pix, 
-    p2pix.abi, 
-    signer
-  );
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   // First get the approval
   const apprv = await tokenContract.approve(
@@ -230,29 +236,28 @@ const mapLocks = async (lockId: string) => {
 
   console.log(lock);
 
-  console.log("Expiration block = ", Number(lock.expirationBlock))
+  console.log("Expiration block = ", Number(lock.expirationBlock));
   return lock;
 };
 
 // Releases lock by specific ID and other additional data
-const releaseLock = async (pixKey: string, amount: string, e2eId: Number, lockId: string) => {
+const releaseLock = async (
+  pixKey: string,
+  amount: string,
+  e2eId: Number,
+  lockId: string
+) => {
   const provider = getProvider();
   if (!provider) return;
 
-  const mockBacenSigner = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
+  const mockBacenSigner = new ethers.Wallet(
+    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+  );
 
   const messageToSign = ethers.utils.solidityKeccak256(
-    [
-      "string", 
-      "uint256", 
-      "uint256"
-    ],
-    [
-      pixKey,
-      formatEther(amount),
-      e2eId
-    ]
-  )
+    ["string", "uint256", "uint256"],
+    [pixKey, formatEther(amount), e2eId]
+  );
 
   const messageHashBytes = ethers.utils.arrayify(messageToSign);
   const flatSig = await mockBacenSigner.signMessage(messageHashBytes);
@@ -260,19 +265,12 @@ const releaseLock = async (pixKey: string, amount: string, e2eId: Number, lockId
 
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  
-  const release = await p2pContract.release(
-    lockId,
-    e2eId,
-    sig.r,
-    sig.s,
-    sig.v
-  )
-  release.wait()
+
+  const release = await p2pContract.release(lockId, e2eId, sig.r, sig.s, sig.v);
+  release.wait();
 
   updateLockReleasedEvents();
 };
-
 
 // Formatting methods
 const formatEther = (num: string) => {
@@ -295,5 +293,5 @@ export default {
   formatBigNumber,
   addLock,
   mapLocks,
-  releaseLock
+  releaseLock,
 };

@@ -196,7 +196,6 @@ const mapDeposits = async (depositId: BigNumber) => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   const deposit = await contract.mapDeposits(depositId.toNumber());
 
-  console.log(deposit);
   return deposit;
 };
 
@@ -211,6 +210,7 @@ const addLock = async (depositId: Number, amount: Number) => {
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   // Make lock
+  const oldEventsLen = etherStore.locksAddedList.length;
   const lock = await p2pContract.lock(
     depositId,
     etherStore.walletAddress,
@@ -220,8 +220,9 @@ const addLock = async (depositId: Number, amount: Number) => {
     []
   );
   lock.wait();
-
-  updateLockAddedEvents();
+  while (etherStore.locksAddedList.length === oldEventsLen) {
+    await updateLockAddedEvents();
+  }
   return lock;
 };
 
@@ -269,9 +270,9 @@ const releaseLock = async (
 
   const release = await p2pContract.release(lockId, e2eId, sig.r, sig.s, sig.v);
   release.wait();
+  await updateLockReleasedEvents();
 
-  updateLockReleasedEvents();
-  return release
+  return release;
 };
 
 // Formatting methods
@@ -296,4 +297,5 @@ export default {
   addLock,
   mapLocks,
   releaseLock,
+  updateLockAddedEvents,
 };

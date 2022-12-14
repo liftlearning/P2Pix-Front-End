@@ -69,7 +69,7 @@ const validatePix = async () => {
 
 <template>
   <div class="page">
-    <h2>{{e2eId}}</h2>
+    <h2>{{ e2eId }}</h2>
     <div class="text-container">
       <span class="text font-extrabold text-2xl max-w-[30rem]">
         Utilize o QR Code ou copie o código para realizar o Pix
@@ -147,7 +147,7 @@ const validatePix = async () => {
       <CustomButton
         :is-disabled="isPixValid == false"
         :text="'Enviar para a rede'"
-        @button-clicked="emit('pixValidated', e2eId)"
+        @button-clicked="emit('pixValidated', { e2eId })"
       />
     </div>
   </div>

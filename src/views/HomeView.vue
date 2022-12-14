@@ -5,11 +5,7 @@ import ListComponent from "@/components/ListComponent.vue";
 import blockchain from "../utils/blockchain";
 import { ref } from "vue";
 
-// (TO DO) Tirar isso tudo daqui
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
-import addresses from "../utils/smart_contract_files/localhost.json";
 import { useEtherStore } from "@/store/ether";
-import { ethers } from "ethers";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
 
@@ -26,6 +22,7 @@ const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
 const lockTransactionHash = ref<string>("");
+const lockId = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
 const lastWalletTransactions = ref<any[] | undefined>([]);
 
@@ -45,52 +42,56 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain.addLock(depositId, tokenValue)
-    .then((lock) => {
-      console.log(lock)
-      lockTransactionHash.value = lock.hash
-    })
-    .catch(() => {
-      flowStep.value = Step.Search;
-    });
+    await blockchain
+      .addLock(depositId, tokenValue)
+      .then((lock) => {
+        lockTransactionHash.value = lock.hash;
+      })
+      .catch(() => {
+        flowStep.value = Step.Search;
+      });
 
-    // (TO DO) Tirar isso daqui
-    const window_ = window as any;
-    const connection = window_.ethereum;
-    let provider: ethers.providers.Web3Provider | null = null;
-    if (!connection) return;
-    provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-    const filterLocks = p2pContract.filters.LockAdded(null);
-    const eventsLocks = await p2pContract.queryFilter(filterLocks);
-    etherStore.setLocksAddedList(eventsLocks);
     etherStore.setLoadingLock(false);
-
-    // Data to QRCode
-    // Chave Pix = depositDetail.pixTarget
-    // Valor = tokenValue
   }
 };
 
 const releaseTransaction = async ({ e2eId }: any) => {
-  console.log(e2eId);
   flowStep.value = Step.List;
   loadingRelease.value = true;
-  console.log(lockTransactionHash.value);
-  console.log(locksAddedList.value);
 
-  // make lock release
-  // need to find lockId
-  // const release = await blockchain.releaseLock(pixTarget.value, String(tokenAmount.value), Number(e2eId), lockTransactionHash.value)
-  // console.log(release);
+  const findLockId = locksAddedList.value.find((element) => {
+    if (element.transactionHash === lockTransactionHash.value) {
+      lockId.value = element.args.lockID;
+      return true;
+    }
+    return false;
+  });
 
-  lastWalletTransactions.value =
-    await blockchain.listTransactionByWalletAddress(
-      walletAddress.value.toLowerCase()
+  if (findLockId) {
+    console.log(
+      pixTarget.value,
+      String(tokenAmount.value),
+      Number(e2eId),
+      lockId.value
     );
 
-  loadingRelease.value = false
+    const release = await blockchain.releaseLock(
+      pixTarget.value,
+      String(tokenAmount.value),
+      Number(e2eId),
+      lockId.value
+    );
+    release.wait();
+
+    lastWalletTransactions.value =
+      await blockchain.listTransactionByWalletAddress(
+        walletAddress.value.toLowerCase()
+      );
+
+    console.log(tokenAmount);
+
+    loadingRelease.value = false;
+  }
 };
 </script>
 
@@ -112,7 +113,11 @@ const releaseTransaction = async ({ e2eId }: any) => {
     />
   </div>
   <div v-if="flowStep == Step.List">
-    <ListComponent v-if="!loadingRelease" :tokenAmount="tokenAmount" :last-wallet-transactions="lastWalletTransactions" />
+    <ListComponent
+      v-if="!loadingRelease"
+      :tokenAmount="tokenAmount"
+      :last-wallet-transactions="lastWalletTransactions"
+    />
     <ValidationComponent
       v-if="loadingRelease"
       :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"

@@ -1,13 +1,27 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
-import { useEtherStore } from "@/store/ether";
+import { BigNumber } from "ethers";
 import blockchain from "../utils/blockchain";
 
 // props and store references
 const props = defineProps({
   lastWalletTransactions: Array,
-  tokenAmmount: Number,
+  tokenAmmount: BigNumber,
 });
+
+const teste = (amount: any) => {
+  console.log(amount);
+  console.log("Teste");
+};
+
+const formatEventsAmount = (amount: any) => {
+  try {
+    const formated = blockchain.formatBigNumber(amount);
+    return formated;
+  } catch {
+    return "";
+  }
+};
 
 const openEtherscanUrl = (url: string) => {
   window.open(url, "_blank");
@@ -28,7 +42,9 @@ const openEtherscanUrl = (url: string) => {
       >
         <div>
           <p>Tokens recebidos</p>
-          <p class="text-2xl text-gray-900">{{ props.tokenAmmount }} BRZ</p>
+          <p class="text-2xl text-gray-900">
+            {{ teste(props.tokenAmmount) }} BRZ
+          </p>
         </div>
         <div class="my-5">
           <p>
@@ -70,7 +86,7 @@ const openEtherscanUrl = (url: string) => {
         :key="deposit?.blockNumber"
       >
         <p class="last-deposit-info">
-          {{ blockchain.formatBigNumber(deposit?.args.amount) }} BRZ
+          {{ formatEventsAmount(deposit?.args.amount) }} BRZ
         </p>
         <p class="last-deposit-info">
           {{

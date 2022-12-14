@@ -81,9 +81,8 @@ const releaseTransaction = async ({ e2eId }: any) => {
         walletAddress.value.toLowerCase()
       );
 
+    await blockchain.updateWalletStatus();
     loadingRelease.value = false;
-
-    blockchain.updateWalletStatus();
   }
 };
 </script>

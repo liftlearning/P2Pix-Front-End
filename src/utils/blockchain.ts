@@ -21,7 +21,7 @@ const updateWalletStatus = async () => {
   const walletAddress = await provider.send("eth_requestAccounts", []);
 
   const balance = await contract.balanceOf(walletAddress[0]);
-  +etherStore.setBalance(formatBigNumber(balance));
+  etherStore.setBalance(formatBigNumber(balance));
   etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
 };
 

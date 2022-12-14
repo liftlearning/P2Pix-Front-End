@@ -2,7 +2,7 @@
 import CustomButton from "@/components/CustomButton.vue";
 import blockchain from "../utils/blockchain";
 
-// props and store references
+// props
 const props = defineProps({
   lastWalletReleaseTransactions: Array,
   tokenAmount: Number,
@@ -49,31 +49,27 @@ const openEtherscanUrl = (url: string) => {
           @buttonClicked="() => {}"
         />
       </div>
-    </div>
-    <div class="blur-container-row">
       <button
         type="button"
-        class="border-amber-500 border-2 rounded default-button text-white p-2 px-50 w-full"
+        class="border-amber-500 border-2 rounded default-button text-white p-2 px-50 min-w-[198px]"
         @click="() => {}"
       >
         Fazer nova transação
       </button>
-      <button
-        type="button"
-        class="border-amber-500 border-2 rounded default-button text-white p-2"
-        @click="() => {}"
-      >
-        Desconectar
-      </button>
     </div>
-    <div class="text-container mt-10">
+    <div class="text-container mt-16">
       <span class="text font-extrabold text-3xl max-w-[50rem]"
         >Últimas transações
       </span>
     </div>
-    <div class="blur-container">
+    <div class="blur-container min-w-[80%] gap-8">
+      <div class="flex flex-row justify-between w-full px-8">
+        <span class="text-xs text-gray-50 font-medium">Valor</span>
+        <span class="text-xs text-gray-50 font-medium">Tipo de transação</span>
+        <span class="text-xs text-gray-50 font-medium">Checar transação</span>
+      </div>
       <div
-        class="flex flex-row justify-between w-full bg-white p-5 rounded-lg"
+        class="flex flex-row justify-between w-full bg-white px-6 py-4 rounded-lg"
         v-for="release in lastWalletReleaseTransactions"
         :key="release?.blockNumber"
       >
@@ -95,14 +91,17 @@ const openEtherscanUrl = (url: string) => {
           <img alt="Redirect image" src="@/assets/redirect.svg" />
         </div>
       </div>
-      <button
-        type="button"
-        class="text-white mt-2"
-        @click="() => {}"
-        v-if="lastWalletReleaseTransactions?.length != 0"
-      >
-        Carregar mais
-      </button>
+      <div class="flex justify-center w-full right-6 mt-2">
+        <button
+          type="button"
+          class="text-white"
+          @click="() => {}"
+          v-if="lastWalletReleaseTransactions?.length != 0"
+        >
+          Carregar mais
+        </button>
+      </div>
+
       <p class="font-bold" v-if="lastWalletReleaseTransactions?.length == 0">
         Não há nenhuma transação anterior
       </p>
@@ -131,7 +130,7 @@ p {
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
 }
 
 .last-release-info {

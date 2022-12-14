@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from "@/router";
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import blockchain from "../utils/blockchain";
@@ -40,7 +41,13 @@ const formatWalletBalance = (): string => {
       @load="connectMetaMask()"
     />
     <div class="flex gap-4 items-center">
-      <button type="button" class="default-button">Quero vender</button>
+      <button
+        type="button"
+        class="default-button"
+        v-on:click="router.push('/seller')"
+      >
+        Quero vender
+      </button>
       <button
         type="button"
         v-if="!walletAddress"

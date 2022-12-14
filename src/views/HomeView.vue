@@ -24,18 +24,18 @@ const tokenAmount = ref<number>();
 const lockTransactionHash = ref<string>("");
 const lockId = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
-const lastWalletTransactions = ref<any[] | undefined>([]);
+const lastWalletReleaseTransactions = ref<any[] | undefined>([]);
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
-  console.log(selectedDeposit);
   let depositDetail;
+  // depositId is BigNumber type object
   const depositId = selectedDeposit["args"]["depositID"];
   await blockchain
     .mapDeposits(depositId)
     .then((deposit) => (depositDetail = deposit));
   tokenAmount.value = tokenValue;
-  pixTarget.value = depositDetail?.pixTarget;
+  pixTarget.value = String(depositDetail?.pixTarget);
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {
@@ -61,36 +61,29 @@ const releaseTransaction = async ({ e2eId }: any) => {
 
   const findLockId = locksAddedList.value.find((element) => {
     if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args.lockID;
+      lockId.value = element.args.lockID; // BigNumber type
       return true;
     }
     return false;
   });
 
   if (findLockId) {
-    console.log(
-      pixTarget.value,
-      String(tokenAmount.value),
-      Number(e2eId),
-      lockId.value
-    );
-
     const release = await blockchain.releaseLock(
-      pixTarget.value,
-      String(tokenAmount.value),
-      Number(e2eId),
-      lockId.value
+      pixTarget.value, // String
+      tokenAmount.value ?? 0, // Number
+      e2eId, // String
+      lockId.value // String
     );
     release.wait();
 
-    lastWalletTransactions.value =
-      await blockchain.listTransactionByWalletAddress(
+    lastWalletReleaseTransactions.value =
+      await blockchain.listReleaseTransactionByWalletAddress(
         walletAddress.value.toLowerCase()
       );
 
-    console.log(tokenAmount);
-
     loadingRelease.value = false;
+
+    blockchain.updateWalletStatus();
   }
 };
 </script>
@@ -115,8 +108,8 @@ const releaseTransaction = async ({ e2eId }: any) => {
   <div v-if="flowStep == Step.List">
     <ListComponent
       v-if="!loadingRelease"
+      :last-wallet-release-transactions="lastWalletReleaseTransactions"
       :tokenAmount="tokenAmount"
-      :last-wallet-transactions="lastWalletTransactions"
     />
     <ValidationComponent
       v-if="loadingRelease"

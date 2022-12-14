@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
-import { BigNumber } from "ethers";
 import blockchain from "../utils/blockchain";
 
 // props and store references
 const props = defineProps({
-  lastWalletTransactions: Array,
-  tokenAmmount: BigNumber,
+  lastWalletReleaseTransactions: Array,
+  tokenAmount: Number,
 });
-
-const teste = (amount: any) => {
-  console.log(amount);
-  console.log("Teste");
-};
 
 const formatEventsAmount = (amount: any) => {
   try {
@@ -42,9 +36,7 @@ const openEtherscanUrl = (url: string) => {
       >
         <div>
           <p>Tokens recebidos</p>
-          <p class="text-2xl text-gray-900">
-            {{ teste(props.tokenAmmount) }} BRZ
-          </p>
+          <p class="text-2xl text-gray-900">{{ props.tokenAmount }} BRZ</p>
         </div>
         <div class="my-5">
           <p>
@@ -82,30 +74,24 @@ const openEtherscanUrl = (url: string) => {
     <div class="blur-container">
       <div
         class="flex flex-row justify-between w-full bg-white p-5 rounded-lg"
-        v-for="deposit in lastWalletTransactions"
-        :key="deposit?.blockNumber"
+        v-for="release in lastWalletReleaseTransactions"
+        :key="release?.blockNumber"
       >
-        <p class="last-deposit-info">
-          {{ formatEventsAmount(deposit?.args.amount) }} BRZ
+        <p class="last-release-info">
+          {{ formatEventsAmount(release?.args.amount) }} BRZ
         </p>
-        <p class="last-deposit-info">
-          {{
-            deposit?.event == "DepositAdded"
-              ? "Depósito"
-              : deposit?.event == "LockAdded"
-              ? "Reserva"
-              : "Compra"
-          }}
+        <p class="last-release-info">
+          {{ "Compra" }}
         </p>
         <div
           class="flex gap-2 cursor-pointer items-center"
           @click="
             openEtherscanUrl(
-              `https://etherscan.io/tx/${deposit?.transactionHash}`
+              `https://etherscan.io/tx/${release?.transactionHash}`
             )
           "
         >
-          <p class="last-deposit-info">Etherscan</p>
+          <p class="last-release-info">Etherscan</p>
           <img alt="Redirect image" src="@/assets/redirect.svg" />
         </div>
       </div>
@@ -113,11 +99,11 @@ const openEtherscanUrl = (url: string) => {
         type="button"
         class="text-white mt-2"
         @click="() => {}"
-        v-if="lastWalletTransactions?.length != 0"
+        v-if="lastWalletReleaseTransactions?.length != 0"
       >
         Carregar mais
       </button>
-      <p class="font-bold" v-if="lastWalletTransactions?.length == 0">
+      <p class="font-bold" v-if="lastWalletReleaseTransactions?.length == 0">
         Não há nenhuma transação anterior
       </p>
     </div>
@@ -148,7 +134,7 @@ p {
   @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
 }
 
-.last-deposit-info {
+.last-release-info {
   @apply font-medium text-base;
 }
 

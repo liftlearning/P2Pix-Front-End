@@ -21,8 +21,7 @@ const updateWalletStatus = async () => {
   const walletAddress = await provider.send("eth_requestAccounts", []);
 
   const balance = await contract.balanceOf(walletAddress[0]);
-
-  etherStore.setBalance(formatBigNumber(balance));
+  +etherStore.setBalance(formatBigNumber(balance));
   etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
 };
 
@@ -48,8 +47,8 @@ const splitTokens = async () => {
   }
 };
 
-// get wallet transactions
-const listTransactionByWalletAddress = async (
+// get all wallet transactions
+const listAllTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<any[] | undefined> => {
   const provider = getProvider();
@@ -74,6 +73,62 @@ const listTransactionByWalletAddress = async (
       return b.blockNumber - a.blockNumber;
     }
   );
+};
+
+// get wallet's deposit transactions
+const listDepositTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<any[] | undefined> => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
+  const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
+  return eventsDeposits.sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
+};
+
+// get wallet's lock transactions
+const listLockTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<any[] | undefined> => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
+  const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
+
+  return eventsAddedLocks.sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
+};
+
+// get wallet's release transactions
+const listReleaseTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<any[] | undefined> => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
+  const eventsReleasedLocks = await p2pContract.queryFilter(
+    filterReleasedLocks
+  );
+
+  return eventsReleasedLocks.sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
 };
 
 // Update events at store methods
@@ -194,14 +249,14 @@ const mapDeposits = async (depositId: BigNumber) => {
 
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  const deposit = await contract.mapDeposits(depositId.toNumber());
+  const deposit = await contract.mapDeposits(depositId);
 
   return deposit;
 };
 
 // Lock methods
 // Gets value from user's form to create a lock in the blockchain
-const addLock = async (depositId: Number, amount: Number) => {
+const addLock = async (depositId: BigNumber, amount: Number) => {
   const etherStore = useEtherStore();
   const provider = getProvider();
 
@@ -212,17 +267,19 @@ const addLock = async (depositId: Number, amount: Number) => {
   // Make lock
   const oldEventsLen = etherStore.locksAddedList.length;
   const lock = await p2pContract.lock(
-    depositId,
-    etherStore.walletAddress,
-    ethers.constants.AddressZero,
+    depositId, // BigNumber
+    etherStore.walletAddress, // String "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (Example)
+    ethers.constants.AddressZero, // String "0x0000000000000000000000000000000000000000"
     0,
-    ethers.utils.parseEther(amount.toString()),
+    formatEther(String(amount)), // BigNumber
     []
   );
   lock.wait();
+
   while (etherStore.locksAddedList.length === oldEventsLen) {
     await updateLockAddedEvents();
   }
+
   return lock;
 };
 
@@ -236,17 +293,14 @@ const mapLocks = async (lockId: string) => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   const lock = await contract.mapLocks(lockId);
 
-  console.log(lock);
-
-  console.log("Expiration block = ", Number(lock.expirationBlock));
   return lock;
 };
 
 // Releases lock by specific ID and other additional data
 const releaseLock = async (
   pixKey: string,
-  amount: string,
-  e2eId: Number,
+  amount: Number,
+  e2eId: string,
   lockId: string
 ) => {
   const provider = getProvider();
@@ -258,7 +312,7 @@ const releaseLock = async (
 
   const messageToSign = ethers.utils.solidityKeccak256(
     ["string", "uint256", "uint256"],
-    [pixKey, formatEther(amount), e2eId]
+    [pixKey, formatEther(String(amount)), formatEther(e2eId)]
   );
 
   const messageHashBytes = ethers.utils.arrayify(messageToSign);
@@ -268,7 +322,13 @@ const releaseLock = async (
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
-  const release = await p2pContract.release(lockId, e2eId, sig.r, sig.s, sig.v);
+  const release = await p2pContract.release(
+    lockId,
+    formatEther(e2eId),
+    sig.r,
+    sig.s,
+    sig.v
+  );
   release.wait();
   await updateLockReleasedEvents();
 
@@ -289,8 +349,12 @@ const formatBigNumber = (num: BigNumber) => {
 export default {
   connectProvider,
   formatEther,
+  updateWalletStatus,
   splitTokens,
-  listTransactionByWalletAddress,
+  listAllTransactionByWalletAddress,
+  listReleaseTransactionByWalletAddress,
+  listDepositTransactionByWalletAddress,
+  listLockTransactionByWalletAddress,
   addDeposit,
   mapDeposits,
   formatBigNumber,

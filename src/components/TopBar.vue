@@ -3,10 +3,12 @@ import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import blockchain from "../utils/blockchain";
 
+// Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
 
+//Methods
 const connectMetaMask = () => {
   blockchain.connectProvider();
 };
@@ -15,16 +17,14 @@ const formatWalletAddress = (): string => {
   const walletAddressLength = walletAddress.value.length;
   const initialText = walletAddress.value.substring(0, 5);
   const finalText = walletAddress.value.substring(
-    walletAddressLength - 5,
-    walletAddressLength - 1
+    walletAddressLength - 4,
+    walletAddressLength
   );
   return `${initialText}...${finalText}`;
 };
 
 const formatWalletBalance = (): string => {
-  const formattedBalance = blockchain.formatEther(balance.value);
-  const fixed = formattedBalance.substring(0, 8);
-
+  const fixed = balance.value.substring(0, 8);
   return fixed;
 };
 </script>

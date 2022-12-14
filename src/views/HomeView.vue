@@ -109,6 +109,7 @@ const releaseTransaction = async ({ e2eId }: any) => {
       v-if="!loadingRelease"
       :last-wallet-release-transactions="lastWalletReleaseTransactions"
       :tokenAmount="tokenAmount"
+      @make-another-transaction="flowStep = Step.Search"
     />
     <ValidationComponent
       v-if="loadingRelease"

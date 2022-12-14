@@ -8,6 +8,9 @@ const props = defineProps({
   tokenAmount: Number,
 });
 
+// Emits
+const emit = defineEmits(["makeAnotherTransaction"]);
+
 const formatEventsAmount = (amount: any) => {
   try {
     const formated = blockchain.formatBigNumber(amount);
@@ -52,7 +55,7 @@ const openEtherscanUrl = (url: string) => {
       <button
         type="button"
         class="border-amber-500 border-2 rounded default-button text-white p-2 px-50 min-w-[198px]"
-        @click="() => {}"
+        @click="emit('makeAnotherTransaction')"
       >
         Fazer nova transação
       </button>
@@ -73,12 +76,12 @@ const openEtherscanUrl = (url: string) => {
         v-for="release in lastWalletReleaseTransactions"
         :key="release?.blockNumber"
       >
-        <p class="last-release-info">
+        <span class="last-release-info">
           {{ formatEventsAmount(release?.args.amount) }} BRZ
-        </p>
-        <p class="last-release-info">
+        </span>
+        <span class="last-release-info">
           {{ "Compra" }}
-        </p>
+        </span>
         <div
           class="flex gap-2 cursor-pointer items-center"
           @click="
@@ -87,7 +90,7 @@ const openEtherscanUrl = (url: string) => {
             )
           "
         >
-          <p class="last-release-info">Etherscan</p>
+          <span class="last-release-info">Etherscan</span>
           <img alt="Redirect image" src="@/assets/redirect.svg" />
         </div>
       </div>
@@ -134,7 +137,7 @@ p {
 }
 
 .last-release-info {
-  @apply font-medium text-base;
+  @apply font-medium text-base text-gray-900;
 }
 
 input[type="number"] {

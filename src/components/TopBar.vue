@@ -37,7 +37,6 @@ const formatWalletBalance = (): string => {
       src="@/assets/logo.svg"
       width="75"
       height="75"
-      @load="connectMetaMask()"
     />
     <div class="flex gap-4 items-center">
       <button type="button" class="default-button">Quero vender</button>

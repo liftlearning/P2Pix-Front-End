@@ -62,6 +62,12 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     // Valor = tokenValue
   }
 };
+
+const disconnectUser = ({}: any) => {
+  console.log('entrou')
+  etherStore.setWalletAddress("");
+  flowStep.value == Step.Search;
+};
 </script>
 
 <template>
@@ -77,6 +83,7 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     />
     <ValidationComponent v-if="loadingLock" />
   </div>
+  <div @disconnect-user="disconnectUser"></div>
 </template>
 
 <style scoped></style>

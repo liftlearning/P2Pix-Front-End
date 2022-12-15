@@ -2,7 +2,11 @@
 </script>
 
 <template>
-  <div>Gerenciar Ofertas</div>
+  <div class="page">Gerenciar Ofertas</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.page {
+  @apply flex gap-8 mt-24;
+}
+</style>

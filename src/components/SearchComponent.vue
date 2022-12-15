@@ -60,9 +60,11 @@ const verifyLiquidity = () => {
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
   depositsAddedList.value.find((element) => {
-    const p2pixTokenValue = blockchain.formatBigNumber(element.args.amount);
+    const p2pixTokenValue = Number(
+      blockchain.formatBigNumber(element.args.amount)
+    );
     if (
-      tokenValue.value!! <= Number(p2pixTokenValue) &&
+      tokenValue.value!! <= p2pixTokenValue &&
       tokenValue.value!! != 0 &&
       element.args.seller !== walletAddress.value
     ) {

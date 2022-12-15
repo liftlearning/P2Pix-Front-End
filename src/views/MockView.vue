@@ -15,7 +15,7 @@ const depositValue = ref<Number>();
 const depositPixKey = ref<string>("");
 
 //  Split tokens between wallets in wallets.json
-const splitTokens = () => {
+const splitTokens = async () => {
   blockchain.splitTokens();
 };
 
@@ -40,13 +40,15 @@ const mockDeposit = () => {
 
 // Get specific deposit data by its ID
 const mapDeposit = (depositId: BigNumber) => {
-  blockchain.mapDeposits(depositId);
+  const deposit = blockchain.mapDeposits(depositId);
+  return deposit;
 };
 
 // Lock methods
 // Get specific lock data by its ID
 const mapLock = (lockId: string) => {
-  blockchain.mapLocks(lockId);
+  const lock = blockchain.mapLocks(lockId);
+  return lock;
 };
 </script>
 

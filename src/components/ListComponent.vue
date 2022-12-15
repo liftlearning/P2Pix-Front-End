@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
-import { BigNumber } from "ethers";
 import blockchain from "../utils/blockchain";
 
-// props and store references
+// props
 const props = defineProps({
-  lastWalletTransactions: Array,
-  tokenAmmount: BigNumber,
+  lastWalletReleaseTransactions: Array,
+  tokenAmount: Number,
 });
 
-const teste = (amount: any) => {
-  console.log(amount);
-  console.log("Teste");
-};
+// Emits
+const emit = defineEmits(["makeAnotherTransaction"]);
 
 const formatEventsAmount = (amount: any) => {
   try {
@@ -42,9 +39,7 @@ const openEtherscanUrl = (url: string) => {
       >
         <div>
           <p>Tokens recebidos</p>
-          <p class="text-2xl text-gray-900">
-            {{ teste(props.tokenAmmount) }} BRZ
-          </p>
+          <p class="text-2xl text-gray-900">{{ props.tokenAmount }} BRZ</p>
         </div>
         <div class="my-5">
           <p>
@@ -57,67 +52,60 @@ const openEtherscanUrl = (url: string) => {
           @buttonClicked="() => {}"
         />
       </div>
-    </div>
-    <div class="blur-container-row">
       <button
         type="button"
-        class="border-amber-500 border-2 rounded default-button text-white p-2 px-50 w-full"
-        @click="() => {}"
+        class="border-amber-500 border-2 rounded default-button text-white p-2 px-50 min-w-[198px]"
+        @click="emit('makeAnotherTransaction')"
       >
         Fazer nova transação
       </button>
-      <button
-        type="button"
-        class="border-amber-500 border-2 rounded default-button text-white p-2"
-        @click="() => {}"
-      >
-        Desconectar
-      </button>
     </div>
-    <div class="text-container mt-10">
+    <div class="text-container mt-16">
       <span class="text font-extrabold text-3xl max-w-[50rem]"
         >Últimas transações
       </span>
     </div>
-    <div class="blur-container">
+    <div class="blur-container min-w-[80%] gap-8">
+      <div class="flex flex-row justify-between w-full px-8">
+        <span class="text-xs text-gray-50 font-medium">Valor</span>
+        <span class="text-xs text-gray-50 font-medium">Tipo de transação</span>
+        <span class="text-xs text-gray-50 font-medium">Checar transação</span>
+      </div>
       <div
-        class="flex flex-row justify-between w-full bg-white p-5 rounded-lg"
-        v-for="deposit in lastWalletTransactions"
-        :key="deposit?.blockNumber"
+        class="flex flex-row justify-between w-full bg-white px-6 py-4 rounded-lg"
+        v-for="release in lastWalletReleaseTransactions"
+        :key="release?.blockNumber"
       >
-        <p class="last-deposit-info">
-          {{ formatEventsAmount(deposit?.args.amount) }} BRZ
-        </p>
-        <p class="last-deposit-info">
-          {{
-            deposit?.event == "DepositAdded"
-              ? "Depósito"
-              : deposit?.event == "LockAdded"
-              ? "Reserva"
-              : "Compra"
-          }}
-        </p>
+        <span class="last-release-info">
+          {{ formatEventsAmount(release?.args.amount) }} BRZ
+        </span>
+        <span class="last-release-info">
+          {{ "Compra" }}
+        </span>
         <div
           class="flex gap-2 cursor-pointer items-center"
           @click="
             openEtherscanUrl(
-              `https://etherscan.io/tx/${deposit?.transactionHash}`
+              `https://etherscan.io/tx/${release?.transactionHash}`
             )
           "
         >
-          <p class="last-deposit-info">Etherscan</p>
+          <span class="last-release-info">Etherscan</span>
           <img alt="Redirect image" src="@/assets/redirect.svg" />
         </div>
       </div>
-      <button
-        type="button"
-        class="text-white mt-2"
-        @click="() => {}"
-        v-if="lastWalletTransactions?.length != 0"
-      >
-        Carregar mais
-      </button>
-      <p class="font-bold" v-if="lastWalletTransactions?.length == 0">
+      <div class="flex justify-center w-full right-6 mt-2">
+        <button
+          type="button"
+          class="text-white"
+          @click="() => {}"
+          v-if="lastWalletReleaseTransactions?.length != 0"
+        >
+          Carregar mais
+        </button>
+      </div>
+
+      <p class="font-bold" v-if="lastWalletReleaseTransactions?.length == 0">
         Não há nenhuma transação anterior
       </p>
     </div>
@@ -145,11 +133,11 @@ p {
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
 }
 
-.last-deposit-info {
-  @apply font-medium text-base;
+.last-release-info {
+  @apply font-medium text-base text-gray-900;
 }
 
 input[type="number"] {

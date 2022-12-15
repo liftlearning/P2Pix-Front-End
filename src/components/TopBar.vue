@@ -3,13 +3,12 @@ import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
 import blockchain from "../utils/blockchain";
+import router from "@/router";
 
 // Store reference
 const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
-
-const emit = defineEmits(["disconnectUser"]);
 
 const menuToggle = ref<boolean>(false);
 
@@ -35,12 +34,9 @@ const formatWalletBalance = (): string => {
   return fixed;
 };
 
-// const disconnectWallet = () => {
-//   menuToggle.value = false;
-// };
-
-const log = () => {
-  console.log(menuToggle.value);
+const disconnectUser = () => {
+  etherStore.setWalletAddress("");
+  router.push("/");
 };
 </script>
 
@@ -117,7 +113,7 @@ const log = () => {
                 </div>
                 <div
                   class="menu-button px-4 py-1 rounded-md cursor-pointer"
-                  @click="emit('disconnectUser', {})"
+                  @click="disconnectUser"
                 >
                   <div class="py-3 text-end font-semibold text-xs">
                     Desconectar

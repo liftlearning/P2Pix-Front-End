@@ -23,19 +23,18 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID_STAGING }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3
   
-      - name: 📦 Build docker image
-        run: |
-          docker build -t p2pix:$GITHUB_SHA .
-          docker save -o image_$GITHUB_SHA p2pix:$GITHUB_SHA
+      - name: 🏗 Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: 📦 Put docker image in cache
-        uses: actions/cache@v3
-        with:
-          key: p2pix
-          path: image_${{ github.sha }}
+      - name: 🏗 Pull staging app from vercel environment
+        run: vercel pull --yes --token=${{ secrets.VERCEL_AUTH_TOKEN }}
 
-  # test job
+      - name: 📦 Build staging app artifacts
+        run: vercel build --token=${{ secrets.VERCEL_AUTH_TOKEN }}

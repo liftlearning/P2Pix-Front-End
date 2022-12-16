@@ -36,7 +36,12 @@ const formatWalletBalance = (): string => {
 
 const disconnectUser = () => {
   etherStore.setWalletAddress("");
-  router.push("/");
+  const currentRoute = router.currentRoute.value.path;
+  if (currentRoute !== "/") {
+    router.push("/");
+  } else {
+    window.location.reload();
+  }
 };
 </script>
 

@@ -28,14 +28,10 @@ const lastWalletReleaseTransactions = ref<any[] | undefined>([]);
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
-  let depositDetail;
-  // depositId is BigNumber type object
-  const depositId = selectedDeposit["args"]["depositID"];
-  await blockchain
-    .mapDeposits(depositId)
-    .then((deposit) => (depositDetail = deposit));
+  const depositDetail = selectedDeposit;
+  const depositId = selectedDeposit.depositID;
+  pixTarget.value = selectedDeposit.pixKey;
   tokenAmount.value = tokenValue;
-  pixTarget.value = String(depositDetail?.pixTarget);
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {
@@ -59,20 +55,20 @@ const releaseTransaction = async ({ e2eId }: any) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  const findLockId = locksAddedList.value.find((element) => {
+  const findLock = locksAddedList.value.find((element) => {
     if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args.lockID; // BigNumber type
+      lockId.value = element.args.lockID;
       return true;
     }
     return false;
   });
 
-  if (findLockId) {
+  if (findLock && tokenAmount.value) {
     const release = await blockchain.releaseLock(
-      pixTarget.value, // String
-      tokenAmount.value ?? 0, // Number
-      e2eId, // String
-      lockId.value // String
+      pixTarget.value,
+      tokenAmount.value,
+      e2eId,
+      lockId.value
     );
     release.wait();
 

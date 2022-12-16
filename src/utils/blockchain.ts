@@ -132,6 +132,38 @@ const listReleaseTransactionByWalletAddress = async (
 };
 
 // Update events at store methods
+const updateValidDeposits = async () => {
+  const etherStore = useEtherStore();
+  const window_ = window as any;
+  const connection = window_.ethereum;
+  let provider: ethers.providers.Web3Provider | null = null;
+  if (!connection) return;
+  provider = new ethers.providers.Web3Provider(connection);
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const filterDeposits = p2pContract.filters.DepositAdded(null);
+  const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
+  const depositList = [] as any[];
+
+  eventsDeposits.forEach(async (deposit) => {
+    const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+
+    const validDeposit = {
+      depositID: deposit.args?.depositID,
+      remaining: formatBigNumber(mappedDeposit.remaining),
+      seller: mappedDeposit.seller,
+      pixKey: mappedDeposit.pixTarget,
+      valid: mappedDeposit.valid,
+    };
+
+    depositList.push(validDeposit);
+  });
+
+  etherStore.setDepositsValidList(depositList);
+};
+
 const updateDepositAddedEvents = async () => {
   const etherStore = useEtherStore();
   const window_ = window as any;
@@ -192,9 +224,10 @@ const connectProvider = async () => {
   await updateDepositAddedEvents();
   await updateLockAddedEvents();
   await updateLockReleasedEvents();
+  await updateValidDeposits();
 
-  connection.on("accountsChanged", () => {
-    updateWalletStatus();
+  connection.on("accountsChanged", async () => {
+    await updateWalletStatus();
   });
 };
 
@@ -209,7 +242,7 @@ const getProvider = (): ethers.providers.Web3Provider | null => {
 
 // Deposit methods
 // Gets value and pix key from user's form to create a deposit in the blockchain
-const addDeposit = async (tokenQty: string, pixKey: string) => {
+const addDeposit = async (tokenQty: Number, pixKey: string) => {
   const provider = getProvider();
   if (!provider) return;
 
@@ -225,20 +258,21 @@ const addDeposit = async (tokenQty: string, pixKey: string) => {
   // First get the approval
   const apprv = await tokenContract.approve(
     addresses.p2pix,
-    formatEther(tokenQty)
+    formatEther(String(tokenQty))
   );
   await apprv.wait();
 
   // Now we make the deposit
   const deposit = await p2pContract.deposit(
     addresses.token,
-    formatEther(tokenQty),
+    formatEther(String(tokenQty)),
     pixKey
   );
   await deposit.wait();
 
-  updateWalletStatus();
-  updateDepositAddedEvents();
+  await updateWalletStatus();
+  await updateDepositAddedEvents();
+  await updateValidDeposits();
 };
 
 // Get specific deposit data by its ID
@@ -278,6 +312,7 @@ const addLock = async (depositId: BigNumber, amount: Number) => {
 
   while (etherStore.locksAddedList.length === oldEventsLen) {
     await updateLockAddedEvents();
+    await updateValidDeposits();
   }
 
   return lock;
@@ -331,6 +366,7 @@ const releaseLock = async (
   );
   release.wait();
   await updateLockReleasedEvents();
+  await updateValidDeposits();
 
   return release;
 };
@@ -362,4 +398,5 @@ export default {
   mapLocks,
   releaseLock,
   updateLockAddedEvents,
+  updateValidDeposits,
 };

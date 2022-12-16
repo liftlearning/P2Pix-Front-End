@@ -9,7 +9,7 @@ import blockchain from "../utils/blockchain";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, depositsAddedList } = storeToRefs(etherStore);
+const { walletAddress, depositsValidList } = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
@@ -59,14 +59,13 @@ const verifyLiquidity = () => {
   selectedDeposit.value = null;
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
-  depositsAddedList.value.find((element) => {
-    const p2pixTokenValue = Number(
-      blockchain.formatBigNumber(element.args.amount)
-    );
+  depositsValidList.value.find((element) => {
+    const remaining = element.remaining;
     if (
-      tokenValue.value!! <= p2pixTokenValue &&
+      element.valid == true &&
+      tokenValue.value!! <= remaining &&
       tokenValue.value!! != 0 &&
-      element.args.seller !== walletAddress.value
+      element.seller !== walletAddress.value
     ) {
       enableSelectButton.value = true;
       hasLiquidity.value = true;

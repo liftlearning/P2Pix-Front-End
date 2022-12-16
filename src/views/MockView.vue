@@ -7,6 +7,7 @@ import blockchain from "../utils/blockchain";
 
 // Blockchain Data
 const etherStore = useEtherStore();
+const { depositsValidList } = storeToRefs(etherStore);
 const { depositsAddedList } = storeToRefs(etherStore);
 const { locksAddedList } = storeToRefs(etherStore);
 
@@ -35,7 +36,7 @@ const formatWalletAddress = (wallet: string): string => {
 // Gets value and pix key from user's form to create a deposit in the blockchain
 const mockDeposit = () => {
   if (!depositValue.value || !depositPixKey.value) return;
-  blockchain.addDeposit(depositValue.value.toString(), depositPixKey.value);
+  blockchain.addDeposit(depositValue.value, depositPixKey.value);
 };
 
 // Get specific deposit data by its ID
@@ -100,6 +101,17 @@ const mapLock = (lockId: string) => {
       >
         Buyer:<br />{{ formatWalletAddress(lock.args.buyer) }}<br />
         MRBZ: {{ blockchain.formatBigNumber(lock.args.amount) }}
+      </li>
+    </ul>
+    <ul class="flex flex-col justify-center items-center gap-4">
+      <li
+        class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
+        v-for="valid in depositsValidList"
+        :key="valid.depositID"
+        @click="mapDeposit(valid.depositID)"
+      >
+        Buyer:<br />{{ formatWalletAddress(valid.seller) }}<br />
+        MRBZ: {{ valid.remaining }}
       </li>
     </ul>
   </div>

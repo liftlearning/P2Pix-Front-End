@@ -24,9 +24,9 @@ const formatWalletAddress = (): string => {
   return `${initialText}...${finalText}`;
 };
 
-const formatWalletBalance = (): string => {
-  const fixed = balance.value.substring(0, 8);
-  return fixed;
+const formatWalletBalance = (): String => {
+  const fixed = Number(balance.value);
+  return fixed.toFixed(2);
 };
 </script>
 

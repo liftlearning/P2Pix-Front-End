@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import MockView from "../views/MockView.vue";
-import ListView from "../components/ListComponent.vue";
 import SellerView from "@/views/SellerView.vue";
 
 const router = createRouter({
@@ -21,11 +20,6 @@ const router = createRouter({
       path: "/mock",
       name: "mock",
       component: MockView,
-    },
-    {
-      path: "/list",
-      name: "list",
-      component: ListView,
     },
   ],
 });

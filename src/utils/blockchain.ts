@@ -276,7 +276,7 @@ const addDeposit = async (tokenQty: Number, pixKey: string) => {
 };
 
 // Get specific deposit data by its ID
-const mapDeposits = async (depositId: BigNumber) => {
+const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   const provider = getProvider();
 
   if (!provider) return;

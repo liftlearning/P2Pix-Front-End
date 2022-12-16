@@ -32,6 +32,10 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   const depositId = selectedDeposit.depositID;
   pixTarget.value = selectedDeposit.pixKey;
   tokenAmount.value = tokenValue;
+  // depositId is BigNumber type object
+  tokenAmount.value = tokenValue;
+
+  pixTarget.value = String(depositDetail?.pixTarget);
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {

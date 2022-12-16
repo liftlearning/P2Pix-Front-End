@@ -3,10 +3,10 @@ import CustomButton from "@/components/CustomButton.vue";
 import blockchain from "../utils/blockchain";
 
 // props
-const props = defineProps({
-  lastWalletReleaseTransactions: Array,
-  tokenAmount: Number,
-});
+const props = defineProps<{
+  lastWalletReleaseTransactions: any[] | undefined;
+  tokenAmount: Number | undefined;
+}>();
 
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);

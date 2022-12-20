@@ -88,7 +88,22 @@ const disconnectUser = () => {
             >
               {{ formatWalletAddress() }}
             </span>
-            <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+            <img
+              class="text-black"
+              v-if="!menuHoverToggle && !menuOpenToggle"
+              alt="Chevron Down"
+              src="@/assets/chevronDown.svg"
+            />
+            <img
+              v-if="menuOpenToggle"
+              alt="Chevron Up"
+              src="@/assets/chevronUp.svg"
+            />
+            <img
+              v-if="menuHoverToggle && !menuOpenToggle"
+              alt="Chevron Down Black"
+              src="@/assets/chevronDownBlack.svg"
+            />
           </div>
           <div
             v-show="menuOpenToggle"

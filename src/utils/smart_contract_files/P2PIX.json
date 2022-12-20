@@ -273,6 +273,25 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "_addr",
+          "type": "address"
+        }
+      ],
+      "name": "_castAddrToKey",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_key",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "depositID",
           "type": "uint256"

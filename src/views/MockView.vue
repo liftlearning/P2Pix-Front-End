@@ -7,6 +7,7 @@ import blockchain from "../utils/blockchain";
 
 // Blockchain Data
 const etherStore = useEtherStore();
+const { depositsValidList } = storeToRefs(etherStore);
 const { depositsAddedList } = storeToRefs(etherStore);
 const { locksAddedList } = storeToRefs(etherStore);
 
@@ -15,7 +16,7 @@ const depositValue = ref<Number>();
 const depositPixKey = ref<string>("");
 
 //  Split tokens between wallets in wallets.json
-const splitTokens = () => {
+const splitTokens = async () => {
   blockchain.splitTokens();
 };
 
@@ -35,23 +36,20 @@ const formatWalletAddress = (wallet: string): string => {
 // Gets value and pix key from user's form to create a deposit in the blockchain
 const mockDeposit = () => {
   if (!depositValue.value || !depositPixKey.value) return;
-  blockchain.addDeposit(depositValue.value.toString(), depositPixKey.value);
+  blockchain.addDeposit(depositValue.value, depositPixKey.value);
 };
 
 // Get specific deposit data by its ID
 const mapDeposit = (depositId: BigNumber) => {
-  blockchain.mapDeposits(depositId);
+  const deposit = blockchain.mapDeposits(depositId);
+  return deposit;
 };
 
 // Lock methods
-// (TO DO) Releases lock by specific ID and other additional data
-const releaseLock = () => {
-  blockchain.releaseLock();
-};
-
 // Get specific lock data by its ID
 const mapLock = (lockId: string) => {
-  blockchain.mapLocks(lockId);
+  const lock = blockchain.mapLocks(lockId);
+  return lock;
 };
 </script>
 
@@ -81,10 +79,6 @@ const mapLock = (lockId: string) => {
       <button type="button" class="default-button" @click="splitTokens()">
         Dividir tokens
       </button>
-
-      <button type="button" class="default-button" @click="releaseLock()">
-        Release Lock
-      </button>
     </div>
 
     <ul class="flex flex-col justify-center items-center gap-4">
@@ -95,7 +89,7 @@ const mapLock = (lockId: string) => {
         @click="mapDeposit(deposit.args.depositID)"
       >
         Seller:<br />{{ formatWalletAddress(deposit.args.seller) }}<br />
-        MRBZ: {{ blockchain.formatEther(deposit.args.amount) }}
+        MRBZ: {{ blockchain.formatBigNumber(deposit.args.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">
@@ -106,7 +100,18 @@ const mapLock = (lockId: string) => {
         @click="mapLock(lock.args.lockID)"
       >
         Buyer:<br />{{ formatWalletAddress(lock.args.buyer) }}<br />
-        MRBZ: {{ blockchain.formatEther(lock.args.amount) }}
+        MRBZ: {{ blockchain.formatBigNumber(lock.args.amount) }}
+      </li>
+    </ul>
+    <ul class="flex flex-col justify-center items-center gap-4">
+      <li
+        class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
+        v-for="valid in depositsValidList"
+        :key="valid.depositID"
+        @click="mapDeposit(valid.depositID)"
+      >
+        Buyer:<br />{{ formatWalletAddress(valid.seller) }}<br />
+        MRBZ: {{ valid.remaining }}
       </li>
     </ul>
   </div>

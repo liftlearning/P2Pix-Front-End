@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomButton from "../components/CustomButton.vue";
+import CustomButton from "../../components/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
 
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, depositsValidList } = storeToRefs(etherStore);
+const { walletAddress, depositsAddedList } = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
@@ -22,10 +21,7 @@ const selectedDeposit = ref();
 const emit = defineEmits(["tokenBuy"]);
 
 // Blockchain methods
-const connectAccount = async () => {
-  await blockchain.connectProvider();
-  verifyLiquidity();
-};
+const connectAccount = async () => {};
 
 // Debounce methods
 const handleInputEvent = (event: any) => {
@@ -40,7 +36,7 @@ const handleInputEvent = (event: any) => {
   }
   validDecimals.value = true;
 
-  verifyLiquidity();
+  // verifyLiquidity();
 };
 
 // Enable button methods
@@ -54,31 +50,30 @@ const decimalCount = (num: Number) => {
 };
 
 // Verify if there is a valid deposit to buy
-const verifyLiquidity = () => {
-  enableSelectButton.value = false;
-  selectedDeposit.value = null;
-  if (!walletAddress.value || tokenValue.value <= 0) return;
+// const verifyLiquidity = () => {
+//   enableSelectButton.value = false;
+//   selectedDeposit.value = null;
+//   if (!walletAddress.value || tokenValue.value <= 0) return;
 
-  depositsValidList.value.find((element) => {
-    const remaining = element.remaining;
-    if (
-      element.valid == true &&
-      tokenValue.value!! <= remaining &&
-      tokenValue.value!! != 0 &&
-      element.seller !== walletAddress.value
-    ) {
-      enableSelectButton.value = true;
-      hasLiquidity.value = true;
-      selectedDeposit.value = element;
-      return true;
-    }
-    return false;
-  });
+//   depositsAddedList.value.find((element) => {
+//     const p2pixTokenValue = blockchain.formatBigNumber(element.args.amount);
+//     if (
+//       tokenValue.value!! <= Number(p2pixTokenValue) &&
+//       tokenValue.value!! != 0 &&
+//       element.args.seller !== walletAddress.value
+//     ) {
+//       enableSelectButton.value = true;
+//       hasLiquidity.value = true;
+//       selectedDeposit.value = element;
+//       return true;
+//     }
+//     return false;
+//   });
 
-  if (!enableSelectButton.value) {
-    hasLiquidity.value = false;
-  }
-};
+//   if (!enableSelectButton.value) {
+//     hasLiquidity.value = false;
+//   }
+// };
 </script>
 
 <template>
@@ -148,15 +143,8 @@ const verifyLiquidity = () => {
         </div>
       </div>
       <CustomButton
-        v-if="!walletAddress"
         :text="'Conectar carteira'"
-        @buttonClicked="connectAccount()"
-      />
-      <CustomButton
-        v-if="walletAddress"
-        :text="'Confirmar compra'"
-        :is-disabled="!enableSelectButton"
-        @buttonClicked="emit('tokenBuy', { selectedDeposit, tokenValue })"
+        @buttonClicked="emit('tokenBuy')"
       />
     </div>
   </div>

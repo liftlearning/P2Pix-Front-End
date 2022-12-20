@@ -5,6 +5,7 @@ import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
 import api from "../services/index";
 
+// props and store references
 const props = defineProps({
   pixTarget: String,
   tokenValue: Number,
@@ -12,13 +13,17 @@ const props = defineProps({
 
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
+const isPixValid = ref<boolean>(false);
+const isCodeInputEmpty = ref<boolean>(true);
+const e2eId = ref<string>("");
+
+// Emits
+const emit = defineEmits(["pixValidated"]);
+
 const pixQrCode = pix({
   pixKey: props.pixTarget ?? "",
   value: props.tokenValue,
 });
-const isPixValid = ref<boolean>(false);
-const isCodeInputEmpty = ref<boolean>(true);
-
 pixQrCode.base64QrCode().then((code: string) => {
   qrCode.value = code;
 });
@@ -27,12 +32,12 @@ qrCodePayload.value = pixQrCode.payload();
 
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
-
-  validatePix(value);
+  e2eId.value = value;
+  validatePix();
 };
 
-const validatePix = async (e2eid: any) => {
-  if (e2eid == "") {
+const validatePix = async () => {
+  if (e2eId.value == "") {
     isPixValid.value = false;
     isCodeInputEmpty.value = true;
     return;
@@ -42,7 +47,7 @@ const validatePix = async (e2eid: any) => {
 
   if (sellerPixKey && transactionValue) {
     var body_req = {
-      e2e_id: e2eid,
+      e2e_id: e2eId.value,
       pix_key: sellerPixKey,
       pix_value: transactionValue,
     };
@@ -141,6 +146,7 @@ const validatePix = async (e2eid: any) => {
       <CustomButton
         :is-disabled="isPixValid == false"
         :text="'Enviar para a rede'"
+        @button-clicked="emit('pixValidated', { e2eId })"
       />
     </div>
   </div>

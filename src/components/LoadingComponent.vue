@@ -1,10 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// prop
+const props = defineProps({
+  title: String,
+  message: String,
+});
+</script>
+
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-bold text-3xl max-w-[29rem]"
-        >Confirme em sua carteira</span
-      >
+      <span class="text font-bold text-3xl max-w-[29rem]">{{
+        props.title ? props.title : "Confirme em sua carteira"
+      }}</span>
     </div>
     <div class="blur-container w-[26rem]">
       <div
@@ -20,7 +27,7 @@
             height="48"
           />
           <span class="text-black font-medium text-sm px-12 mt-4">
-            A transação está sendo enviada para a rede
+            {{ $props.message }}
           </span>
         </div>
       </div>

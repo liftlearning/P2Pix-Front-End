@@ -10,7 +10,8 @@ const etherStore = useEtherStore();
 
 const { walletAddress, balance } = storeToRefs(etherStore);
 
-const menuToggle = ref<boolean>(false);
+const menuOpenToggle = ref<boolean>(false);
+const menuHoverToggle = ref<boolean>(false);
 
 //Methods
 const connectMetaMask = () => {
@@ -61,34 +62,64 @@ const disconnectUser = () => {
           <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
         </div>
         <div class="flex flex-col">
-          <div class="top-bar-info" @mouseover="menuToggle = true" @mouseout="menuToggle = false" :style="{
-            backgroundColor: menuToggle ? '#F9F9F9' : 'transparent',
-          }">
+          <div
+            class="top-bar-info cursor-pointer"
+            @click="menuOpenToggle = !menuOpenToggle"
+            @mouseover="menuHoverToggle = true"
+            @mouseout="menuHoverToggle = false"
+            :style="{
+              backgroundColor: menuOpenToggle
+                ? '#F9F9F9'
+                : menuHoverToggle
+                ? '#F9F9F9'
+                : 'transparent',
+            }"
+          >
             <img alt="Account image" src="@/assets/account.svg" />
-            <span class="default-text text-sm" :style="{
-              color: menuToggle ? '#000000' : 'rgb(249 250 251)',
-            }">
+            <span
+              class="default-text text-sm"
+              :style="{
+                color: menuOpenToggle
+                  ? '#000000'
+                  : menuHoverToggle
+                  ? '#000000'
+                  : 'rgb(249 250 251)',
+              }"
+            >
               {{ formatWalletAddress() }}
             </span>
             <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
           </div>
-          <div v-show="menuToggle" class="mt-10 absolute w-full text-black" @mouseover="menuToggle = true"
-            @mouseout="menuToggle = false">
+          <div
+            v-show="menuOpenToggle"
+            class="mt-10 absolute w-full text-black"
+            @mouseover="menuOpenToggle = true"
+            @mouseout="menuOpenToggle = false"
+          >
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
-                <div class="menu-button px-4 rounded-md cursor-pointer" onclick="window.location='/bid_history'">
+                <div
+                  class="menu-button px-4 rounded-md cursor-pointer"
+                  onclick="window.location='/bid_history'"
+                >
                   <div class="py-4 text-end font-semibold text-xs">
                     Histórico de compras
                   </div>
                   <hr />
                 </div>
-                <div class="menu-button px-4 cursor-pointer" onclick="window.location='/manage_bids'">
+                <div
+                  class="menu-button px-4 cursor-pointer"
+                  onclick="window.location='/manage_bids'"
+                >
                   <div class="py-4 text-end font-semibold text-xs">
                     Gerenciar Ofertas
                   </div>
                   <hr />
                 </div>
-                <div class="menu-button px-4 py-1 rounded-md cursor-pointer" @click="disconnectUser">
+                <div
+                  class="menu-button px-4 py-1 rounded-md cursor-pointer"
+                  @click="disconnectUser"
+                >
                   <div class="py-3 text-end font-semibold text-xs">
                     Desconectar
                   </div>

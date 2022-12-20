@@ -108,8 +108,6 @@ const disconnectUser = () => {
           <div
             v-show="menuOpenToggle"
             class="mt-10 absolute w-full text-black"
-            @mouseover="menuOpenToggle = true"
-            @mouseout="menuOpenToggle = false"
           >
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">

@@ -1,46 +1,37 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomButton from "../components/CustomButton.vue";
+import CustomButton from "../CustomButton.vue";
 import { debounce } from "@/utils/debounce";
-import { useEtherStore } from "@/store/ether";
-import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
-
-// Store reference
-const etherStore = useEtherStore();
-
-const { walletAddress, depositsValidList } = storeToRefs(etherStore);
 
 // Reactive state
-const tokenValue = ref(0);
+const offer = ref<string | number>("");
+const pixKey = ref<string>("");
+
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
 const validDecimals = ref(true);
-const selectedDeposit = ref();
 
 // Emits
-const emit = defineEmits(["tokenBuy"]);
+const emit = defineEmits(["approveTokens"]);
 
 // Blockchain methods
-const connectAccount = async () => {
-  await blockchain.connectProvider();
-  verifyLiquidity();
+const approveTokensHandle = async () => {
+  console.log(offer.value, pixKey.value);
+  emit("approveTokens");
 };
 
 // Debounce methods
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
 
-  tokenValue.value = Number(value);
+  offer.value = Number(value);
 
-  if (decimalCount(tokenValue.value) > 2) {
+  if (decimalCount(offer.value) > 2) {
     validDecimals.value = false;
     enableSelectButton.value = false;
     return;
   }
   validDecimals.value = true;
-
-  verifyLiquidity();
 };
 
 // Enable button methods
@@ -52,44 +43,17 @@ const decimalCount = (num: Number) => {
   }
   return 0;
 };
-
-// Verify if there is a valid deposit to buy
-const verifyLiquidity = () => {
-  enableSelectButton.value = false;
-  selectedDeposit.value = null;
-  if (!walletAddress.value || tokenValue.value <= 0) return;
-
-  depositsValidList.value.find((element) => {
-    const remaining = element.remaining;
-    if (
-      element.valid == true &&
-      tokenValue.value!! <= remaining &&
-      tokenValue.value!! != 0 &&
-      element.seller !== walletAddress.value
-    ) {
-      enableSelectButton.value = true;
-      hasLiquidity.value = true;
-      selectedDeposit.value = element;
-      return true;
-    }
-    return false;
-  });
-
-  if (!enableSelectButton.value) {
-    hasLiquidity.value = false;
-  }
-};
 </script>
 
 <template>
   <div class="page">
     <div class="text-container">
       <span class="text font-extrabold text-5xl max-w-[29rem]"
-        >Adquira cripto com apenas um Pix</span
+        >Venda cripto e receba em Pix</span
       >
       <span class="text font-medium text-base max-w-[28rem]"
-        >Digite um valor, confira a oferta, conecte sua carteira e receba os
-        tokens após realizar o Pix</span
+        >Digite sua oferta, informe a chave Pix, selecione a rede, aprove o
+        envio da transação e confirme sua oferta.</span
       >
     </div>
     <div class="blur-container">
@@ -99,13 +63,14 @@ const verifyLiquidity = () => {
         <div class="flex justify-between w-full items-center">
           <input
             type="number"
+            v-model="offer"
             class="border-none outline-none text-lg text-gray-900 w-fit"
             v-bind:class="{
-              'font-semibold': tokenValue != undefined,
-              'text-xl': tokenValue != undefined,
+              'font-semibold': offer != undefined,
+              'text-xl': offer != undefined,
             }"
             @input="debounce(handleInputEvent, 500)($event)"
-            placeholder="0  "
+            placeholder="Digite sua oferta"
             step=".01"
           />
           <div
@@ -116,26 +81,6 @@ const verifyLiquidity = () => {
           </div>
         </div>
 
-        <div class="custom-divide py-2"></div>
-        <div class="flex justify-between pt-2" v-if="hasLiquidity">
-          <p class="text-gray-500 font-normal text-sm w-auto">
-            ~ R$ {{ tokenValue.toFixed(2) }}
-          </p>
-          <div class="flex gap-2">
-            <img
-              alt="Polygon image"
-              src="@/assets/polygon.svg"
-              width="24"
-              height="24"
-            />
-            <img
-              alt="Ethereum image"
-              src="@/assets/ethereum.svg"
-              width="24"
-              height="24"
-            />
-          </div>
-        </div>
         <div class="flex pt-2 justify-center" v-if="!validDecimals">
           <span class="text-red-500 font-normal text-sm"
             >Por favor utilize no máximo 2 casas decimais</span
@@ -147,16 +92,21 @@ const verifyLiquidity = () => {
           >
         </div>
       </div>
+      <div
+        class="flex flex-col w-full bg-white px-10 py-8 rounded-lg border-y-10"
+      >
+        <div class="flex justify-between w-full items-center">
+          <input
+            type="text"
+            v-model="pixKey"
+            class="border-none outline-none text-lg text-gray-900 w-fit"
+            placeholder="Digite a chave Pix"
+          />
+        </div>
+      </div>
       <CustomButton
-        v-if="!walletAddress"
-        :text="'Conectar carteira'"
-        @buttonClicked="connectAccount()"
-      />
-      <CustomButton
-        v-if="walletAddress"
-        :text="'Confirmar compra'"
-        :is-disabled="!enableSelectButton"
-        @buttonClicked="emit('tokenBuy', { selectedDeposit, tokenValue })"
+        :text="'Aprovar tokens'"
+        @buttonClicked="approveTokensHandle()"
       />
     </div>
   </div>

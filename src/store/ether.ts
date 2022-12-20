@@ -13,6 +13,10 @@ export const useEtherStore = defineStore("ether", {
     depositsExpiredList: [] as any[],
     // Locks adicionados na blockchain
     locksAddedList: [] as any[],
+    // Locks 'released' na blockchain
+    locksReleasedList: [] as any[],
+    // Locks expirados na blockchain
+    locksExpiredList: [] as any[],
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -35,6 +39,12 @@ export const useEtherStore = defineStore("ether", {
     },
     setLocksAddedList(locksAddedList: any[]) {
       this.locksAddedList = locksAddedList;
+    },
+    setLocksReleasedList(locksReleasedList: any[]) {
+      this.locksReleasedList = locksReleasedList;
+    },
+    setLocksExpiredList(locksExpiredList: any[]) {
+      this.locksExpiredList = locksExpiredList;
     },
   },
 });

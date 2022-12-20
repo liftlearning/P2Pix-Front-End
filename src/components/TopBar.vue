@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from "@/router";
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import blockchain from "../utils/blockchain";
@@ -23,11 +24,9 @@ const formatWalletAddress = (): string => {
   return `${initialText}...${finalText}`;
 };
 
-const formatWalletBalance = (): string => {
-  const formattedBalance = blockchain.formatEther(balance.value);
-  const fixed = formattedBalance.substring(0, 8);
-
-  return fixed;
+const formatWalletBalance = (): String => {
+  const fixed = Number(balance.value);
+  return fixed.toFixed(2);
 };
 </script>
 
@@ -41,7 +40,13 @@ const formatWalletBalance = (): string => {
       height="75"
     />
     <div class="flex gap-4 items-center">
-      <button type="button" class="default-button">Quero vender</button>
+      <button
+        type="button"
+        class="default-button"
+        v-on:click="router.push('/seller')"
+      >
+        Quero vender
+      </button>
       <button
         type="button"
         v-if="!walletAddress"

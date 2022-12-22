@@ -13,6 +13,8 @@ const { walletAddress, balance } = storeToRefs(etherStore);
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
 
+const currencyMenuToggle = ref<boolean>(false);
+
 //Methods
 const connectMetaMask = () => {
   blockchain.connectProvider();
@@ -46,20 +48,82 @@ const disconnectUser = () => {
 
 <template>
   <header>
-    <img alt="P2Pix logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
+    <img
+      alt="P2Pix logo"
+      class="logo"
+      src="@/assets/logo.svg"
+      width="75"
+      height="75"
+    />
     <div class="flex gap-4 items-center">
-      <button type="button" class="default-button" v-on:click="router.push('/seller')">
+      <button
+        type="button"
+        class="default-button"
+        v-on:click="router.push('/seller')"
+      >
         Quero vender
       </button>
-      <button type="button" v-if="!walletAddress" class="border-amber-500 border-2 rounded default-button"
-        @click="connectMetaMask()">
+      <button
+        type="button"
+        v-if="!walletAddress"
+        class="border-amber-500 border-2 rounded default-button"
+        @click="connectMetaMask()"
+      >
         Conectar carteira
       </button>
       <div v-if="walletAddress" class="account-info">
-        <div class="top-bar-info">
-          <img alt="Ethereum image" src="@/assets/ethereum.svg" />
-          <span class="default-text"> Ethereum </span>
-          <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+        <div class="flex flex-col">
+          <div
+            class="group top-bar-info cursor-pointer hover:bg-white"
+            @click="currencyMenuToggle = !currencyMenuToggle"
+          >
+            <img alt="Ethereum image" src="@/assets/ethereum.svg" />
+            <span class="default-text group-hover:text-black"> Ethereum </span>
+            <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+          </div>
+          <div
+            v-show="currencyMenuToggle"
+            class="mt-10 absolute w-full text-black"
+          >
+            <div class="mt-2">
+              <div class="bg-white rounded-md z-10">
+                <div class="menu-button px-4 rounded-md cursor-pointer">
+                  <div class="flex justify-between">
+                    <img
+                      alt="Ethereum image"
+                      width="20"
+                      height="20"
+                      src="@/assets/ethereum.svg"
+                    />
+                    <span
+                      class="text-black py-4 text-end font-semibold text-xs"
+                    >
+                      Ethereum
+                    </span>
+                    <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+                  </div>
+                  <hr />
+                </div>
+                <div class="menu-button px-4 rounded-md cursor-pointer">
+                  <div class="flex justify-between">
+                    <img
+                      alt="Ethereum image"
+                      width="20"
+                      height="20"
+                      src="@/assets/polygon.svg"
+                    />
+                    <span
+                      class="text-black py-4 text-end font-semibold text-xs"
+                    >
+                      Polygon
+                    </span>
+                    <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+                  </div>
+                  <hr />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="flex flex-col">
           <div
@@ -105,11 +169,8 @@ const disconnectUser = () => {
               src="@/assets/chevronDownBlack.svg"
             />
           </div>
-          <div
-            v-show="menuOpenToggle"
-            class="mt-10 absolute w-full text-black"
-          >
-            <div class="pl-4 mt-2">
+          <div v-show="menuOpenToggle" class="mt-10 absolute w-full text-black">
+            <div class="mt-2">
               <div class="bg-white rounded-md z-10">
                 <div
                   class="menu-button px-4 rounded-md cursor-pointer"
@@ -174,6 +235,6 @@ header {
 }
 
 .menu-button:hover {
-  background-color: #E5E7EB;
+  background-color: #e5e7eb;
 }
 </style>

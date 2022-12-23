@@ -13,7 +13,8 @@ const { walletAddress, balance } = storeToRefs(etherStore);
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
 
-const currencyMenuToggle = ref<boolean>(false);
+const currencyMenuOpenToggle = ref<boolean>(false);
+const currencyMenuHoverToggle = ref<boolean>(false);
 
 //Methods
 const connectMetaMask = () => {
@@ -75,14 +76,54 @@ const disconnectUser = () => {
         <div class="flex flex-col">
           <div
             class="group top-bar-info cursor-pointer hover:bg-white"
-            @click="currencyMenuToggle = !currencyMenuToggle"
+            @click="
+              [
+                (currencyMenuOpenToggle = !currencyMenuOpenToggle),
+                (menuOpenToggle = false),
+              ]
+            "
+            @mouseover="currencyMenuHoverToggle = true"
+            @mouseout="currencyMenuHoverToggle = false"
+            :style="{
+              backgroundColor: currencyMenuOpenToggle
+                ? '#F9F9F9'
+                : currencyMenuHoverToggle
+                ? '#F9F9F9'
+                : 'transparent',
+            }"
           >
             <img alt="Ethereum image" src="@/assets/ethereum.svg" />
-            <span class="default-text group-hover:text-black"> Ethereum </span>
-            <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
+            <span
+              class="default-text group-hover:text-black"
+              :style="{
+                color: currencyMenuOpenToggle
+                  ? '#000000'
+                  : currencyMenuHoverToggle
+                  ? '#000000'
+                  : 'rgb(249 250 251)',
+              }"
+            >
+              Ethereum
+            </span>
+            <img
+              class="text-black"
+              v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
+              alt="Chevron Down"
+              src="@/assets/chevronDown.svg"
+            />
+            <img
+              v-if="currencyMenuOpenToggle"
+              alt="Chevron Up"
+              src="@/assets/chevronUp.svg"
+            />
+            <img
+              v-if="currencyMenuHoverToggle && !currencyMenuOpenToggle"
+              alt="Chevron Down Black"
+              src="@/assets/chevronDownBlack.svg"
+            />
           </div>
           <div
-            v-show="currencyMenuToggle"
+            v-show="currencyMenuOpenToggle"
             class="mt-10 absolute w-full text-black"
           >
             <div class="mt-2">
@@ -128,7 +169,9 @@ const disconnectUser = () => {
         <div class="flex flex-col">
           <div
             class="top-bar-info cursor-pointer"
-            @click="menuOpenToggle = !menuOpenToggle"
+            @click="
+              [(menuOpenToggle = !menuOpenToggle), (currencyMenuOpenToggle = false)]
+            "
             @mouseover="menuHoverToggle = true"
             @mouseout="menuHoverToggle = false"
             :style="{

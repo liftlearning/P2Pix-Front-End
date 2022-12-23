@@ -281,6 +281,38 @@ const addDeposit = async (tokenQty: Number, pixKey: String) => {
   await updateValidDeposits();
 };
 
+const mockDeposit = async (tokenQty: Number, pixKey: String) => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+
+  const tokenContract = new ethers.Contract(
+    addresses.token,
+    mockToken.abi,
+    signer
+  );
+
+  const apprv = await tokenContract.approve(
+    addresses.p2pix,
+    formatEther(String(tokenQty))
+  );
+  await apprv.wait();
+
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+  const deposit = await p2pContract.deposit(
+    addresses.token,
+    formatEther(String(tokenQty)),
+    pixKey
+  );
+  await deposit.wait();
+
+  await updateWalletStatus();
+  await updateDepositAddedEvents();
+  await updateValidDeposits();
+};
+
 // Get specific deposit data by its ID
 const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   const provider = getProvider();
@@ -399,6 +431,7 @@ export default {
   listLockTransactionByWalletAddress,
   approveTokens,
   addDeposit,
+  mockDeposit,
   mapDeposits,
   formatBigNumber,
   addLock,

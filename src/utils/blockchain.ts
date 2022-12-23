@@ -241,8 +241,7 @@ const getProvider = (): ethers.providers.Web3Provider | null => {
 };
 
 // Deposit methods
-// Gets value and pix key from user's form to create a deposit in the blockchain
-const addDeposit = async (tokenQty: Number, pixKey: string) => {
+const approveTokens = async (tokenQty: Number) => {
   const provider = getProvider();
   if (!provider) return;
 
@@ -253,16 +252,23 @@ const addDeposit = async (tokenQty: Number, pixKey: string) => {
     mockToken.abi,
     signer
   );
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
-  // First get the approval
   const apprv = await tokenContract.approve(
     addresses.p2pix,
     formatEther(String(tokenQty))
   );
   await apprv.wait();
+  return apprv;
+};
 
-  // Now we make the deposit
+// Gets value and pix key from user's form to create a deposit in the blockchain
+const addDeposit = async (tokenQty: Number, pixKey: String) => {
+  const provider = getProvider();
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
   const deposit = await p2pContract.deposit(
     addresses.token,
     formatEther(String(tokenQty)),
@@ -391,6 +397,7 @@ export default {
   listReleaseTransactionByWalletAddress,
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
+  approveTokens,
   addDeposit,
   mapDeposits,
   formatBigNumber,

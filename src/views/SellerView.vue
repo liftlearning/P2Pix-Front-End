@@ -2,9 +2,11 @@
 import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
 import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
+import blockchain from "../utils/blockchain";
 
 import { ref } from "vue";
 import router from "@/router";
+import { pix } from "@/utils/QrCodePix";
 
 enum Step {
   Search,
@@ -15,24 +17,40 @@ enum Step {
 const flowStep = ref<Step>(Step.Sell);
 const loading = ref<boolean>(false);
 
+const offerValue = ref<number>();
+const pixKeyBuyer = ref<string>("");
+
 const walletConnect = async () => {
   flowStep.value = Step.Sell;
 };
 
-const approveTokens = async () => {
+// Verificar tipagem
+const approveOffer = async ({ offer, pixKey }: any) => {
   loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
+  try {
+    offerValue.value = offer;
+    pixKeyBuyer.value = pixKey;
+    await blockchain.approveTokens(offerValue.value);
     flowStep.value = Step.Network;
-  }, 2000);
+    loading.value = false;
+  } catch {
+    flowStep.value = Step.Sell;
+    loading.value = false;
+  }
 };
 
 const sendNetwork = async () => {
   loading.value = true;
-  setTimeout(() => {
+  try {
+    if (offerValue.value && pixKeyBuyer.value) {
+      await blockchain.addDeposit(offerValue.value, pixKeyBuyer.value);
+      flowStep.value = Step.Sell;
+      loading.value = false;
+    }
+  } catch {
+    flowStep.value = Step.Network;
     loading.value = false;
-    router.push("/");
-  }, 2000);
+  }
 };
 </script>
 
@@ -42,14 +60,19 @@ const sendNetwork = async () => {
     @token-buy="walletConnect"
   /> -->
   <div v-if="flowStep == Step.Sell">
-    <WantSellComponent v-if="!loading" @approve-tokens="approveTokens" />
+    <WantSellComponent v-if="!loading" @approve-tokens="approveOffer" />
     <ValidationComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"
     />
   </div>
   <div v-if="flowStep == Step.Network">
-    <SendNetwork v-if="!loading" @send-network="sendNetwork" />
+    <SendNetwork
+      :pixKey="pixKeyBuyer"
+      :offer="Number(offerValue)"
+      v-if="!loading"
+      @send-network="sendNetwork"
+    />
     <ValidationComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"

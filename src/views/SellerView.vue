@@ -30,7 +30,7 @@ const approveOffer = async ({ offer, pixKey }: any) => {
   try {
     offerValue.value = offer;
     pixKeyBuyer.value = pixKey;
-    await blockchain.approveTokens(offerValue.value);
+    await blockchain.approveTokens(Number(offerValue.value));
     flowStep.value = Step.Network;
     loading.value = false;
   } catch {

@@ -86,21 +86,30 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit')"
+        @click="emit('cancelDeposit', item.args.depositID)"
       >
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
       </div>
 
-      <span class="last-release-info" v-if="item.event == 'DepositAdded' && !props.isManageMode">
+      <span
+        class="last-release-info"
+        v-if="item.event == 'DepositAdded' && !props.isManageMode"
+      >
         {{ "Oferta" }}
       </span>
 
-      <span class="last-release-info" v-if="item.event == 'LockAdded' && !props.isManageMode">
+      <span
+        class="last-release-info"
+        v-if="item.event == 'LockAdded' && !props.isManageMode"
+      >
         {{ "Reserva" }}
       </span>
 
-      <span class="last-release-info" v-if="item.event == 'LockReleased' && !props.isManageMode">
+      <span
+        class="last-release-info"
+        v-if="item.event == 'LockReleased' && !props.isManageMode"
+      >
         {{ "Compra" }}
       </span>
 

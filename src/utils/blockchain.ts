@@ -78,9 +78,9 @@ const listAllTransactionByWalletAddress = async (
 // get wallet's deposit transactions
 const listDepositTransactionByWalletAddress = async (
   walletAddress: string
-): Promise<any[] | undefined> => {
+): Promise<any[]> => {
   const provider = getProvider();
-  if (!provider) return;
+  if (!provider) return [];
 
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
@@ -275,6 +275,22 @@ const addDeposit = async (tokenQty: Number, pixKey: string) => {
   await updateValidDeposits();
 };
 
+// cancel a deposit by ots Id
+const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+  const provider = getProvider();
+
+  if (!provider) return false;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+  await contract.cancelDeposit(depositId);
+
+  await updateWalletStatus();
+  await updateDepositAddedEvents();
+  await updateValidDeposits();
+  return true;
+};
+
 // Get specific deposit data by its ID
 const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   const provider = getProvider();
@@ -392,6 +408,7 @@ export default {
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
   addDeposit,
+  cancelDeposit,
   mapDeposits,
   formatBigNumber,
   addLock,

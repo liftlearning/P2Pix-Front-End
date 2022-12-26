@@ -170,7 +170,10 @@ const closeMenu = () => {
           <div
             class="top-bar-info cursor-pointer"
             @click="
-              [(menuOpenToggle = !menuOpenToggle), (currencyMenuOpenToggle = false)]
+              [
+                (menuOpenToggle = !menuOpenToggle),
+                (currencyMenuOpenToggle = false),
+              ]
             "
             @mouseover="menuHoverToggle = true"
             @mouseout="menuHoverToggle = false"

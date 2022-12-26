@@ -10,9 +10,11 @@ const { walletAddress } = storeToRefs(etherStore);
 const allUserTransactions = ref<any[]>([]);
 
 if (walletAddress.value != "") {
-  blockchain.listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
+  blockchain
+    .listAllTransactionByWalletAddress(walletAddress.value)
+    .then((res) => {
       allUserTransactions.value = res;
-    })
+    });
 }
 </script>
 

@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import blockchain from '@/utils/blockchain';
-import { ref } from 'vue';
+import blockchain from "@/utils/blockchain";
+import { ref } from "vue";
+
+// props
+const props = defineProps<{
+  walletTransactions: any[];
+  isManageMode: boolean;
+}>();
 
 const itemsToShow = ref<any[]>([]);
 
-const props = defineProps<{
-  lastWalletReleaseTransactions: any[];
-}>();
+itemsToShow.value =
+  props.walletTransactions?.length > 3
+    ? props.walletTransactions.slice(0, 3)
+    : props.walletTransactions;
 
+// Methods
 const formatEventsAmount = (amount: any) => {
   try {
     const formated = blockchain.formatBigNumber(amount);
@@ -22,68 +30,87 @@ const openEtherscanUrl = (url: string) => {
 };
 
 const loadMore = () => {
-  const itemsShowing = itemsToShow.value.length
-  if(props.lastWalletReleaseTransactions?.length > ( itemsShowing + 3))
-    itemsToShow.value?.push(...props.lastWalletReleaseTransactions.slice(itemsShowing, itemsShowing + 3))
-  else
-    itemsToShow.value = props.lastWalletReleaseTransactions
+  const itemsShowing = itemsToShow.value.length;
+  if (props.walletTransactions?.length > itemsShowing + 3)
+    itemsToShow.value?.push(
+      ...props.walletTransactions.slice(itemsShowing, itemsShowing + 3)
+    );
+  else itemsToShow.value = props.walletTransactions;
 };
 
-itemsToShow.value = (props.lastWalletReleaseTransactions?.length > 3) ? props.lastWalletReleaseTransactions.slice(0, 3) : props.lastWalletReleaseTransactions;
-
+//emits
+const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
 </script>
 
 <template>
-      <div class="blur-container">
-        <div class="grid grid-cols-4 grid-flow-row w-full px-6">
-            <span class="text-xs text-gray-50 font-medium justify-self-center">Valor</span>
-            <span class="text-xs text-gray-50 font-medium justify-self-center">Data</span>
-            <span class="text-xs text-gray-50 font-medium justify-self-center">Tipo de transação</span>
-            <span class="text-xs text-gray-50 font-medium justify-self-center">Checar transação</span>
-        </div>
-        <div
-            class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
-            v-for="item in itemsToShow"
-            :key="item?.blockNumber"
-          >
-            <span class="last-release-info">
-              {{ formatEventsAmount(item?.args.amount) }} BRZ
-            </span>
-            
-            <span class="last-release-info">
-              20 out 2022
-            </span>
+  <div class="blur-container">
+    <div class="grid grid-cols-4 grid-flow-row w-full px-6">
+      <span class="text-xs text-gray-50 font-medium justify-self-center"
+        >Valor</span
+      >
+      <span class="text-xs text-gray-50 font-medium justify-self-center"
+        >Data</span
+      >
+      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
+        props.isManageMode ? "Cancelar oferta" : "Tipo de transação"
+      }}</span>
+      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
+        props.isManageMode ? "Retirar tokens" : "Checar transação"
+      }}</span>
+    </div>
+    <div
+      class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
+      v-for="item in itemsToShow"
+      :key="item?.blockNumber"
+    >
+      <span class="last-release-info">
+        {{ formatEventsAmount(item?.args.amount) }} BRZ
+      </span>
 
-            <span class="last-release-info">
-              {{ "Compra" }}
-            </span>
+      <span class="last-release-info"> 20 out 2022 </span>
 
-            <div
-              class="flex gap-2 cursor-pointer items-center justify-self-center"
-              @click="
-                openEtherscanUrl(
-                  `https://etherscan.io/tx/${item?.transactionHash}`
-                )
-              "
-            >
-              <span class="last-release-info">Etherscan</span>
-              <img alt="Redirect image" src="@/assets/redirect.svg" />
-            </div>
-          </div>
-          <div class="flex justify-center w-full mt-2">
-            <button
-              type="button"
-              class="text-white"
-              @click="loadMore()"
-            >
-              Carregar mais
-            </button>
-        </div>
-        <p class="font-bold" v-if="props.lastWalletReleaseTransactions?.length == 0">
-          Não há nenhuma transação anterior
-        </p>
+      <div
+        v-if="props.isManageMode"
+        class="flex gap-2 cursor-pointer items-center justify-self-center"
+        @click="emit('cancelDeposit')"
+      >
+        <span class="last-release-info">Cancelar</span>
+        <img alt="Cancel image" src="@/assets/cancel.svg" />
       </div>
 
+      <span class="last-release-info" v-if="!props.isManageMode">
+        {{ "Compra" }}
+      </span>
+
+      <div
+        v-if="props.isManageMode"
+        class="flex gap-2 cursor-pointer items-center justify-self-center"
+        @click="emit('withdrawDeposit')"
+      >
+        <span class="last-release-info">Retirar</span>
+        <img alt="Cancel image" src="@/assets/withdraw.svg" />
+      </div>
+
+      <div
+        v-if="!props.isManageMode"
+        class="flex gap-2 cursor-pointer items-center justify-self-center"
+        @click="
+          openEtherscanUrl(`https://etherscan.io/tx/${item?.transactionHash}`)
+        "
+      >
+        <span class="last-release-info">Etherscan</span>
+        <img alt="Redirect image" src="@/assets/redirect.svg" />
+      </div>
+    </div>
+    <div class="flex justify-center w-full mt-2">
+      <button type="button" class="text-white" @click="loadMore()">
+        Carregar mais
+      </button>
+    </div>
+    <p class="font-bold" v-if="props.walletTransactions?.length == 0">
+      Não há nenhuma transação anterior
+    </p>
+  </div>
 </template>
 
 <style scoped>
@@ -107,7 +134,7 @@ p {
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-auto;
 }
 
 .grid-container {

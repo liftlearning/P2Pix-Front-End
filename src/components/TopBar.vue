@@ -35,24 +35,38 @@ const formatWalletBalance = (): String => {
 
 const disconnectUser = () => {
   etherStore.setWalletAddress("");
-  const currentRoute = router.currentRoute.value.path;
-  if (currentRoute !== "/") {
-    router.push("/");
-  } else {
-    window.location.reload();
-  }
+  closeMenu();
+  window.location.reload();
+};
+
+const closeMenu = () => {
+  menuOpenToggle.value = false;
 };
 </script>
 
 <template>
   <header>
-    <img alt="P2Pix logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
+    <img
+      alt="P2Pix logo"
+      class="logo"
+      src="@/assets/logo.svg"
+      width="75"
+      height="75"
+    />
     <div class="flex gap-4 items-center">
-      <button type="button" class="default-button" v-on:click="router.push('/seller')">
+      <button
+        type="button"
+        class="default-button"
+        v-on:click="router.push('/seller')"
+      >
         Quero vender
       </button>
-      <button type="button" v-if="!walletAddress" class="border-amber-500 border-2 rounded default-button"
-        @click="connectMetaMask()">
+      <button
+        type="button"
+        v-if="!walletAddress"
+        class="border-amber-500 border-2 rounded default-button"
+        @click="connectMetaMask()"
+      >
         Conectar carteira
       </button>
       <div v-if="walletAddress" class="account-info">
@@ -105,37 +119,29 @@ const disconnectUser = () => {
               src="@/assets/chevronDownBlack.svg"
             />
           </div>
-          <div
-            v-show="menuOpenToggle"
-            class="mt-10 absolute w-full text-black"
-          >
+          <div v-show="menuOpenToggle" class="mt-10 absolute w-full text-black">
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
-                <div
-                  class="menu-button px-4 rounded-md cursor-pointer"
-                  onclick="window.location='/bid_history'"
-                >
-                  <div class="py-4 text-end font-semibold text-xs">
+                <div class="menu-button" @click="closeMenu()">
+                  <RouterLink to="/bid_history" class="redirect_button px-0">
                     Histórico de compras
-                  </div>
-                  <hr />
+                  </RouterLink>
                 </div>
-                <div
-                  class="menu-button px-4 cursor-pointer"
-                  onclick="window.location='/manage_bids'"
-                >
-                  <div class="py-4 text-end font-semibold text-xs">
+                <div class="w-full flex justify-center">
+                  <hr class="w-4/5" />
+                </div>
+                <div class="menu-button" @click="closeMenu()">
+                  <RouterLink to="/manage_bids" class="redirect_button">
                     Gerenciar Ofertas
-                  </div>
-                  <hr />
+                  </RouterLink>
                 </div>
-                <div
-                  class="menu-button px-4 py-1 rounded-md cursor-pointer"
-                  @click="disconnectUser"
-                >
-                  <div class="py-3 text-end font-semibold text-xs">
+                <div class="w-full flex justify-center">
+                  <hr class="w-4/5" />
+                </div>
+                <div class="menu-button" @click="disconnectUser">
+                  <RouterLink to="/" class="redirect_button">
                     Desconectar
-                  </div>
+                  </RouterLink>
                 </div>
               </div>
             </div>
@@ -173,7 +179,15 @@ header {
   @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 rounded;
 }
 
-.menu-button:hover {
-  background-color: #E5E7EB;
+.redirect_button {
+  @apply py-4 text-gray-900 font-semibold text-xs w-full;
+}
+
+.menu-button {
+  @apply flex text-center justify-center;
+}
+
+a:hover {
+  @apply bg-gray-200 rounded;
 }
 </style>

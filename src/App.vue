@@ -4,8 +4,13 @@ import TopBar from "./components/TopBar.vue";
 
 <template>
   <TopBar />
-
-  <RouterView />
+  <RouterView v-slot="{ Component }">
+    <template v-if="Component">
+      <Suspense>
+        <component :is="Component"></component>
+      </Suspense>
+    </template>
+  </RouterView>
 </template>
 
 <style scoped></style>

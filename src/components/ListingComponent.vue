@@ -92,7 +92,15 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
         <img alt="Cancel image" src="@/assets/cancel.svg" />
       </div>
 
-      <span class="last-release-info" v-if="!props.isManageMode">
+      <span class="last-release-info" v-if="item.event == 'DepositAdded' && !props.isManageMode">
+        {{ "Oferta" }}
+      </span>
+
+      <span class="last-release-info" v-if="item.event == 'LockAdded' && !props.isManageMode">
+        {{ "Reserva" }}
+      </span>
+
+      <span class="last-release-info" v-if="item.event == 'LockReleased' && !props.isManageMode">
         {{ "Compra" }}
       </span>
 

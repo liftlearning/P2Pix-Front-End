@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import blockchain from "@/utils/blockchain";
-import { ref } from "vue";
+import { ref, onUpdated } from "vue";
 
 // props
 const props = defineProps<{
@@ -38,13 +38,27 @@ const loadMore = () => {
   else itemsToShow.value = props.walletTransactions;
 };
 
+// lifecycle methods
+
+onUpdated(() => {
+  if (itemsToShow.value.length == 0) {
+    itemsToShow.value =
+      props.walletTransactions?.length > 3
+        ? props.walletTransactions.slice(0, 3)
+        : props.walletTransactions;
+  }
+});
+
 //emits
 const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
 </script>
 
 <template>
   <div class="blur-container">
-    <div class="grid grid-cols-4 grid-flow-row w-full px-6">
+    <div
+      class="grid grid-cols-4 grid-flow-row w-full px-6"
+      v-if="props.walletTransactions?.length != 0"
+    >
       <span class="text-xs text-gray-50 font-medium justify-self-center"
         >Valor</span
       >
@@ -102,14 +116,20 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
         <img alt="Redirect image" src="@/assets/redirect.svg" />
       </div>
     </div>
-    <div class="flex justify-center w-full mt-2">
+    <div
+      class="flex justify-center w-full mt-2"
+      v-if="props.walletTransactions?.length != 0"
+    >
       <button type="button" class="text-white" @click="loadMore()">
         Carregar mais
       </button>
     </div>
-    <p class="font-bold" v-if="props.walletTransactions?.length == 0">
+    <span
+      class="font-bold text-gray-900"
+      v-if="props.walletTransactions?.length == 0"
+    >
       Não há nenhuma transação anterior
-    </p>
+    </span>
   </div>
 </template>
 

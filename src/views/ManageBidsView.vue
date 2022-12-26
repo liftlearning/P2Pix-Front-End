@@ -9,12 +9,9 @@ const { depositsAddedList } = storeToRefs(etherStore);
 
 <template>
   <div class="page">
-    <div class="header">
-      Gerenciar ofertas
-    </div>
+    <div class="header">Gerenciar ofertas</div>
     <ListingComponent
-      v-if="depositsAddedList?.length != 0"
-      :wallet-transactions="depositsAddedList!"
+      :wallet-transactions="depositsAddedList"
       :is-manage-mode="true"
     ></ListingComponent>
   </div>
@@ -25,7 +22,7 @@ const { depositsAddedList } = storeToRefs(etherStore);
   @apply flex flex-col gap-10 mt-20 w-full;
 }
 
-.header{
-  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex
+.header {
+  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex;
 }
 </style>

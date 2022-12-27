@@ -178,7 +178,9 @@ const updateDepositAddedEvents = async () => {
 
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
   etherStore.setDepositsAddedList(eventsDeposits);
+  console.log("DEPOSITS", eventsDeposits);
 };
 
 const updateLockAddedEvents = async () => {
@@ -196,6 +198,7 @@ const updateLockAddedEvents = async () => {
   const filterLocks = p2pContract.filters.LockAdded(null);
   const eventsLocks = await p2pContract.queryFilter(filterLocks);
   etherStore.setLocksAddedList(eventsLocks);
+  console.log("LOCKS", eventsLocks);
 };
 
 const updateLockReleasedEvents = async () => {
@@ -210,9 +213,10 @@ const updateLockReleasedEvents = async () => {
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
-  const filterLocks = p2pContract.filters.LockReleased(null);
-  const eventsLocks = await p2pContract.queryFilter(filterLocks);
-  etherStore.setLocksReleasedList(eventsLocks);
+  const filterReleases = p2pContract.filters.LockReleased(null);
+  const eventsReleases = await p2pContract.queryFilter(filterReleases);
+  etherStore.setLocksReleasedList(eventsReleases);
+  console.log("RELEASES", eventsReleases);
 };
 
 // Provider methods
@@ -272,7 +276,8 @@ const addDeposit = async (tokenQty: Number, pixKey: String) => {
   const deposit = await p2pContract.deposit(
     addresses.token,
     formatEther(String(tokenQty)),
-    pixKey
+    pixKey,
+    ethers.utils.formatBytes32String("")
   );
   await deposit.wait();
 
@@ -304,7 +309,8 @@ const mockDeposit = async (tokenQty: Number, pixKey: String) => {
   const deposit = await p2pContract.deposit(
     addresses.token,
     formatEther(String(tokenQty)),
-    pixKey
+    pixKey,
+    ethers.utils.formatBytes32String("")
   );
   await deposit.wait();
 
@@ -344,6 +350,7 @@ const addLock = async (depositId: BigNumber, amount: Number) => {
     ethers.constants.AddressZero, // String "0x0000000000000000000000000000000000000000"
     0,
     formatEther(String(amount)), // BigNumber
+    [],
     []
   );
   lock.wait();
@@ -384,8 +391,12 @@ const releaseLock = async (
   );
 
   const messageToSign = ethers.utils.solidityKeccak256(
-    ["string", "uint256", "uint256"],
-    [pixKey, formatEther(String(amount)), formatEther(e2eId)]
+    ["string", "uint256", "bytes32"],
+    [
+      pixKey,
+      formatEther(String(amount)),
+      ethers.utils.formatBytes32String(e2eId),
+    ]
   );
 
   const messageHashBytes = ethers.utils.arrayify(messageToSign);
@@ -397,7 +408,8 @@ const releaseLock = async (
 
   const release = await p2pContract.release(
     lockId,
-    formatEther(e2eId),
+    ethers.constants.AddressZero,
+    ethers.utils.formatBytes32String(e2eId),
     sig.r,
     sig.s,
     sig.v

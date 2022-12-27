@@ -24,8 +24,6 @@ const handleInputEvent = (event: any) => {
     return;
   }
   validDecimals.value = true;
-
-  // verifyLiquidity();
 };
 
 // Enable button methods
@@ -38,31 +36,6 @@ const decimalCount = (num: Number) => {
   return 0;
 };
 
-// Verify if there is a valid deposit to buy
-// const verifyLiquidity = () => {
-//   enableSelectButton.value = false;
-//   selectedDeposit.value = null;
-//   if (!walletAddress.value || tokenValue.value <= 0) return;
-
-//   depositsAddedList.value.find((element) => {
-//     const p2pixTokenValue = blockchain.formatBigNumber(element.args.amount);
-//     if (
-//       tokenValue.value!! <= Number(p2pixTokenValue) &&
-//       tokenValue.value!! != 0 &&
-//       element.args.seller !== walletAddress.value
-//     ) {
-//       enableSelectButton.value = true;
-//       hasLiquidity.value = true;
-//       selectedDeposit.value = element;
-//       return true;
-//     }
-//     return false;
-//   });
-
-//   if (!enableSelectButton.value) {
-//     hasLiquidity.value = false;
-//   }
-// };
 </script>
 
 <template>

@@ -50,10 +50,6 @@ const sendNetwork = async () => {
 </script>
 
 <template>
-  <!-- <SellerSearchComponent
-    v-if="flowStep == Step.Search"
-    @token-buy="walletConnect"
-  /> -->
   <div v-if="flowStep == Step.Sell">
     <WantSellComponent v-if="!loading" @approve-tokens="approveOffer" />
     <ValidationComponent

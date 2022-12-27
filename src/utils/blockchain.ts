@@ -93,6 +93,25 @@ const listDepositTransactionByWalletAddress = async (
   });
 };
 
+// get wallet's deposit transactions
+// const listValidDepositTransactionsByWalletAddress = async (
+//   walletAddress: string
+// ): Promise<any[]> => {
+//   const provider = getProvider();
+//   const etherStore = useEtherStore();
+//   if (!provider) return [];
+
+//   const signer = provider.getSigner();
+//   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+
+//   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
+//   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
+//   console.log()
+
+  
+// };
+
 // get wallet's lock transactions
 const listLockTransactionByWalletAddress = async (
   walletAddress: string
@@ -155,10 +174,10 @@ const updateValidDeposits = async () => {
       remaining: formatBigNumber(mappedDeposit.remaining),
       seller: mappedDeposit.seller,
       pixKey: mappedDeposit.pixTarget,
-      valid: mappedDeposit.valid,
     };
 
-    depositList.push(validDeposit);
+    if (mappedDeposit.valid)
+      depositList.push(validDeposit);
   });
 
   etherStore.setDepositsValidList(depositList);
@@ -275,7 +294,7 @@ const addDeposit = async (tokenQty: Number, pixKey: string) => {
   await updateValidDeposits();
 };
 
-// cancel a deposit by ots Id
+// cancel a deposit by its Id
 const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const provider = getProvider();
 
@@ -286,7 +305,21 @@ const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   await contract.cancelDeposit(depositId);
 
   await updateWalletStatus();
-  await updateDepositAddedEvents();
+  await updateValidDeposits();
+  return true;
+};
+
+// withdraw a deposit by its Id
+const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+  const provider = getProvider();
+
+  if (!provider) return false;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+  await contract.withdraw(depositId, []);
+
+  await updateWalletStatus();
   await updateValidDeposits();
   return true;
 };
@@ -409,6 +442,7 @@ export default {
   listLockTransactionByWalletAddress,
   addDeposit,
   cancelDeposit,
+  withdrawDeposit,
   mapDeposits,
   formatBigNumber,
   addLock,

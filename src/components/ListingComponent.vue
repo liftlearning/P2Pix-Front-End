@@ -77,15 +77,16 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
       :key="item?.blockNumber"
     >
       <span class="last-release-info">
-        {{ formatEventsAmount(item?.args.amount) }} BRZ
+        {{ formatEventsAmount(item?.args ? item?.args.amount : item?.remaining) }} BRZ
       </span>
 
-      <span class="last-release-info"> 20 out 2022 </span>
+      <!-- TODO: change this hardcoded date -->
+      <span class="last-release-info"> 20 out 2022 </span> 
 
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', item.args.depositID)"
+        @click="emit('cancelDeposit', item.depositID)"
       >
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
@@ -115,7 +116,7 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('withdrawDeposit')"
+        @click="emit('withdrawDeposit', item.depositID)"
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Cancel image" src="@/assets/withdraw.svg" />

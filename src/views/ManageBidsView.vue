@@ -7,46 +7,50 @@ import type { BigNumber } from "ethers";
 import { ref } from "vue";
 
 const etherStore = useEtherStore();
-const { walletAddress } = storeToRefs(etherStore);
+const { walletAddress, depositsValidList } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
 
-if (walletAddress.value) {
-  await blockchain
-    .listDepositTransactionByWalletAddress(walletAddress.value)
-    .then((value) => (depositList.value = value));
+const listValidDepositTransactionsByWalletAddress = (walletAddress: string, deposits: any[]) => {
+  depositList.value = deposits.filter((deposit) => deposit.seller === walletAddress) 
 }
 
 const handleCancelDeposit = async (depositID: BigNumber) => {
-  console.log(depositID);
   const response = await blockchain.cancelDeposit(depositID);
   if (response == true) console.log("Depósito cancelado com sucesso.");
 };
 
-etherStore.$subscribe(async (mutation, state) => {
-  if (mutation.events.key == "walletAddress") {
-    if (state.walletAddress) {
-      await blockchain
-        .listDepositTransactionByWalletAddress(state.walletAddress)
-        .then((value) => (depositList.value = value));
-    }
-  }
+const handleWithDrawDeposit = async (depositID: BigNumber) => {
+  const response = await blockchain.withdrawDeposit(depositID);
+  if (response == true) console.log("Token retirado com sucesso.");
+};
+
+if (walletAddress.value) {
+  listValidDepositTransactionsByWalletAddress(walletAddress.value, depositsValidList.value)
+}
+
+etherStore.$subscribe((_mutation, state) => {
+  if(state.walletAddress != "")
+    listValidDepositTransactionsByWalletAddress(state.walletAddress, state.depositsValidList)
 });
 </script>
 
 <template>
   <div class="page">
     <div class="header">Gerenciar ofertas</div>
-    <ListingComponent
-      :wallet-transactions="depositList"
-      :is-manage-mode="true"
-      @cancel-deposit="handleCancelDeposit"
-    ></ListingComponent>
+    <div class="w-full max-w-4xl">
+      <ListingComponent
+        :wallet-transactions="depositList"
+        :is-manage-mode="true"
+        @cancel-deposit="handleCancelDeposit"
+        @withdraw-deposit="handleWithDrawDeposit"
+      ></ListingComponent>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .page {
-  @apply flex flex-col gap-10 mt-20 w-full;
+  @apply flex flex-col items-center gap-10 mt-20 w-full;
 }
 
 .header {

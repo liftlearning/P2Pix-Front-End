@@ -34,7 +34,6 @@ const approveOffer = async ({ offer, pixKey }: any) => {
 };
 
 const sendNetwork = async () => {
-  console.log("OIOI");
   loading.value = true;
   try {
     if (offerValue.value && pixKeyBuyer.value) {
@@ -43,7 +42,6 @@ const sendNetwork = async () => {
       loading.value = false;
     }
   } catch (err) {
-    console.log("Erro");
     console.log(err);
     flowStep.value = Step.Network;
     loading.value = false;

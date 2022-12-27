@@ -2,26 +2,15 @@
 import { ref } from "vue";
 import CustomButton from "../../components/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
-import { useEtherStore } from "@/store/ether";
-import { storeToRefs } from "pinia";
-
-// Store reference
-const etherStore = useEtherStore();
-
-const { walletAddress, depositsAddedList } = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
 const enableSelectButton = ref(false);
 const hasLiquidity = ref(true);
 const validDecimals = ref(true);
-const selectedDeposit = ref();
 
 // Emits
 const emit = defineEmits(["tokenBuy"]);
-
-// Blockchain methods
-const connectAccount = async () => {};
 
 // Debounce methods
 const handleInputEvent = (event: any) => {

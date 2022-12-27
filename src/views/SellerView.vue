@@ -5,8 +5,6 @@ import ValidationComponent from "../components/LoadingComponent.vue";
 import blockchain from "../utils/blockchain";
 
 import { ref } from "vue";
-import router from "@/router";
-import { pix } from "@/utils/QrCodePix";
 
 enum Step {
   Search,
@@ -19,10 +17,6 @@ const loading = ref<boolean>(false);
 
 const offerValue = ref<number>();
 const pixKeyBuyer = ref<string>("");
-
-const walletConnect = async () => {
-  flowStep.value = Step.Sell;
-};
 
 // Verificar tipagem
 const approveOffer = async ({ offer, pixKey }: any) => {

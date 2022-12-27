@@ -11,8 +11,6 @@ const props = defineProps({
   tokenValue: Number,
 });
 
-console.log(props.pixTarget, props.tokenValue);
-
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const isPixValid = ref<boolean>(false);

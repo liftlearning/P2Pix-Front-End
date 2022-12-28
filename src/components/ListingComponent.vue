@@ -6,16 +6,16 @@ import { ref, watch } from "vue";
 const props = defineProps<{
   walletTransactions: any[];
   isManageMode: boolean;
+  walletAddress?: string;
 }>();
 
 const itemsToShow = ref<any[]>([]);
 
-itemsToShow.value =
-  props.walletTransactions?.length > 3
-    ? props.walletTransactions.slice(0, 3)
-    : props.walletTransactions;
-
 // Methods
+const showInitialItems = (items: any[]) => {
+  return items.length > 3 ? items.slice(0, 3) : items;
+};
+
 const formatEventsAmount = (amount: any) => {
   try {
     const formated = blockchain.formatBigNumber(amount);
@@ -41,15 +41,21 @@ const loadMore = () => {
 // watch props changes
 
 watch(props, (newProps) => {
-  const itemsToShowQty = itemsToShow.value.length
-  itemsToShow.value =
-  newProps?.walletTransactions.length > itemsToShowQty + 3
-      ? newProps.walletTransactions.slice(itemsToShowQty, itemsToShowQty + 3)
-      : newProps.walletTransactions;
-})
+  const itemsToShowQty = itemsToShow.value.length;
+  if (itemsToShowQty == 0)
+    itemsToShow.value = showInitialItems(props.walletTransactions);
+  else
+    itemsToShow.value =
+      newProps?.walletTransactions.length > itemsToShowQty
+        ? newProps.walletTransactions.slice(0, itemsToShowQty)
+        : newProps.walletTransactions;
+});
 
 //emits
 const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
+
+// initial itemToShow value
+itemsToShow.value = showInitialItems(props.walletTransactions);
 </script>
 
 <template>
@@ -77,11 +83,14 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
       :key="item?.blockNumber"
     >
       <span class="last-release-info">
-        {{ formatEventsAmount(item?.args ? item?.args.amount : item?.remaining) }} BRZ
+        {{
+          item?.args ? formatEventsAmount(item?.args.amount) : item?.remaining
+        }}
+        BRZ
       </span>
 
       <!-- TODO: change this hardcoded date -->
-      <span class="last-release-info"> 20 out 2022 </span> 
+      <span class="last-release-info"> 20 out 2022 </span>
 
       <div
         v-if="props.isManageMode"
@@ -133,18 +142,12 @@ const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
         <img alt="Redirect image" src="@/assets/redirect.svg" />
       </div>
     </div>
-    <div
-      class="flex justify-center w-full mt-2"
-      v-if="itemsToShow.length != 0"
-    >
+    <div class="flex justify-center w-full mt-2" v-if="itemsToShow.length != 0">
       <button type="button" class="text-white" @click="loadMore()">
         Carregar mais
       </button>
     </div>
-    <span
-      class="font-bold text-gray-900"
-      v-if="itemsToShow.length == 0"
-    >
+    <span class="font-bold text-gray-900" v-if="itemsToShow.length == 0">
       Não há nenhuma transação anterior
     </span>
   </div>

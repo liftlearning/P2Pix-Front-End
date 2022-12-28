@@ -47,4 +47,14 @@ export const useEtherStore = defineStore("ether", {
       this.locksExpiredList = locksExpiredList;
     },
   },
+  getters: {
+    getValidDepositByWalletAddress: (state) => {
+      return (walletAddress: string) =>
+        state.depositsValidList
+          .filter((deposit) => deposit.seller == walletAddress)
+          .sort((a, b) => {
+            return b.blockNumber - a.blockNumber;
+          });
+    },
+  },
 });

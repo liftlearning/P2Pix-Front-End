@@ -7,30 +7,47 @@ import type { BigNumber } from "ethers";
 import { ref } from "vue";
 
 const etherStore = useEtherStore();
-const { walletAddress, depositsValidList } = storeToRefs(etherStore);
+const { walletAddress } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
-
-const listValidDepositTransactionsByWalletAddress = (walletAddress: string, deposits: any[]) => {
-  depositList.value = deposits.filter((deposit) => deposit.seller === walletAddress) 
-}
 
 const handleCancelDeposit = async (depositID: BigNumber) => {
   const response = await blockchain.cancelDeposit(depositID);
-  if (response == true) console.log("Depósito cancelado com sucesso.");
+  if (response == true) {
+    console.log("Depósito cancelado com sucesso.");
+    await blockchain
+      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
+      .then((deposits) => {
+        if (deposits) depositList.value = deposits;
+      });
+  }
 };
 
 const handleWithDrawDeposit = async (depositID: BigNumber) => {
   const response = await blockchain.withdrawDeposit(depositID);
-  if (response == true) console.log("Token retirado com sucesso.");
+  if (response == true) {
+    console.log("Token retirado com sucesso.");
+    await blockchain
+      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
+      .then((deposits) => {
+        if (deposits) depositList.value = deposits;
+      });
+  }
 };
 
 if (walletAddress.value) {
-  listValidDepositTransactionsByWalletAddress(walletAddress.value, depositsValidList.value)
+  depositList.value = etherStore.getValidDepositByWalletAddress(
+    walletAddress.value
+  );
 }
 
-etherStore.$subscribe((_mutation, state) => {
-  if(state.walletAddress != "")
-    listValidDepositTransactionsByWalletAddress(state.walletAddress, state.depositsValidList)
+etherStore.$subscribe(async (_mutation, state) => {
+  if (state.walletAddress != "" && state.depositsValidList.length > 0) {
+    await blockchain
+      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
+      .then((deposits) => {
+        if (deposits) depositList.value = deposits;
+      });
+  }
 });
 </script>
 

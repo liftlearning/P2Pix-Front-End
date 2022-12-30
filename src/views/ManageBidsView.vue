@@ -7,8 +7,20 @@ import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
 
 const etherStore = useEtherStore();
+
+
 const { walletAddress } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
+
+if (walletAddress.value) {
+  const walletDeposits =
+    await blockchain.listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+  if (walletDeposits) {
+    depositList.value = walletDeposits;
+  }
+}
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
   const response = await blockchain.cancelDeposit(depositID);
@@ -25,16 +37,6 @@ const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
     depositList.value.splice(index, 1);
   }
 };
-
-if (walletAddress.value) {
-  const walletDeposits =
-    await blockchain.listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
-  if (walletDeposits) {
-    depositList.value = walletDeposits;
-  }
-}
 
 watch(walletAddress, async () => {
   const walletDeposits =

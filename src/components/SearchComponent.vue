@@ -62,7 +62,6 @@ const verifyLiquidity = () => {
   depositsValidList.value.find((element) => {
     const remaining = element.remaining;
     if (
-      element.valid == true &&
       tokenValue.value!! <= remaining &&
       tokenValue.value!! != 0 &&
       element.seller !== walletAddress.value

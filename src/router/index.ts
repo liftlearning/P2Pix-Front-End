@@ -3,7 +3,6 @@ import HomeView from "../views/HomeView.vue";
 import MockView from "../views/MockView.vue";
 import BidHistoryView from "../views/BidHistoryView.vue";
 import ManageBidsView from "../views/ManageBidsView.vue";
-import DepositsHistoryView from "../views/DepositsHistoryView.vue";
 import SellerView from "@/views/SellerView.vue";
 
 const router = createRouter({
@@ -33,11 +32,6 @@ const router = createRouter({
       path: "/manage_bids",
       name: "manage bids",
       component: ManageBidsView,
-    },
-    {
-      path: "/deposits_history",
-      name: "deposits history",
-      component: DepositsHistoryView,
     },
   ],
 });

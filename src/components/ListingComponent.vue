@@ -154,7 +154,7 @@ showInitialItems();
       </button>
       <span class="text-gray-300">
         ({{ itemsToShow.length }} de
-        {{ props.walletTransactions.length }} transações)
+        {{ props.walletTransactions.length }} {{isManageMode ? 'ofertas' : 'transações'}})
       </span>
     </div>
 

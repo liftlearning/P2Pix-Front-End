@@ -52,11 +52,13 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         >Histórico de compras
       </span>
     </div>
-    <ListingComponent
-      :walletTransactions="lastWalletReleaseTransactions"
-      :isManageMode="false"
-    >
-    </ListingComponent>
+    <div class="w-full max-w-4xl">
+      <ListingComponent
+        :walletTransactions="lastWalletReleaseTransactions"
+        :isManageMode="false"
+      >
+      </ListingComponent>
+    </div>
   </div>
 </template>
 

@@ -13,6 +13,7 @@ import { wallets } from "./smart_contract_files/wallets.json";
 const updateWalletStatus = async () => {
   const etherStore = useEtherStore();
   const provider = getProvider();
+
   if (!provider) return;
 
   const signer = provider.getSigner();
@@ -23,6 +24,21 @@ const updateWalletStatus = async () => {
   const balance = await contract.balanceOf(walletAddress[0]);
   etherStore.setBalance(formatBigNumber(balance));
   etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
+};
+
+const updateWalletBalance = async () => {
+  const etherStore = useEtherStore();
+  const provider = getProvider();
+
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
+
+  const walletAddress = await provider.send("eth_requestAccounts", []);
+
+  const balance = await contract.balanceOf(walletAddress[0]);
+  etherStore.setBalance(formatBigNumber(balance));
 };
 
 //  Split tokens between wallets in wallets.json
@@ -78,9 +94,9 @@ const listAllTransactionByWalletAddress = async (
 // get wallet's deposit transactions
 const listDepositTransactionByWalletAddress = async (
   walletAddress: string
-): Promise<any[] | undefined> => {
+): Promise<any[]> => {
   const provider = getProvider();
-  if (!provider) return;
+  if (!provider) return [];
 
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
@@ -91,6 +107,21 @@ const listDepositTransactionByWalletAddress = async (
   return eventsDeposits.sort((a, b) => {
     return b.blockNumber - a.blockNumber;
   });
+};
+
+// get wallet's deposit transactions
+const listValidDepositTransactionsByWalletAddress = async (
+  walletAddress: string
+): Promise<any[]> => {
+  const walletDeposits = await getValidDeposits();
+  if (walletDeposits) {
+    return walletDeposits
+      .filter((deposit) => deposit.seller == walletAddress)
+      .sort((a, b) => {
+        return b.blockNumber - a.blockNumber;
+      });
+  }
+  return [];
 };
 
 // get wallet's lock transactions
@@ -131,13 +162,14 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
-// Update events at store methods
-const updateValidDeposits = async () => {
-  const etherStore = useEtherStore();
+//get valid deposits
+const getValidDeposits = async (): Promise<any[] | undefined> => {
   const window_ = window as any;
   const connection = window_.ethereum;
   let provider: ethers.providers.Web3Provider | null = null;
-  if (!connection) return;
+
+  if (!connection) return [];
+
   provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
@@ -145,23 +177,34 @@ const updateValidDeposits = async () => {
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
-  const depositList = [] as any[];
+  const depositList: any[] = await Promise.all(
+    eventsDeposits
+      .map(async (deposit) => {
+        const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        let validDeposit = {};
 
-  eventsDeposits.forEach(async (deposit) => {
-    const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        if (mappedDeposit.valid) {
+          validDeposit = {
+            blockNumber: deposit.blockNumber,
+            depositID: deposit.args?.depositID,
+            remaining: formatBigNumber(mappedDeposit.remaining),
+            seller: mappedDeposit.seller,
+            pixKey: mappedDeposit.pixTarget,
+          };
+        }
 
-    const validDeposit = {
-      depositID: deposit.args?.depositID,
-      remaining: formatBigNumber(mappedDeposit.remaining),
-      seller: mappedDeposit.seller,
-      pixKey: mappedDeposit.pixTarget,
-      valid: mappedDeposit.valid,
-    };
+        return validDeposit;
+      })
+      .filter((deposit) => deposit)
+  );
 
-    depositList.push(validDeposit);
-  });
-
-  etherStore.setDepositsValidList(depositList);
+  return depositList;
+};
+// Update events at store methods
+const updateValidDeposits = async () => {
+  const etherStore = useEtherStore();
+  const deposits = await getValidDeposits();
+  if (deposits) etherStore.setDepositsValidList(deposits);
 };
 
 const updateDepositAddedEvents = async () => {
@@ -225,10 +268,10 @@ const connectProvider = async () => {
   const connection = window_.ethereum;
 
   await updateWalletStatus();
+  await updateValidDeposits();
   await updateDepositAddedEvents();
   await updateLockAddedEvents();
   await updateLockReleasedEvents();
-  await updateValidDeposits();
 
   connection.on("accountsChanged", async () => {
     await updateWalletStatus();
@@ -315,8 +358,38 @@ const mockDeposit = async (tokenQty: Number, pixKey: String) => {
   await deposit.wait();
 
   await updateWalletStatus();
-  await updateDepositAddedEvents();
   await updateValidDeposits();
+  await updateDepositAddedEvents();
+};
+
+// cancel a deposit by its Id
+const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+  const provider = getProvider();
+
+  if (!provider) return false;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+  await contract.cancelDeposit(depositId);
+
+  await updateWalletBalance();
+  await updateValidDeposits();
+  return true;
+};
+
+// withdraw a deposit by its Id
+const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+  const provider = getProvider();
+
+  if (!provider) return false;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
+  await contract.withdraw(depositId, []);
+
+  await updateWalletBalance();
+  await updateValidDeposits();
+  return true;
 };
 
 // Get specific deposit data by its ID
@@ -437,12 +510,15 @@ export default {
   formatEther,
   updateWalletStatus,
   splitTokens,
+  listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
   approveTokens,
   addDeposit,
+  cancelDeposit,
+  withdrawDeposit,
   mockDeposit,
   mapDeposits,
   formatBigNumber,
@@ -451,4 +527,5 @@ export default {
   releaseLock,
   updateLockAddedEvents,
   updateValidDeposits,
+  getValidDeposits,
 };

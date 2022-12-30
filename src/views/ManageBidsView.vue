@@ -1,11 +1,73 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import blockchain from "../utils/blockchain";
+import ListingComponent from "@/components/ListingComponent.vue";
+import type { BigNumber } from "ethers";
+import { ref, watch } from "vue";
+
+const etherStore = useEtherStore();
+
+const { walletAddress } = storeToRefs(etherStore);
+const depositList = ref<any[]>([]);
+
+if (walletAddress.value) {
+  const walletDeposits =
+    await blockchain.listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+  if (walletDeposits) {
+    depositList.value = walletDeposits;
+  }
+}
+
+const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
+  const response = await blockchain.cancelDeposit(depositID);
+  if (response == true) {
+    console.log("Depósito cancelado com sucesso.");
+    depositList.value.splice(index, 1);
+  }
+};
+
+const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
+  const response = await blockchain.withdrawDeposit(depositID);
+  if (response == true) {
+    console.log("Token retirado com sucesso.");
+    depositList.value.splice(index, 1);
+  }
+};
+
+watch(walletAddress, async () => {
+  const walletDeposits =
+    await blockchain.listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+  if (walletDeposits) {
+    depositList.value = walletDeposits;
+  }
+});
+</script>
 
 <template>
-  <div class="page">Gerenciar Ofertas</div>
+  <div class="page">
+    <div class="header">Gerenciar ofertas</div>
+    <div class="w-full max-w-4xl">
+      <ListingComponent
+        :wallet-transactions="depositList"
+        :is-manage-mode="true"
+        @cancel-deposit="handleCancelDeposit"
+        @withdraw-deposit="handleWithDrawDeposit"
+      ></ListingComponent>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .page {
-  @apply flex gap-8 mt-24;
+  @apply flex flex-col items-center gap-10 mt-20 w-full;
+}
+
+.header {
+  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex;
 }
 </style>

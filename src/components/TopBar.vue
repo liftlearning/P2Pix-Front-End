@@ -38,12 +38,12 @@ const formatWalletBalance = (): String => {
 
 const disconnectUser = () => {
   etherStore.setWalletAddress("");
-  const currentRoute = router.currentRoute.value.path;
-  if (currentRoute !== "/") {
-    router.push("/");
-  } else {
-    window.location.reload();
-  }
+  closeMenu();
+  window.location.reload();
+};
+
+const closeMenu = () => {
+  menuOpenToggle.value = false;
 };
 </script>
 
@@ -94,7 +94,7 @@ const disconnectUser = () => {
           >
             <img alt="Ethereum image" src="@/assets/ethereum.svg" />
             <span
-              class="default-text group-hover:text-black"
+              class="default-text group-hover:text-gray-900"
               :style="{
                 color: currencyMenuOpenToggle
                   ? '#000000'
@@ -106,7 +106,7 @@ const disconnectUser = () => {
               Ethereum
             </span>
             <img
-              class="text-black"
+              class="text-gray-900"
               v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"
@@ -124,42 +124,38 @@ const disconnectUser = () => {
           </div>
           <div
             v-show="currencyMenuOpenToggle"
-            class="mt-10 absolute w-full text-black"
+            class="mt-10 pl-3 absolute w-full text-gray-900"
           >
             <div class="mt-2">
               <div class="bg-white rounded-md z-10">
-                <div class="menu-button px-4 rounded-md cursor-pointer">
-                  <div class="flex justify-between">
-                    <img
-                      alt="Ethereum image"
-                      width="20"
-                      height="20"
-                      src="@/assets/ethereum.svg"
-                    />
-                    <span
-                      class="text-black py-4 text-end font-semibold text-xs"
-                    >
-                      Ethereum
-                    </span>
-                    <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
-                  </div>
-                  <hr />
+                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
+                  <img
+                    alt="Ethereum image"
+                    width="20"
+                    height="20"
+                    src="@/assets/ethereum.svg"
+                  />
+                  <span
+                    class="text-gray-900 py-4 text-end font-semibold text-sm"
+                  >
+                    Ethereum
+                  </span>
                 </div>
-                <div class="menu-button px-4 rounded-md cursor-pointer">
-                  <div class="flex justify-between">
-                    <img
-                      alt="Ethereum image"
-                      width="20"
-                      height="20"
-                      src="@/assets/polygon.svg"
-                    />
-                    <span
-                      class="text-black py-4 text-end font-semibold text-xs"
-                    >
-                      Polygon
-                    </span>
-                    <img alt="Chevron Down" src="@/assets/chevronDown.svg" />
-                  </div>
+                <div class="w-full flex justify-center">
+                  <hr class="w-4/5" />
+                </div>
+                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
+                  <img
+                    alt="Polygon image"
+                    width="20"
+                    height="20"
+                    src="@/assets/polygon.svg"
+                  />
+                  <span
+                    class="text-gray-900 py-4 text-end font-semibold text-sm"
+                  >
+                    Polygon
+                  </span>
                   <hr />
                 </div>
               </div>
@@ -199,7 +195,7 @@ const disconnectUser = () => {
               {{ formatWalletAddress() }}
             </span>
             <img
-              class="text-black"
+              class="text-gray-900"
               v-if="!menuHoverToggle && !menuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"
@@ -215,34 +211,32 @@ const disconnectUser = () => {
               src="@/assets/chevronDownBlack.svg"
             />
           </div>
-          <div v-show="menuOpenToggle" class="mt-10 absolute w-full text-black">
-            <div class="mt-2">
+          <div
+            v-show="menuOpenToggle"
+            class="mt-10 absolute w-full text-gray-900"
+          >
+            <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
-                <div
-                  class="menu-button px-4 rounded-md cursor-pointer"
-                  onclick="window.location='/bid_history'"
-                >
-                  <div class="py-4 text-end font-semibold text-xs">
-                    Histórico de compras
-                  </div>
-                  <hr />
+                <div class="menu-button" @click="closeMenu()">
+                  <RouterLink to="/transaction_history" class="redirect_button">
+                    Histórico de transações
+                  </RouterLink>
                 </div>
-                <div
-                  class="menu-button px-4 cursor-pointer"
-                  onclick="window.location='/manage_bids'"
-                >
-                  <div class="py-4 text-end font-semibold text-xs">
+                <div class="w-full flex justify-center">
+                  <hr class="w-4/5" />
+                </div>
+                <div class="menu-button" @click="closeMenu()">
+                  <RouterLink to="/manage_bids" class="redirect_button">
                     Gerenciar Ofertas
-                  </div>
-                  <hr />
+                  </RouterLink>
                 </div>
-                <div
-                  class="menu-button px-4 py-1 rounded-md cursor-pointer"
-                  @click="disconnectUser"
-                >
-                  <div class="py-3 text-end font-semibold text-xs">
+                <div class="w-full flex justify-center">
+                  <hr class="w-4/5" />
+                </div>
+                <div class="menu-button" @click="disconnectUser">
+                  <RouterLink to="/" class="redirect_button">
                     Desconectar
-                  </div>
+                  </RouterLink>
                 </div>
               </div>
             </div>
@@ -280,7 +274,15 @@ header {
   @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 rounded;
 }
 
-.menu-button:hover {
-  background-color: #e5e7eb;
+.redirect_button {
+  @apply py-4 text-gray-900 font-semibold text-xs w-full;
+}
+
+.menu-button {
+  @apply flex text-center justify-center hover:bg-gray-200;
+}
+
+a:hover {
+  @apply bg-gray-200 rounded;
 }
 </style>

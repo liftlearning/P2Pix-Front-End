@@ -4,9 +4,11 @@ import CustomButton from "@/components/CustomButton.vue";
 // Emits
 const emit = defineEmits(["sendNetwork"]);
 
-const sendNetworkHandle = () => {
-  emit("sendNetwork");
-};
+// props and store references
+const props = defineProps({
+  pixKey: String,
+  offer: Number,
+});
 </script>
 
 <template>
@@ -27,12 +29,12 @@ const sendNetworkHandle = () => {
       >
         <div>
           <p>Tokens ofertados</p>
-          <p class="text-2xl text-gray-900">100 BRZ</p>
+          <p class="text-2xl text-gray-900">{{ props.offer }} BRZ</p>
         </div>
         <div class="my-3">
           <p>Chave Pix</p>
           <p class="text-xl text-gray-900 break-words">
-            c02942far7047f6shri5ifh371908973
+            {{ props.pixKey }}
           </p>
         </div>
         <div class="mb-5">
@@ -44,7 +46,7 @@ const sendNetworkHandle = () => {
         </div>
         <CustomButton
           :text="'Enviar para a rede'"
-          @buttonClicked="sendNetworkHandle()"
+          @buttonClicked="emit('sendNetwork')"
         />
       </div>
     </div>

@@ -14,12 +14,6 @@ const validDecimals = ref(true);
 // Emits
 const emit = defineEmits(["approveTokens"]);
 
-// Blockchain methods
-const approveTokensHandle = async () => {
-  console.log(offer.value, pixKey.value);
-  emit("approveTokens");
-};
-
 // Debounce methods
 const handleInputEvent = (event: any) => {
   const { value } = event.target;
@@ -106,7 +100,7 @@ const decimalCount = (num: Number) => {
       </div>
       <CustomButton
         :text="'Aprovar tokens'"
-        @buttonClicked="approveTokensHandle()"
+        @buttonClicked="emit('approveTokens', { offer, pixKey })"
       />
     </div>
   </div>

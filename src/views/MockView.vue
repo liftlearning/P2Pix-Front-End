@@ -36,7 +36,7 @@ const formatWalletAddress = (wallet: string): string => {
 // Gets value and pix key from user's form to create a deposit in the blockchain
 const mockDeposit = () => {
   if (!depositValue.value || !depositPixKey.value) return;
-  blockchain.addDeposit(depositValue.value, depositPixKey.value);
+  blockchain.mockDeposit(depositValue.value, depositPixKey.value);
 };
 
 // Get specific deposit data by its ID

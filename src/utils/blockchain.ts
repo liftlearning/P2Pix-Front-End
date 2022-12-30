@@ -26,6 +26,21 @@ const updateWalletStatus = async () => {
   etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
 };
 
+const updateWalletBalance = async () => {
+  const etherStore = useEtherStore();
+  const provider = getProvider();
+
+  if (!provider) return;
+
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
+
+  const walletAddress = await provider.send("eth_requestAccounts", []);
+
+  const balance = await contract.balanceOf(walletAddress[0]);
+  etherStore.setBalance(formatBigNumber(balance));
+};
+
 //  Split tokens between wallets in wallets.json
 const splitTokens = async () => {
   const provider = getProvider();
@@ -101,7 +116,7 @@ const listValidDepositTransactionsByWalletAddress = async (
   const walletDeposits = await getValidDeposits();
   if (walletDeposits) {
     return walletDeposits
-      .filter((deposit) => deposit.seller == String(walletAddress))
+      .filter((deposit) => deposit.seller == walletAddress)
       .sort((a, b) => {
         return b.blockNumber - a.blockNumber;
       });
@@ -152,7 +167,9 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
   const window_ = window as any;
   const connection = window_.ethereum;
   let provider: ethers.providers.Web3Provider | null = null;
-  if (!connection) return;
+
+  if (!connection) return [];
+
   provider = new ethers.providers.Web3Provider(connection);
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
@@ -160,21 +177,26 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
-  const depositList = [] as any[];
+  const depositList: any[] = await Promise.all(
+    eventsDeposits
+      .map(async (deposit) => {
+        const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        let validDeposit = {};
 
-  eventsDeposits.forEach(async (deposit) => {
-    const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        if (mappedDeposit.valid) {
+          validDeposit = {
+            blockNumber: deposit.blockNumber,
+            depositID: deposit.args?.depositID,
+            remaining: formatBigNumber(mappedDeposit.remaining),
+            seller: mappedDeposit.seller,
+            pixKey: mappedDeposit.pixTarget,
+          };
+        }
 
-    const validDeposit = {
-      blockNumber: deposit.blockNumber,
-      depositID: deposit.args?.depositID,
-      remaining: formatBigNumber(mappedDeposit.remaining),
-      seller: mappedDeposit.seller,
-      pixKey: mappedDeposit.pixTarget,
-    };
-
-    if (mappedDeposit.valid) depositList.push(validDeposit);
-  });
+        return validDeposit;
+      })
+      .filter((deposit) => deposit)
+  );
 
   return depositList;
 };
@@ -306,7 +328,7 @@ const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   await contract.cancelDeposit(depositId);
 
-  await updateWalletStatus();
+  await updateWalletBalance();
   await updateValidDeposits();
   return true;
 };
@@ -321,7 +343,7 @@ const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   await contract.withdraw(depositId, []);
 
-  await updateWalletStatus();
+  await updateWalletBalance();
   await updateValidDeposits();
   return true;
 };

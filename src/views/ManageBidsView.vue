@@ -4,49 +4,45 @@ import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
 import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const etherStore = useEtherStore();
 const { walletAddress } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
 
-const handleCancelDeposit = async (depositID: BigNumber) => {
+const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
   const response = await blockchain.cancelDeposit(depositID);
   if (response == true) {
     console.log("Depósito cancelado com sucesso.");
-    await blockchain
-      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
-      .then((deposits) => {
-        if (deposits) depositList.value = deposits;
-      });
+    depositList.value.splice(index, 1);
   }
 };
 
-const handleWithDrawDeposit = async (depositID: BigNumber) => {
+const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
   const response = await blockchain.withdrawDeposit(depositID);
   if (response == true) {
     console.log("Token retirado com sucesso.");
-    await blockchain
-      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
-      .then((deposits) => {
-        if (deposits) depositList.value = deposits;
-      });
+    depositList.value.splice(index, 1);
   }
 };
 
 if (walletAddress.value) {
-  depositList.value = etherStore.getValidDepositByWalletAddress(
-    walletAddress.value
-  );
+  const walletDeposits =
+    await blockchain.listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+  if (walletDeposits) {
+    depositList.value = walletDeposits;
+  }
 }
 
-etherStore.$subscribe(async (_mutation, state) => {
-  if (state.walletAddress != "" && state.depositsValidList.length > 0) {
-    await blockchain
-      .listValidDepositTransactionsByWalletAddress(walletAddress.value)
-      .then((deposits) => {
-        if (deposits) depositList.value = deposits;
-      });
+watch(walletAddress, async () => {
+  const walletDeposits =
+    await blockchain.listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+  if (walletDeposits) {
+    depositList.value = walletDeposits;
   }
 });
 </script>

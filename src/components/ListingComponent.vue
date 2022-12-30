@@ -12,8 +12,8 @@ const props = defineProps<{
 const itemsToShow = ref<any[]>([]);
 
 // Methods
-const showInitialItems = (items: any[]) => {
-  return items.length > 3 ? items.slice(0, 3) : items;
+const showInitialItems = () => {
+  itemsToShow.value = props.walletTransactions.slice(0, 3);
 };
 
 const formatEventsAmount = (amount: any) => {
@@ -31,31 +31,27 @@ const openEtherscanUrl = (url: string) => {
 
 const loadMore = () => {
   const itemsShowing = itemsToShow.value.length;
-  if (props.walletTransactions?.length > itemsShowing + 3)
-    itemsToShow.value?.push(
-      ...props.walletTransactions.slice(itemsShowing, itemsShowing + 3)
-    );
-  else itemsToShow.value = props.walletTransactions;
+  itemsToShow.value?.push(
+    ...props.walletTransactions.slice(itemsShowing, itemsShowing + 3)
+  );
 };
 
 // watch props changes
-
-watch(props, (newProps) => {
+watch(props, async () => {
   const itemsToShowQty = itemsToShow.value.length;
-  if (itemsToShowQty == 0)
-    itemsToShow.value = showInitialItems(props.walletTransactions);
+  if (itemsToShowQty == 0) showInitialItems();
   else
     itemsToShow.value =
-      newProps?.walletTransactions.length > itemsToShowQty
-        ? newProps.walletTransactions.slice(0, itemsToShowQty)
-        : newProps.walletTransactions;
+      props.walletTransactions.length > itemsToShowQty
+        ? props.walletTransactions.slice(0, itemsToShowQty)
+        : props.walletTransactions;
 });
 
 //emits
 const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
 
-// initial itemToShow value
-itemsToShow.value = showInitialItems(props.walletTransactions);
+// initial itemsToShow value
+showInitialItems();
 </script>
 
 <template>
@@ -79,8 +75,8 @@ itemsToShow.value = showInitialItems(props.walletTransactions);
     </div>
     <div
       class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
-      v-for="item in itemsToShow"
-      :key="item?.blockNumber"
+      v-for="(item, index) in itemsToShow"
+      :key="item.depositID"
     >
       <span class="last-release-info">
         {{
@@ -95,7 +91,7 @@ itemsToShow.value = showInitialItems(props.walletTransactions);
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', item.depositID)"
+        @click="emit('cancelDeposit', item.depositID, index)"
       >
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
@@ -125,7 +121,7 @@ itemsToShow.value = showInitialItems(props.walletTransactions);
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('withdrawDeposit', item.depositID)"
+        @click="emit('withdrawDeposit', item.depositID, index)"
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Cancel image" src="@/assets/withdraw.svg" />
@@ -142,11 +138,26 @@ itemsToShow.value = showInitialItems(props.walletTransactions);
         <img alt="Redirect image" src="@/assets/redirect.svg" />
       </div>
     </div>
-    <div class="flex justify-center w-full mt-2" v-if="itemsToShow.length != 0">
-      <button type="button" class="text-white" @click="loadMore()">
+    <div
+      class="flex flex-col justify-center items-center w-full mt-2 gap-2"
+      v-if="
+        itemsToShow.length != 0 &&
+        itemsToShow.length != props.walletTransactions.length
+      "
+    >
+      <button
+        type="button"
+        class="text-white font-semibold"
+        @click="loadMore()"
+      >
         Carregar mais
       </button>
+      <span class="text-gray-300">
+        ({{ itemsToShow.length }} de
+        {{ props.walletTransactions.length }} transações)
+      </span>
     </div>
+
     <span class="font-bold text-gray-900" v-if="itemsToShow.length == 0">
       Não há nenhuma transação anterior
     </span>

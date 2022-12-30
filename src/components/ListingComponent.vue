@@ -6,7 +6,6 @@ import { ref, watch } from "vue";
 const props = defineProps<{
   walletTransactions: any[];
   isManageMode: boolean;
-  walletAddress?: string;
 }>();
 
 const itemsToShow = ref<any[]>([]);
@@ -153,8 +152,8 @@ showInitialItems();
         Carregar mais
       </button>
       <span class="text-gray-300">
-        ({{ itemsToShow.length }} de
-        {{ props.walletTransactions.length }} {{isManageMode ? 'ofertas' : 'transações'}})
+        ({{ itemsToShow.length }} de {{ props.walletTransactions.length }}
+        {{ isManageMode ? "ofertas" : "transações" }})
       </span>
     </div>
 

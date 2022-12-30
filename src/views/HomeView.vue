@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
-import ListComponent from "@/components/ListComponent.vue";
+import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
 import blockchain from "../utils/blockchain";
 import { ref } from "vue";
 
@@ -24,7 +24,7 @@ const tokenAmount = ref<number>();
 const lockTransactionHash = ref<string>("");
 const lockId = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
-const lastWalletReleaseTransactions = ref<any[] | undefined>([]);
+const lastWalletReleaseTransactions = ref<any[]>([]);
 
 const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   // finish buy screen
@@ -72,10 +72,12 @@ const releaseTransaction = async ({ e2eId }: any) => {
     );
     release.wait();
 
-    lastWalletReleaseTransactions.value =
-      await blockchain.listReleaseTransactionByWalletAddress(
-        walletAddress.value.toLowerCase()
-      );
+    await blockchain
+      .listReleaseTransactionByWalletAddress(walletAddress.value.toLowerCase())
+      .then((releaseTransactions) => {
+        if (releaseTransactions)
+          lastWalletReleaseTransactions.value = releaseTransactions;
+      });
 
     await blockchain.updateWalletStatus();
     loadingRelease.value = false;
@@ -101,7 +103,7 @@ const releaseTransaction = async ({ e2eId }: any) => {
     />
   </div>
   <div v-if="flowStep == Step.List">
-    <ListComponent
+    <BuyConfirmedComponent
       v-if="!loadingRelease"
       :last-wallet-release-transactions="lastWalletReleaseTransactions"
       :tokenAmount="tokenAmount"

@@ -1,28 +1,15 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
-import blockchain from "../utils/blockchain";
+import ListingComponent from "@/components/ListingComponent.vue";
 
 // props
 const props = defineProps<{
-  lastWalletReleaseTransactions: any[] | undefined;
+  lastWalletReleaseTransactions: any[];
   tokenAmount: Number | undefined;
 }>();
 
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);
-
-const formatEventsAmount = (amount: any) => {
-  try {
-    const formated = blockchain.formatBigNumber(amount);
-    return formated;
-  } catch {
-    return "";
-  }
-};
-
-const openEtherscanUrl = (url: string) => {
-  window.open(url, "_blank");
-};
 </script>
 
 <template>
@@ -62,53 +49,14 @@ const openEtherscanUrl = (url: string) => {
     </div>
     <div class="text-container mt-16">
       <span class="text font-extrabold text-3xl max-w-[50rem]"
-        >Últimas transações
+        >Histórico de compras
       </span>
     </div>
-    <div class="blur-container min-w-[80%] gap-8">
-      <div class="flex flex-row justify-between w-full px-8">
-        <span class="text-xs text-gray-50 font-medium">Valor</span>
-        <span class="text-xs text-gray-50 font-medium">Tipo de transação</span>
-        <span class="text-xs text-gray-50 font-medium">Checar transação</span>
-      </div>
-      <div
-        class="flex flex-row justify-between w-full bg-white px-6 py-4 rounded-lg"
-        v-for="release in lastWalletReleaseTransactions"
-        :key="release?.blockNumber"
-      >
-        <span class="last-release-info">
-          {{ formatEventsAmount(release?.args.amount) }} BRZ
-        </span>
-        <span class="last-release-info">
-          {{ "Compra" }}
-        </span>
-        <div
-          class="flex gap-2 cursor-pointer items-center"
-          @click="
-            openEtherscanUrl(
-              `https://etherscan.io/tx/${release?.transactionHash}`
-            )
-          "
-        >
-          <span class="last-release-info">Etherscan</span>
-          <img alt="Redirect image" src="@/assets/redirect.svg" />
-        </div>
-      </div>
-      <div class="flex justify-center w-full right-6 mt-2">
-        <button
-          type="button"
-          class="text-white"
-          @click="() => {}"
-          v-if="lastWalletReleaseTransactions?.length != 0"
-        >
-          Carregar mais
-        </button>
-      </div>
-
-      <p class="font-bold" v-if="lastWalletReleaseTransactions?.length == 0">
-        Não há nenhuma transação anterior
-      </p>
-    </div>
+    <ListingComponent
+      :walletTransactions="lastWalletReleaseTransactions"
+      :isManageMode="false"
+    >
+    </ListingComponent>
   </div>
 </template>
 

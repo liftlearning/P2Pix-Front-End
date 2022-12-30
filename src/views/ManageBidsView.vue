@@ -8,7 +8,6 @@ import { ref, watch } from "vue";
 
 const etherStore = useEtherStore();
 
-
 const { walletAddress } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
 

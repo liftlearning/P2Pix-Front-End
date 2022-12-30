@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import MockView from "../views/MockView.vue";
-import BidHistoryView from "../views/BidHistoryView.vue";
+import TransactionHistoryView from "../views/TransactionHistoryView.vue";
 import ManageBidsView from "../views/ManageBidsView.vue";
 import SellerView from "@/views/SellerView.vue";
 
@@ -24,9 +24,9 @@ const router = createRouter({
       component: MockView,
     },
     {
-      path: "/bid_history",
-      name: "bid history",
-      component: BidHistoryView,
+      path: "/transaction_history",
+      name: "transaction history",
+      component: TransactionHistoryView,
     },
     {
       path: "/manage_bids",

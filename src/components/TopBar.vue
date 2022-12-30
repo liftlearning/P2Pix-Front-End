@@ -218,7 +218,7 @@ const closeMenu = () => {
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
                 <div class="menu-button" @click="closeMenu()">
-                  <RouterLink to="/bid_history" class="redirect_button px-0">
+                  <RouterLink to="/transaction_history" class="redirect_button">
                     Histórico de transações
                   </RouterLink>
                 </div>

@@ -35,7 +35,6 @@ const decimalCount = (num: Number) => {
   }
   return 0;
 };
-
 </script>
 
 <template>

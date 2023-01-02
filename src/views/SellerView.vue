@@ -5,12 +5,16 @@ import ValidationComponent from "../components/LoadingComponent.vue";
 import blockchain from "../utils/blockchain";
 
 import { ref } from "vue";
+import { useEtherStore } from "@/store/ether";
 
 enum Step {
   Search,
   Sell,
   Network,
 }
+
+const etherStore = useEtherStore();
+etherStore.setSellerView(true);
 
 const flowStep = ref<Step>(Step.Sell);
 const loading = ref<boolean>(false);

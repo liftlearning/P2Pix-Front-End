@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from "@/router";
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
@@ -8,7 +7,7 @@ import blockchain from "../utils/blockchain";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, balance } = storeToRefs(etherStore);
+const { walletAddress, balance, sellerView } = storeToRefs(etherStore);
 
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
@@ -57,13 +56,9 @@ const closeMenu = () => {
       height="75"
     />
     <div class="flex gap-4 items-center">
-      <button
-        type="button"
-        class="default-button"
-        v-on:click="router.push('/seller')"
-      >
-        Quero vender
-      </button>
+      <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
+        {{ sellerView ? "Quero comprar" : "Quero vender" }}
+      </RouterLink>
       <button
         type="button"
         v-if="!walletAddress"
@@ -259,7 +254,7 @@ header {
 }
 
 .default-button {
-  @apply px-4 py-2 rounded text-gray-50 font-semibold text-base;
+  @apply px-4 py-2 rounded text-gray-50 font-semibold text-base hover:bg-transparent;
 }
 
 .account-info {

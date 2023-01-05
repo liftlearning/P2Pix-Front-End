@@ -5,6 +5,7 @@ export const useEtherStore = defineStore("ether", {
     walletAddress: "",
     balance: "",
     loadingLock: false,
+    sellerView: false,
     // Depósitos válidos para compra
     depositsValidList: [] as any[],
     // Depósitos adicionados na blockchain
@@ -27,6 +28,9 @@ export const useEtherStore = defineStore("ether", {
     },
     setLoadingLock(isLoadingLock: boolean) {
       this.loadingLock = isLoadingLock;
+    },
+    setSellerView(sellerView: boolean) {
+      this.sellerView = sellerView;
     },
     setDepositsValidList(depositsValidList: any[]) {
       this.depositsValidList = depositsValidList;

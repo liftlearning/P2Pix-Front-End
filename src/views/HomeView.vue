@@ -15,8 +15,10 @@ enum Step {
   List,
 }
 
-// States
 const etherStore = useEtherStore();
+etherStore.setSellerView(false);
+
+// States
 const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");

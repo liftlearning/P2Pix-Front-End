@@ -2,7 +2,10 @@
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
+import { NetworkEnum } from "@/model/NetworkEnum";
 import blockchain from "../utils/blockchain";
+import ethereumImage from "../assets/ethereum.svg"
+import polygonImage from "../assets/polygon.svg"
 
 // Store reference
 const etherStore = useEtherStore();
@@ -44,6 +47,15 @@ const disconnectUser = () => {
 const closeMenu = () => {
   menuOpenToggle.value = false;
 };
+
+const getNetworkImage = (networkName: NetworkEnum) => {
+  let validImages = {
+    "Ethereum": ethereumImage,
+    "Polygon": polygonImage,
+  }
+
+  return validImages[networkName];
+}
 </script>
 
 <template>
@@ -59,6 +71,101 @@ const closeMenu = () => {
       <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>
+      <div class="flex flex-col">
+        <div
+          class="group top-bar-info cursor-pointer hover:bg-white"
+          @click="
+            [
+              (currencyMenuOpenToggle = !currencyMenuOpenToggle),
+              (menuOpenToggle = false),
+            ]
+          "
+          @mouseover="currencyMenuHoverToggle = true"
+          @mouseout="currencyMenuHoverToggle = false;"
+          :style="{
+            backgroundColor: currencyMenuOpenToggle
+              ? '#F9F9F9'
+              : currencyMenuHoverToggle
+              ? '#F9F9F9'
+              : 'transparent',
+          }"
+        >
+          <img alt="Choosed network image" :src="getNetworkImage(etherStore.networkName)" />
+          <span
+            class="default-text group-hover:text-gray-900"
+            :style="{
+              color: currencyMenuOpenToggle
+                ? '#000000'
+                : currencyMenuHoverToggle
+                ? '#000000'
+                : 'rgb(249 250 251)',
+            }"
+          >
+            {{ etherStore.networkName }}
+          </span>
+          <img
+            class="text-gray-900"
+            v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
+            alt="Chevron Down"
+            src="@/assets/chevronDown.svg"
+          />
+          <img
+            v-if="currencyMenuOpenToggle"
+            alt="Chevron Up"
+            src="@/assets/chevronUp.svg"
+          />
+          <img
+            v-if="currencyMenuHoverToggle && !currencyMenuOpenToggle"
+            alt="Chevron Down Black"
+            src="@/assets/chevronDownBlack.svg"
+          />
+        </div>
+        <div
+          v-show="currencyMenuOpenToggle"
+          class="mt-10 pl-3 absolute w-full text-gray-900"
+        >
+          <div class="mt-2">
+            <div class="bg-white rounded-md z-10">
+              <div 
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+                @click="etherStore.setNetworkName(NetworkEnum.ethereum)"
+              >
+                <img
+                  alt="Ethereum image"
+                  width="20"
+                  height="20"
+                  src="@/assets/ethereum.svg"
+                />
+                <span
+                  class="text-gray-900 py-4 text-end font-semibold text-sm"
+                >
+                  Ethereum
+                </span>
+              </div>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+              <div 
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+                @click="etherStore.setNetworkName(NetworkEnum.polygon)"
+              >
+                <img
+                  alt="Polygon image"
+                  width="20"
+                  height="20"
+                  src="@/assets/polygon.svg"
+                />
+                <span
+                  class="text-gray-900 py-4 text-end font-semibold text-sm"
+                >
+                  Polygon
+                </span>
+                <hr />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <button
         type="button"
         v-if="!walletAddress"
@@ -68,95 +175,6 @@ const closeMenu = () => {
         Conectar carteira
       </button>
       <div v-if="walletAddress" class="account-info">
-        <div class="flex flex-col">
-          <div
-            class="group top-bar-info cursor-pointer hover:bg-white"
-            @click="
-              [
-                (currencyMenuOpenToggle = !currencyMenuOpenToggle),
-                (menuOpenToggle = false),
-              ]
-            "
-            @mouseover="currencyMenuHoverToggle = true"
-            @mouseout="currencyMenuHoverToggle = false"
-            :style="{
-              backgroundColor: currencyMenuOpenToggle
-                ? '#F9F9F9'
-                : currencyMenuHoverToggle
-                ? '#F9F9F9'
-                : 'transparent',
-            }"
-          >
-            <img alt="Ethereum image" src="@/assets/ethereum.svg" />
-            <span
-              class="default-text group-hover:text-gray-900"
-              :style="{
-                color: currencyMenuOpenToggle
-                  ? '#000000'
-                  : currencyMenuHoverToggle
-                  ? '#000000'
-                  : 'rgb(249 250 251)',
-              }"
-            >
-              Ethereum
-            </span>
-            <img
-              class="text-gray-900"
-              v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
-              alt="Chevron Down"
-              src="@/assets/chevronDown.svg"
-            />
-            <img
-              v-if="currencyMenuOpenToggle"
-              alt="Chevron Up"
-              src="@/assets/chevronUp.svg"
-            />
-            <img
-              v-if="currencyMenuHoverToggle && !currencyMenuOpenToggle"
-              alt="Chevron Down Black"
-              src="@/assets/chevronDownBlack.svg"
-            />
-          </div>
-          <div
-            v-show="currencyMenuOpenToggle"
-            class="mt-10 pl-3 absolute w-full text-gray-900"
-          >
-            <div class="mt-2">
-              <div class="bg-white rounded-md z-10">
-                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
-                  <img
-                    alt="Ethereum image"
-                    width="20"
-                    height="20"
-                    src="@/assets/ethereum.svg"
-                  />
-                  <span
-                    class="text-gray-900 py-4 text-end font-semibold text-sm"
-                  >
-                    Ethereum
-                  </span>
-                </div>
-                <div class="w-full flex justify-center">
-                  <hr class="w-4/5" />
-                </div>
-                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
-                  <img
-                    alt="Polygon image"
-                    width="20"
-                    height="20"
-                    src="@/assets/polygon.svg"
-                  />
-                  <span
-                    class="text-gray-900 py-4 text-end font-semibold text-sm"
-                  >
-                    Polygon
-                  </span>
-                  <hr />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="flex flex-col">
           <div
             class="top-bar-info cursor-pointer"

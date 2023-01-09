@@ -1,9 +1,11 @@
+import { NetworkEnum } from "@/model/NetworkEnum";
 import { defineStore } from "pinia";
 
 export const useEtherStore = defineStore("ether", {
   state: () => ({
     walletAddress: "",
     balance: "",
+    networkName: NetworkEnum.ethereum,
     loadingLock: false,
     sellerView: false,
     // Depósitos válidos para compra
@@ -25,6 +27,9 @@ export const useEtherStore = defineStore("ether", {
     },
     setBalance(balance: string) {
       this.balance = balance;
+    },
+    setNetworkName(networkName: NetworkEnum) {
+      this.networkName = networkName;
     },
     setLoadingLock(isLoadingLock: boolean) {
       this.loadingLock = isLoadingLock;

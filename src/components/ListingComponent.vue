@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import blockchain from "@/utils/blockchain";
+import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
+import type { DepositEvent } from "@/model/Deposit";
+import type { ValidDeposit } from "@/model/ValidDeposit";
+
 
 // props
 const props = defineProps<{
-  walletTransactions: any[];
+  walletTransactions: (DepositEvent | ValidDeposit)[];
   isManageMode: boolean;
 }>();
 
-const itemsToShow = ref<any[]>([]);
+const itemsToShow = ref<(DepositEvent | ValidDeposit)[]>([]);
 
 // Methods
 const showInitialItems = () => {
   itemsToShow.value = props.walletTransactions.slice(0, 3);
 };
 
-const formatEventsAmount = (amount: any) => {
+const formatEventsAmount = (amount: BigNumber | undefined) => {
   try {
-    const formated = blockchain.formatBigNumber(amount);
-    return formated;
+    if(amount){
+      const formated = blockchain.formatBigNumber(amount);
+      return formated;
+    }
+    return "";
   } catch {
     return "";
   }
@@ -75,11 +82,11 @@ showInitialItems();
     <div
       class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
       v-for="(item, index) in itemsToShow"
-      :key="item.depositID"
+      :key="item.blockNumber"
     >
       <span class="last-release-info">
         {{
-          item?.args ? formatEventsAmount(item?.args.amount) : item?.remaining
+          ('args' in item) ? formatEventsAmount(item.args.amount) : item?.remaining
         }}
         BRZ
       </span>

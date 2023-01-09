@@ -5,11 +5,13 @@ import blockchain from "../utils/blockchain";
 import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
+import type {ValidDeposit} from "@/model/ValidDeposit";
+
 
 const etherStore = useEtherStore();
 
 const { walletAddress } = storeToRefs(etherStore);
-const depositList = ref<any[]>([]);
+const depositList = ref<ValidDeposit[]>([]);
 
 if (walletAddress.value) {
   const walletDeposits =

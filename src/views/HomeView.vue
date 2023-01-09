@@ -8,6 +8,8 @@ import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
+// import type { ReleaseEvent } from "@/model/LockRelease";
+// import type { ValidDeposit } from "@/model/ValidDeposit";
 
 enum Step {
   Search,

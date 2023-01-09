@@ -1,4 +1,8 @@
 import { defineStore } from "pinia";
+import type { DepositEvent } from "@/model/Deposit";
+import type { LockEvent } from "@/model/Lock";
+import type { ReleaseEvent } from "@/model/LockRelease";
+import type {ValidDeposit} from "@/model/ValidDeposit";
 
 export const useEtherStore = defineStore("ether", {
   state: () => ({
@@ -6,17 +10,17 @@ export const useEtherStore = defineStore("ether", {
     balance: "",
     loadingLock: false,
     // Depósitos válidos para compra
-    depositsValidList: [] as any[],
+    depositsValidList: [] as ValidDeposit[],
     // Depósitos adicionados na blockchain
-    depositsAddedList: [] as any[],
+    depositsAddedList: [] as ValidDeposit[],
     // Depósitos expirados na blockchain
-    depositsExpiredList: [] as any[],
+    depositsExpiredList: [] as ValidDeposit[],
     // Locks adicionados na blockchain
-    locksAddedList: [] as any[],
+    locksAddedList: [] as LockEvent[],
     // Locks 'released' na blockchain
-    locksReleasedList: [] as any[],
+    locksReleasedList: [] as ReleaseEvent[],
     // Locks expirados na blockchain
-    locksExpiredList: [] as any[],
+    locksExpiredList: [] as LockEvent[],
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -28,22 +32,22 @@ export const useEtherStore = defineStore("ether", {
     setLoadingLock(isLoadingLock: boolean) {
       this.loadingLock = isLoadingLock;
     },
-    setDepositsValidList(depositsValidList: any[]) {
+    setDepositsValidList(depositsValidList: ValidDeposit[]) {
       this.depositsValidList = depositsValidList;
     },
-    setDepositsAddedList(depositsAddedList: any[]) {
+    setDepositsAddedList(depositsAddedList: ValidDeposit[]) {
       this.depositsAddedList = depositsAddedList;
     },
-    setDepositsExpiredList(depositsExpiredList: any[]) {
+    setDepositsExpiredList(depositsExpiredList: ValidDeposit[]) {
       this.depositsExpiredList = depositsExpiredList;
     },
-    setLocksAddedList(locksAddedList: any[]) {
+    setLocksAddedList(locksAddedList: LockEvent[]) {
       this.locksAddedList = locksAddedList;
     },
-    setLocksReleasedList(locksReleasedList: any[]) {
+    setLocksReleasedList(locksReleasedList: ReleaseEvent[]) {
       this.locksReleasedList = locksReleasedList;
     },
-    setLocksExpiredList(locksExpiredList: any[]) {
+    setLocksExpiredList(locksExpiredList: LockEvent[]) {
       this.locksExpiredList = locksExpiredList;
     },
   },

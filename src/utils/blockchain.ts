@@ -1,8 +1,9 @@
 import { useEtherStore } from "@/store/ether";
 import { BigNumber, ethers } from "ethers";
-import type { DepositEvent } from "@/model/Deposity";
+import type { DepositEvent } from "@/model/Deposit";
 import type { LockEvent } from "@/model/Lock";
 import type { ReleaseEvent } from "@/model/LockRelease";
+import type {ValidDeposit} from "@/model/ValidDeposit";
 
 // Smart contract imports
 import mockToken from "./smart_contract_files/MockToken.json";
@@ -115,8 +116,8 @@ const listDepositTransactionByWalletAddress = async (
 // get wallet's deposit transactions
 const listValidDepositTransactionsByWalletAddress = async (
   walletAddress: string
-): Promise<any[]> => {
-  const walletDeposits = await getValidDeposits();
+): Promise<(ValidDeposit)[]> => {
+  const walletDeposits: ({} | ValidDeposit[] | undefined) = await getValidDeposits();
   if (walletDeposits) {
     return walletDeposits
       .filter((deposit) => deposit.seller == walletAddress)
@@ -165,8 +166,7 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
-//get valid deposits
-const getValidDeposits = async (): Promise<any[] | undefined> => {
+const getValidDeposits = async (): Promise<(ValidDeposit | {})[] | undefined> => {
   const window_ = window as any;
   const connection = window_.ethereum;
   let provider: ethers.providers.Web3Provider | null = null;
@@ -180,20 +180,21 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
-  const depositList: any[] = await Promise.all(
+  const depositList = await Promise.all(
     eventsDeposits
       .map(async (deposit) => {
-        const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        const mappedDeposit: (ValidDeposit | undefined) = await mapDeposits(deposit.args?.depositID);
         let validDeposit = {};
 
-        if (mappedDeposit.valid) {
-          validDeposit = {
+        if (mappedDeposit) {
+          const validDeposit: ValidDeposit = {
             blockNumber: deposit.blockNumber,
             depositID: deposit.args?.depositID,
             remaining: formatBigNumber(mappedDeposit.remaining),
             seller: mappedDeposit.seller,
             pixKey: mappedDeposit.pixTarget,
           };
+          return validDeposit
         }
 
         return validDeposit;
@@ -207,7 +208,7 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
 const updateValidDeposits = async () => {
   const etherStore = useEtherStore();
   const deposits = await getValidDeposits();
-  if (deposits) etherStore.setDepositsValidList(deposits);
+  if (deposits !== undefined) etherStore.setDepositsValidList(deposits);
 };
 
 const updateDepositAddedEvents = async () => {
@@ -223,7 +224,7 @@ const updateDepositAddedEvents = async () => {
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   const filterDeposits = p2pContract.filters.DepositAdded(null);
-  const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+  const eventsDeposits:any = await p2pContract.queryFilter(filterDeposits);
 
   etherStore.setDepositsAddedList(eventsDeposits);
   console.log("DEPOSITS", eventsDeposits);
@@ -396,14 +397,14 @@ const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
 };
 
 // Get specific deposit data by its ID
-const mapDeposits = async (depositId: BigNumber): Promise<any> => {
+const mapDeposits = async (depositId: BigNumber): Promise<ValidDeposit | undefined> => {
   const provider = getProvider();
 
   if (!provider) return;
 
   const signer = provider.getSigner();
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  const deposit = await contract.mapDeposits(depositId);
+  const deposit: ValidDeposit = await contract.mapDeposits(depositId);
 
   return deposit;
 };

@@ -15,11 +15,15 @@ const props = defineProps<{
 const itemsToShow = ref<(DepositEvent | ValidDeposit)[]>([]);
 
 // Methods
-const showInitialItems = () => {
+const  isValidDeposit = (deposit: DepositEvent | ValidDeposit): deposit is ValidDeposit => {
+  return (deposit as ValidDeposit).depositID !== undefined;
+}
+
+const showInitialItems = (): void => {
   itemsToShow.value = props.walletTransactions.slice(0, 3);
 };
 
-const formatEventsAmount = (amount: BigNumber | undefined) => {
+const formatEventsAmount = (amount: BigNumber | undefined): string => {
   try {
     if(amount){
       const formated = blockchain.formatBigNumber(amount);
@@ -31,11 +35,11 @@ const formatEventsAmount = (amount: BigNumber | undefined) => {
   }
 };
 
-const openEtherscanUrl = (url: string) => {
+const openEtherscanUrl = (url: string): void => {
   window.open(url, "_blank");
 };
 
-const loadMore = () => {
+const loadMore = (): void => {
   const itemsShowing = itemsToShow.value.length;
   itemsToShow.value?.push(
     ...props.walletTransactions.slice(itemsShowing, itemsShowing + 3)
@@ -86,7 +90,7 @@ showInitialItems();
     >
       <span class="last-release-info">
         {{
-          ('args' in item) ? formatEventsAmount(item.args.amount) : item?.remaining
+          isValidDeposit(item) ? item?.remaining : formatEventsAmount(item.args?.amount)
         }}
         BRZ
       </span>
@@ -97,7 +101,7 @@ showInitialItems();
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', item.depositID, index)"
+        @click="emit('cancelDeposit', (item as ValidDeposit).depositID, index)"
       >
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
@@ -105,21 +109,21 @@ showInitialItems();
 
       <span
         class="last-release-info"
-        v-if="item.event == 'DepositAdded' && !props.isManageMode"
+        v-if="(item as DepositEvent).event == 'DepositAdded' && !props.isManageMode"
       >
         {{ "Oferta" }}
       </span>
 
       <span
         class="last-release-info"
-        v-if="item.event == 'LockAdded' && !props.isManageMode"
+        v-if="(item as DepositEvent).event == 'LockAdded' && !props.isManageMode"
       >
         {{ "Reserva" }}
       </span>
 
       <span
         class="last-release-info"
-        v-if="item.event == 'LockReleased' && !props.isManageMode"
+        v-if="(item as DepositEvent).event == 'LockReleased' && !props.isManageMode"
       >
         {{ "Compra" }}
       </span>
@@ -127,7 +131,7 @@ showInitialItems();
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('withdrawDeposit', item.depositID, index)"
+        @click="emit('withdrawDeposit', (item as ValidDeposit).depositID, index)"
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Cancel image" src="@/assets/withdraw.svg" />
@@ -137,7 +141,7 @@ showInitialItems();
         v-if="!props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
         @click="
-          openEtherscanUrl(`https://etherscan.io/tx/${item?.transactionHash}`)
+          openEtherscanUrl(`https://etherscan.io/tx/${(item as DepositEvent)?.transactionHash}`)
         "
       >
         <span class="last-release-info">Etherscan</span>

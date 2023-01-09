@@ -146,7 +146,7 @@ const validatePix = async () => {
       <CustomButton
         :is-disabled="isPixValid == false"
         :text="'Enviar para a rede'"
-        @button-clicked="emit('pixValidated', { e2eId })"
+        @button-clicked="emit('pixValidated', e2eId)"
       />
     </div>
   </div>

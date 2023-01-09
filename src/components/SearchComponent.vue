@@ -5,6 +5,7 @@ import { debounce } from "@/utils/debounce";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 // Store reference
 const etherStore = useEtherStore();
@@ -12,11 +13,11 @@ const etherStore = useEtherStore();
 const { walletAddress, depositsValidList } = storeToRefs(etherStore);
 
 // Reactive state
-const tokenValue = ref(0);
-const enableSelectButton = ref(false);
-const hasLiquidity = ref(true);
-const validDecimals = ref(true);
-const selectedDeposit = ref();
+const tokenValue = ref<number>(0);
+const enableSelectButton = ref<boolean>(false);
+const hasLiquidity = ref<boolean>(true);
+const validDecimals = ref<boolean>(true);
+const selectedDeposit = ref<ValidDeposit>();
 
 // Emits
 const emit = defineEmits(["tokenBuy"]);
@@ -56,13 +57,12 @@ const decimalCount = (num: Number) => {
 // Verify if there is a valid deposit to buy
 const verifyLiquidity = () => {
   enableSelectButton.value = false;
-  selectedDeposit.value = null;
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
   depositsValidList.value.find((element) => {
     const remaining = element.remaining;
     if (
-      tokenValue.value!! <= remaining &&
+      tokenValue.value!! <= Number(remaining) &&
       tokenValue.value!! != 0 &&
       element.seller !== walletAddress.value
     ) {

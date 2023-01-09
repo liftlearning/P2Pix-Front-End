@@ -4,7 +4,7 @@ import CustomButton from "../CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 
 // Reactive state
-const offer = ref<string | number>("");
+const offer = ref<number>();
 const pixKey = ref<string>("");
 
 const enableSelectButton = ref(false);

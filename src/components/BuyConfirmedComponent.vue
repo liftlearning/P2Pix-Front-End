@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton.vue";
 import ListingComponent from "@/components/ListingComponent.vue";
+import type { ReleaseEvent } from "@/model/LockRelease";
 import type {ValidDeposit} from "@/model/ValidDeposit";
 
 // props
 const props = defineProps<{
-  lastWalletReleaseTransactions: ValidDeposit[];
+  lastWalletReleaseTransactions: ReleaseEvent[];
   tokenAmount: Number | undefined;
 }>();
 

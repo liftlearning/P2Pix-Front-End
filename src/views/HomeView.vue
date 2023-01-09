@@ -8,8 +8,8 @@ import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
-// import type { ReleaseEvent } from "@/model/LockRelease";
-// import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { ReleaseEvent } from "@/model/LockRelease";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 enum Step {
   Search,
@@ -26,40 +26,42 @@ const tokenAmount = ref<number>();
 const lockTransactionHash = ref<string>("");
 const lockId = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
-const lastWalletReleaseTransactions = ref<any[]>([]);
+const lastWalletReleaseTransactions = ref<ReleaseEvent[]>([]);
 
-const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
+const confirmBuyClick = async (args: { selectedDeposit: ValidDeposit, tokenValue: number }) => {
   // finish buy screen
-  const depositDetail = selectedDeposit;
-  const depositId = selectedDeposit.depositID;
-  pixTarget.value = selectedDeposit.pixKey;
-  tokenAmount.value = tokenValue;
+  const depositDetail = args.selectedDeposit;
+  const depositId = args.selectedDeposit.depositID;
+  pixTarget.value = args.selectedDeposit.pixKey!!;
+  tokenAmount.value = args.tokenValue;
 
   // Makes lock with deposit ID and the Amount
   if (depositDetail) {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain
-      .addLock(depositId, tokenValue)
-      .then((lock) => {
-        lockTransactionHash.value = lock.hash;
-      })
-      .catch(() => {
-        flowStep.value = Step.Search;
-      });
+    if(depositId){
+      await blockchain
+        .addLock(depositId, args.tokenValue)
+        .then((lock) => {
+          lockTransactionHash.value = lock.hash;
+        })
+        .catch(() => {
+          flowStep.value = Step.Search;
+        });
+    }
 
     etherStore.setLoadingLock(false);
   }
 };
 
-const releaseTransaction = async ({ e2eId }: any) => {
+const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
   const findLock = locksAddedList.value.find((element) => {
     if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args.lockID;
+      lockId.value = element.args?.lockID;
       return true;
     }
     return false;

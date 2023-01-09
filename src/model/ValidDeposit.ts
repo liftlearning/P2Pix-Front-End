@@ -1,9 +1,9 @@
 import type { BigNumber } from "ethers";
 
 export type ValidDeposit = {
-    depositID?: string;
+    depositID?: BigNumber;
     blockNumber: number;
-    remaining: any;
+    remaining: string;
     seller: string;
     pixKey: (string | undefined);
     pixTarget?: string;

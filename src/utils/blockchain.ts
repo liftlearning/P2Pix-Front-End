@@ -106,7 +106,7 @@ const listDepositTransactionByWalletAddress = async (
   const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
 
   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
-  const eventsDeposits: DepositEvent[] = await p2pContract.queryFilter(filterDeposits);
+  const eventsDeposits: DepositEvent[] = await p2pContract.queryFilter(filterDeposits)
 
   return eventsDeposits.sort((a, b) => {
     return b.blockNumber - a.blockNumber;
@@ -117,7 +117,7 @@ const listDepositTransactionByWalletAddress = async (
 const listValidDepositTransactionsByWalletAddress = async (
   walletAddress: string
 ): Promise<(ValidDeposit)[]> => {
-  const walletDeposits: ({} | ValidDeposit[] | undefined) = await getValidDeposits();
+  const walletDeposits: ValidDeposit[] = await getValidDeposits();
   if (walletDeposits) {
     return walletDeposits
       .filter((deposit) => deposit.seller == walletAddress)
@@ -166,7 +166,7 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
-const getValidDeposits = async (): Promise<(ValidDeposit | {})[] | undefined> => {
+const getValidDeposits = async (): Promise<ValidDeposit[]> => {
   const window_ = window as any;
   const connection = window_.ethereum;
   let provider: ethers.providers.Web3Provider | null = null;
@@ -183,7 +183,7 @@ const getValidDeposits = async (): Promise<(ValidDeposit | {})[] | undefined> =>
   const depositList = await Promise.all(
     eventsDeposits
       .map(async (deposit) => {
-        const mappedDeposit: (ValidDeposit | undefined) = await mapDeposits(deposit.args?.depositID);
+        const mappedDeposit: (any | undefined) = await mapDeposits(deposit.args?.depositID);
         let validDeposit = {};
 
         if (mappedDeposit) {
@@ -202,7 +202,7 @@ const getValidDeposits = async (): Promise<(ValidDeposit | {})[] | undefined> =>
       .filter((deposit) => deposit)
   );
 
-  return depositList;
+  return depositList as ValidDeposit[];
 };
 // Update events at store methods
 const updateValidDeposits = async () => {
@@ -397,7 +397,7 @@ const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
 };
 
 // Get specific deposit data by its ID
-const mapDeposits = async (depositId: BigNumber): Promise<ValidDeposit | undefined> => {
+const mapDeposits = async (depositId: BigNumber): Promise<any | undefined> => {
   const provider = getProvider();
 
   if (!provider) return;

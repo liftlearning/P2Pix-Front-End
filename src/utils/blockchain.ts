@@ -184,7 +184,7 @@ const getValidDeposits = async (): Promise<ValidDeposit[]> => {
     eventsDeposits
       .map(async (deposit) => {
         const mappedDeposit: (any | undefined) = await mapDeposits(deposit.args?.depositID);
-        let validDeposit = {};
+        const validDeposit = {};
 
         if (mappedDeposit) {
           const validDeposit: ValidDeposit = {

@@ -2,7 +2,7 @@
 import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
-import CustomButton from "./CustomButton.vue";
+import CustomButton from "./CustomButton/CustomButton.vue";
 import api from "../services/index";
 
 // props and store references

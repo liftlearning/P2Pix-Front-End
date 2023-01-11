@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CustomButton from "@/components/CustomButton.vue";
+import CustomButton from "@/components/CustomButton/CustomButton.vue";
 import ListingComponent from "@/components/ListingComponent.vue";
 
 // props

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomButton from "../components/CustomButton.vue";
+import CustomButton from "./CustomButton/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";

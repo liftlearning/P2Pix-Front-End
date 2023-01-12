@@ -4,8 +4,8 @@ import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import blockchain from "../utils/blockchain";
-import ethereumImage from "../assets/ethereum.svg"
-import polygonImage from "../assets/polygon.svg"
+import ethereumImage from "../assets/ethereum.svg";
+import polygonImage from "../assets/polygon.svg";
 
 // Store reference
 const etherStore = useEtherStore();
@@ -50,12 +50,12 @@ const closeMenu = () => {
 
 const getNetworkImage = (networkName: NetworkEnum) => {
   let validImages = {
-    "Ethereum": ethereumImage,
-    "Polygon": polygonImage,
-  }
+    Ethereum: ethereumImage,
+    Polygon: polygonImage,
+  };
 
   return validImages[networkName];
-}
+};
 </script>
 
 <template>
@@ -81,7 +81,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
             ]
           "
           @mouseover="currencyMenuHoverToggle = true"
-          @mouseout="currencyMenuHoverToggle = false;"
+          @mouseout="currencyMenuHoverToggle = false"
           :style="{
             backgroundColor: currencyMenuOpenToggle
               ? '#F9F9F9'
@@ -90,7 +90,10 @@ const getNetworkImage = (networkName: NetworkEnum) => {
               : 'transparent',
           }"
         >
-          <img alt="Choosed network image" :src="getNetworkImage(etherStore.networkName)" />
+          <img
+            alt="Choosed network image"
+            :src="getNetworkImage(etherStore.networkName)"
+          />
           <span
             class="default-text group-hover:text-gray-900"
             :style="{
@@ -126,7 +129,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10">
-              <div 
+              <div
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
                 @click="etherStore.setNetworkName(NetworkEnum.ethereum)"
               >
@@ -136,16 +139,14 @@ const getNetworkImage = (networkName: NetworkEnum) => {
                   height="20"
                   src="@/assets/ethereum.svg"
                 />
-                <span
-                  class="text-gray-900 py-4 text-end font-semibold text-sm"
-                >
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
                   Ethereum
                 </span>
               </div>
               <div class="w-full flex justify-center">
                 <hr class="w-4/5" />
               </div>
-              <div 
+              <div
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
                 @click="etherStore.setNetworkName(NetworkEnum.polygon)"
               >
@@ -155,9 +156,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
                   height="20"
                   src="@/assets/polygon.svg"
                 />
-                <span
-                  class="text-gray-900 py-4 text-end font-semibold text-sm"
-                >
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
                   Polygon
                 </span>
                 <hr />

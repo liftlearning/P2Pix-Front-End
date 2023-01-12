@@ -8,40 +8,7 @@ import addresses from "./smart_contract_files/localhost.json";
 // Mock wallets import
 import { wallets } from "./smart_contract_files/wallets.json";
 import { getProvider } from "../blockchain/provider";
-import { NetworkEnum } from "@/model/NetworkEnum";
-
-// Wallet methods
-// Update wallet state (balance and address)
-const updateWalletStatus = async () => {
-  const etherStore = useEtherStore();
-  const provider = getProvider();
-
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
-
-  const walletAddress = await provider.send("eth_requestAccounts", []);
-
-  const balance = await contract.balanceOf(walletAddress[0]);
-  etherStore.setBalance(formatBigNumber(balance));
-  etherStore.setWalletAddress(ethers.utils.getAddress(walletAddress[0]));
-};
-
-const updateWalletBalance = async () => {
-  const etherStore = useEtherStore();
-  const provider = getProvider();
-
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(addresses.token, mockToken.abi, signer);
-
-  const walletAddress = await provider.send("eth_requestAccounts", []);
-
-  const balance = await contract.balanceOf(walletAddress[0]);
-  etherStore.setBalance(formatBigNumber(balance));
-};
+import { updateWalletBalance, updateWalletStatus } from "../blockchain/wallet";
 
 //  Split tokens between wallets in wallets.json
 const splitTokens = async () => {
@@ -264,39 +231,6 @@ const updateLockReleasedEvents = async () => {
   console.log("RELEASES", eventsReleases);
 };
 
-// Provider methods
-const connectProvider = async () => {
-  const window_ = window as any;
-  const connection = window_.ethereum;
-
-  await updateWalletStatus();
-  await updateValidDeposits();
-  await updateDepositAddedEvents();
-  await updateLockAddedEvents();
-  await updateLockReleasedEvents();
-  listenToNetworkChange(connection);
-
-  connection.on("accountsChanged", async () => {
-    await updateWalletStatus();
-  });
-};
-
-const listenToNetworkChange = (connection: any) => {
-  const etherStore = useEtherStore();
-
-  const possibleNetworks: {[key: string]: NetworkEnum} = {
-    "0x5": NetworkEnum.ethereum,
-    "0x13881": NetworkEnum.polygon,
-    "0x7a69": NetworkEnum.localhost,
-  }
-
-  connection.on("chainChanged", (networkChain: string) => {
-    if (Object.keys(possibleNetworks).includes(networkChain)){
-      etherStore.setNetworkName(possibleNetworks[networkChain]);
-    }
-  });
-}
-
 // Deposit methods
 const approveTokens = async (tokenQty: Number) => {
   const provider = getProvider();
@@ -516,9 +450,7 @@ const formatBigNumber = (num: BigNumber) => {
 };
 
 export default {
-  connectProvider,
   formatEther,
-  updateWalletStatus,
   splitTokens,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,

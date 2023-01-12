@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
 import { NetworkEnum } from "@/model/NetworkEnum";
-import blockchain from "../utils/blockchain";
+import { connectProvider } from "../blockchain/provider";
 import ethereumImage from "../assets/ethereum.svg";
 import polygonImage from "../assets/polygon.svg";
 
@@ -20,7 +20,7 @@ const currencyMenuHoverToggle = ref<boolean>(false);
 
 //Methods
 const connectMetaMask = () => {
-  blockchain.connectProvider();
+  connectProvider();
 };
 
 const formatWalletAddress = (): string => {
@@ -52,7 +52,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
   let validImages = {
     Ethereum: ethereumImage,
     Polygon: polygonImage,
-    Localhost: ethereumImage
+    Localhost: ethereumImage,
   };
 
   return validImages[networkName];

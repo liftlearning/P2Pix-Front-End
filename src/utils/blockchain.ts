@@ -7,6 +7,8 @@ import p2pix from "./smart_contract_files/P2PIX.json";
 import addresses from "./smart_contract_files/localhost.json";
 // Mock wallets import
 import { wallets } from "./smart_contract_files/wallets.json";
+import { getProvider } from "../blockchain/provider";
+import { NetworkEnum } from "@/model/NetworkEnum";
 
 // Wallet methods
 // Update wallet state (balance and address)
@@ -272,20 +274,28 @@ const connectProvider = async () => {
   await updateDepositAddedEvents();
   await updateLockAddedEvents();
   await updateLockReleasedEvents();
+  listenToNetworkChange(connection);
 
   connection.on("accountsChanged", async () => {
     await updateWalletStatus();
   });
 };
 
-const getProvider = (): ethers.providers.Web3Provider | null => {
-  const window_ = window as any;
-  const connection = window_.ethereum;
+const listenToNetworkChange = (connection: any) => {
+  const etherStore = useEtherStore();
 
-  if (!connection) return null;
+  const possibleNetworks: {[key: string]: NetworkEnum} = {
+    "0x5": NetworkEnum.ethereum,
+    "0x13881": NetworkEnum.polygon,
+    "0x7a69": NetworkEnum.localhost,
+  }
 
-  return new ethers.providers.Web3Provider(connection);
-};
+  connection.on("chainChanged", (networkChain: string) => {
+    if (Object.keys(possibleNetworks).includes(networkChain)){
+      etherStore.setNetworkName(possibleNetworks[networkChain]);
+    }
+  });
+}
 
 // Deposit methods
 const approveTokens = async (tokenQty: Number) => {

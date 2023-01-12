@@ -3,12 +3,24 @@ import { useEtherStore } from "@/store/ether";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import { updateWalletStatus } from "./wallet";
 
+const getProviderUrl = (): string => {
+    const etherStore = useEtherStore();
+
+    const possibleProvidersUrls: {[key: string]: string} = {
+        Ethereum: import.meta.env.VITE_GOERLI_API_URL,
+        Polygon: import.meta.env.VITE_MUMBAI_API_URL,
+        Localhost: import.meta.env.VITE_GOERLI_API_URL
+    }
+
+    return possibleProvidersUrls[etherStore.networkName]
+}
+
 const getProvider = (): ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider => {
     const window_ = window as any;
     const connection = window_.ethereum;
     
-    if (!connection) 
-        return new ethers.providers.JsonRpcProvider("provider_url"); // alchemy provider
+    if (!connection)
+        return new ethers.providers.JsonRpcProvider(getProviderUrl()); // alchemy provider
 
     return new ethers.providers.Web3Provider(connection); // metamask provider
 };

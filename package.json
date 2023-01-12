@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.18.6",
+    "@pinia/testing": "^0.0.14",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/crc": "^3.8.0",
     "@types/jest": "^27.0.0",
@@ -49,20 +51,8 @@
     "ts-jest": "^27.0.0",
     "typescript": "~4.7.4",
     "vite": "^3.1.8",
+    "vitest": "^0.27.1",
     "vue-tsc": "^1.0.8",
     "vue3-jest": "^27.0.0-alpha.1"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "json",
-      "vue"
-    ],
-    "transform": {
-      ".*\\.(vue)$": "vue3-jest",
-      "^.+\\.tsx?$": "ts-jest"
-    }
   }
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useEtherStore } from "../store/ether";
+import { useEtherStore } from "../../store/ether";
 import { ref } from "vue";
-import blockchain from "../utils/blockchain";
+import blockchain from "../../utils/blockchain";
 
 // Store reference
 const etherStore = useEtherStore();

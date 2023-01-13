@@ -13,6 +13,18 @@ const getTokenAddress = (): string => {
   return possibleTokenAddresses[etherStore.networkName];
 };
 
+const getP2PixAddress = (): string => {
+  const etherStore = useEtherStore();
+
+  const possibleP2PixAddresses: { [key: string]: string } = {
+    Ethereum: "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    Polygon: "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    Localhost: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+  };
+
+  return possibleP2PixAddresses[etherStore.networkName];
+};
+
 const getProviderUrl = (): string => {
   const etherStore = useEtherStore();
 
@@ -53,4 +65,5 @@ export {
   possibleChains,
   network2Chain,
   isPossibleNetwork,
+  getP2PixAddress,
 };

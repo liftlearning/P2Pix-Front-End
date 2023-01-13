@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatEther } from "@ethersproject/units";
 import type { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -89,7 +90,7 @@ const mapLock = (lockId: string) => {
         @click="mapDeposit(deposit.args.depositID)"
       >
         Seller:<br />{{ formatWalletAddress(deposit.args.seller) }}<br />
-        MRBZ: {{ blockchain.formatBigNumber(deposit.args.amount) }}
+        MRBZ: {{ formatEther(deposit.args.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">
@@ -100,7 +101,7 @@ const mapLock = (lockId: string) => {
         @click="mapLock(lock.args.lockID)"
       >
         Buyer:<br />{{ formatWalletAddress(lock.args.buyer) }}<br />
-        MRBZ: {{ blockchain.formatBigNumber(lock.args.amount) }}
+        MRBZ: {{ formatEther(lock.args.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">

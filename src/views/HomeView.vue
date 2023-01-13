@@ -8,6 +8,8 @@ import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
+import { addLock, releaseLock } from "@/blockchain/methods";
+import { updateWalletStatus } from "@/blockchain/wallet";
 
 enum Step {
   Search,
@@ -40,10 +42,9 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain
-      .addLock(depositId, tokenValue)
+    await addLock(depositId, tokenValue)
       .then((lock) => {
-        lockTransactionHash.value = lock.hash;
+        lockTransactionHash.value = lock.transactionHash;
       })
       .catch(() => {
         flowStep.value = Step.Search;
@@ -66,7 +67,7 @@ const releaseTransaction = async ({ e2eId }: any) => {
   });
 
   if (findLock && tokenAmount.value) {
-    const release = await blockchain.releaseLock(
+    const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
       e2eId,
@@ -81,7 +82,7 @@ const releaseTransaction = async ({ e2eId }: any) => {
           lastWalletReleaseTransactions.value = releaseTransactions;
       });
 
-    await blockchain.updateWalletStatus();
+    await updateWalletStatus();
     loadingRelease.value = false;
   }
 };

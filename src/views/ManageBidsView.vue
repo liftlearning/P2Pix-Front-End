@@ -5,6 +5,7 @@ import blockchain from "../utils/blockchain";
 import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
+import { cancelDeposit, withdrawDeposit } from "@/blockchain/methods";
 
 const etherStore = useEtherStore();
 
@@ -22,7 +23,7 @@ if (walletAddress.value) {
 }
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await blockchain.cancelDeposit(depositID);
+  const response = await cancelDeposit(depositID);
   if (response == true) {
     console.log("Depósito cancelado com sucesso.");
     depositList.value.splice(index, 1);
@@ -30,7 +31,7 @@ const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
 };
 
 const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await blockchain.withdrawDeposit(depositID);
+  const response = await withdrawDeposit(depositID);
   if (response == true) {
     console.log("Token retirado com sucesso.");
     depositList.value.splice(index, 1);

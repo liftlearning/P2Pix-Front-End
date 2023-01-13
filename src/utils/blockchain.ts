@@ -168,6 +168,7 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
 
   return depositList;
 };
+
 // Update events at store methods
 const updateValidDeposits = async () => {
   const etherStore = useEtherStore();
@@ -230,48 +231,6 @@ const updateLockReleasedEvents = async () => {
   console.log("RELEASES", eventsReleases);
 };
 
-// Deposit methods
-const approveTokens = async (tokenQty: Number) => {
-  const provider = getProvider();
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-
-  const tokenContract = new ethers.Contract(
-    addresses.token,
-    mockToken.abi,
-    signer
-  );
-
-  const apprv = await tokenContract.approve(
-    addresses.p2pix,
-    formatEther(String(tokenQty))
-  );
-  await apprv.wait();
-  return apprv;
-};
-
-// Gets value and pix key from user's form to create a deposit in the blockchain
-const addDeposit = async (tokenQty: Number, pixKey: String) => {
-  const provider = getProvider();
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-
-  const deposit = await p2pContract.deposit(
-    addresses.token,
-    formatEther(String(tokenQty)),
-    pixKey,
-    ethers.utils.formatBytes32String("")
-  );
-  await deposit.wait();
-
-  // await updateWalletStatus();
-  await updateDepositAddedEvents();
-  await updateValidDeposits();
-};
-
 const mockDeposit = async (tokenQty: Number, pixKey: String) => {
   const provider = getProvider();
   if (!provider) return;
@@ -305,36 +264,6 @@ const mockDeposit = async (tokenQty: Number, pixKey: String) => {
   await updateDepositAddedEvents();
 };
 
-// cancel a deposit by its Id
-const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
-  const provider = getProvider();
-
-  if (!provider) return false;
-
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  await contract.cancelDeposit(depositId);
-
-  // await updateWalletBalance();
-  await updateValidDeposits();
-  return true;
-};
-
-// withdraw a deposit by its Id
-const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
-  const provider = getProvider();
-
-  if (!provider) return false;
-
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  await contract.withdraw(depositId, []);
-
-  // await updateWalletBalance();
-  await updateValidDeposits();
-  return true;
-};
-
 // Get specific deposit data by its ID
 const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   const provider = getProvider();
@@ -348,37 +277,6 @@ const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   return deposit;
 };
 
-// Lock methods
-// Gets value from user's form to create a lock in the blockchain
-const addLock = async (depositId: BigNumber, amount: Number) => {
-  const etherStore = useEtherStore();
-  const provider = getProvider();
-
-  if (!provider) return;
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-
-  // Make lock
-  const oldEventsLen = etherStore.locksAddedList.length;
-  const lock = await p2pContract.lock(
-    depositId, // BigNumber
-    etherStore.walletAddress, // String "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (Example)
-    ethers.constants.AddressZero, // String "0x0000000000000000000000000000000000000000"
-    0,
-    formatEther(String(amount)), // BigNumber
-    [],
-    []
-  );
-  lock.wait();
-
-  while (etherStore.locksAddedList.length === oldEventsLen) {
-    await updateLockAddedEvents();
-    await updateValidDeposits();
-  }
-
-  return lock;
-};
-
 // Get specific lock data by its ID
 const mapLocks = async (lockId: string) => {
   const provider = getProvider();
@@ -390,51 +288,6 @@ const mapLocks = async (lockId: string) => {
   const lock = await contract.mapLocks(lockId);
 
   return lock;
-};
-
-// Releases lock by specific ID and other additional data
-const releaseLock = async (
-  pixKey: string,
-  amount: Number,
-  e2eId: string,
-  lockId: string
-) => {
-  const provider = getProvider();
-  if (!provider) return;
-
-  const mockBacenSigner = new ethers.Wallet(
-    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-  );
-
-  const messageToSign = ethers.utils.solidityKeccak256(
-    ["string", "uint256", "bytes32"],
-    [
-      pixKey,
-      formatEther(String(amount)),
-      ethers.utils.formatBytes32String(e2eId),
-    ]
-  );
-
-  const messageHashBytes = ethers.utils.arrayify(messageToSign);
-  const flatSig = await mockBacenSigner.signMessage(messageHashBytes);
-  const sig = ethers.utils.splitSignature(flatSig);
-
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-
-  const release = await p2pContract.release(
-    lockId,
-    ethers.constants.AddressZero,
-    ethers.utils.formatBytes32String(e2eId),
-    sig.r,
-    sig.s,
-    sig.v
-  );
-  release.wait();
-  await updateLockReleasedEvents();
-  await updateValidDeposits();
-
-  return release;
 };
 
 // Formatting methods
@@ -456,17 +309,12 @@ export default {
   listReleaseTransactionByWalletAddress,
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
-  approveTokens,
-  addDeposit,
-  cancelDeposit,
-  withdrawDeposit,
   mockDeposit,
   mapDeposits,
   formatBigNumber,
-  addLock,
   mapLocks,
-  releaseLock,
   updateLockAddedEvents,
   updateValidDeposits,
   getValidDeposits,
+  updateLockReleasedEvents,
 };

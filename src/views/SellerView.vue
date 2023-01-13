@@ -2,7 +2,7 @@
 import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
 import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
-import blockchain from "../utils/blockchain";
+import { approveTokens, addDeposit } from "../blockchain/methods";
 
 import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
@@ -28,10 +28,11 @@ const approveOffer = async ({ offer, pixKey }: any) => {
   try {
     offerValue.value = offer;
     pixKeyBuyer.value = pixKey;
-    await blockchain.approveTokens(Number(offerValue.value));
+    await approveTokens(String(offerValue.value));
     flowStep.value = Step.Network;
     loading.value = false;
-  } catch {
+  } catch (err) {
+    console.log(err);
     flowStep.value = Step.Sell;
     loading.value = false;
   }
@@ -41,7 +42,7 @@ const sendNetwork = async () => {
   loading.value = true;
   try {
     if (offerValue.value && pixKeyBuyer.value) {
-      await blockchain.addDeposit(offerValue.value, pixKeyBuyer.value);
+      await addDeposit(String(offerValue.value), pixKeyBuyer.value);
       flowStep.value = Step.Sell;
       loading.value = false;
     }

@@ -4,7 +4,7 @@ import CustomButton from "../components/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
+import { connectProvider } from "@/blockchain/provider";
 
 // Store reference
 const etherStore = useEtherStore();
@@ -23,7 +23,7 @@ const emit = defineEmits(["tokenBuy"]);
 
 // Blockchain methods
 const connectAccount = async () => {
-  await blockchain.connectProvider();
+  await connectProvider();
   verifyLiquidity();
 };
 

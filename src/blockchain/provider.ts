@@ -61,6 +61,9 @@ const listenToNetworkChange = (connection: any) => {
 };
 
 const requestNetworkChange = async (network: string): Promise<boolean> => {
+  const etherStore = useEtherStore();
+  if (!etherStore.walletAddress) return true;
+
   try {
     const window_ = window as any;
     await window_.ethereum.request({

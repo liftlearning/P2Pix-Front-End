@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import blockchain from "@/utils/blockchain";
+import { formatEther } from "@ethersproject/units";
 import { ref, watch } from "vue";
 
 // props
@@ -17,7 +17,7 @@ const showInitialItems = () => {
 
 const formatEventsAmount = (amount: any) => {
   try {
-    const formated = blockchain.formatBigNumber(amount);
+    const formated = formatEther(amount);
     return formated;
   } catch {
     return "";

@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
 import { NetworkEnum } from "@/model/NetworkEnum";
-import { connectProvider } from "../blockchain/provider";
+import { connectProvider, requestNetworkChange } from "../blockchain/provider";
 import ethereumImage from "../assets/ethereum.svg";
 import polygonImage from "../assets/polygon.svg";
 
@@ -46,6 +46,11 @@ const disconnectUser = () => {
 
 const closeMenu = () => {
   menuOpenToggle.value = false;
+};
+
+const networkChange = async (network: NetworkEnum) => {
+  const change = await requestNetworkChange(network);
+  if (change) etherStore.setNetworkName(network);
 };
 
 const getNetworkImage = (networkName: NetworkEnum) => {
@@ -132,7 +137,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
             <div class="bg-white rounded-md z-10">
               <div
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
-                @click="etherStore.setNetworkName(NetworkEnum.ethereum)"
+                @click="networkChange(NetworkEnum.ethereum)"
               >
                 <img
                   alt="Ethereum image"
@@ -149,7 +154,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
               </div>
               <div
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
-                @click="etherStore.setNetworkName(NetworkEnum.polygon)"
+                @click="networkChange(NetworkEnum.polygon)"
               >
                 <img
                   alt="Polygon image"
@@ -166,7 +171,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
               </div>
               <div
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
-                @click="etherStore.setNetworkName(NetworkEnum.localhost)"
+                @click="networkChange(NetworkEnum.localhost)"
               >
                 <img
                   alt="Localhost"
@@ -273,7 +278,7 @@ const getNetworkImage = (networkName: NetworkEnum) => {
         </div>
         <div class="top-bar-info">
           <span class="default-text text-sm">
-            MBRZ: {{ formatWalletBalance() }}
+            MBRL: {{ formatWalletBalance() }}
           </span>
         </div>
         <!-- Temporary div, just to show a wallet's balance -->

@@ -8,7 +8,6 @@ import addresses from "./smart_contract_files/localhost.json";
 // Mock wallets import
 import { wallets } from "./smart_contract_files/wallets.json";
 import { getProvider } from "../blockchain/provider";
-import { updateWalletBalance, updateWalletStatus } from "../blockchain/wallet";
 
 //  Split tokens between wallets in wallets.json
 const splitTokens = async () => {
@@ -28,7 +27,7 @@ const splitTokens = async () => {
       ethers.utils.parseEther("4000000.0")
     );
     await tx.wait();
-    updateWalletStatus();
+    // updateWalletStatus();
   }
 };
 
@@ -268,7 +267,7 @@ const addDeposit = async (tokenQty: Number, pixKey: String) => {
   );
   await deposit.wait();
 
-  await updateWalletStatus();
+  // await updateWalletStatus();
   await updateDepositAddedEvents();
   await updateValidDeposits();
 };
@@ -301,7 +300,7 @@ const mockDeposit = async (tokenQty: Number, pixKey: String) => {
   );
   await deposit.wait();
 
-  await updateWalletStatus();
+  // await updateWalletStatus();
   await updateValidDeposits();
   await updateDepositAddedEvents();
 };
@@ -316,7 +315,7 @@ const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   await contract.cancelDeposit(depositId);
 
-  await updateWalletBalance();
+  // await updateWalletBalance();
   await updateValidDeposits();
   return true;
 };
@@ -331,7 +330,7 @@ const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
   await contract.withdraw(depositId, []);
 
-  await updateWalletBalance();
+  // await updateWalletBalance();
   await updateValidDeposits();
   return true;
 };

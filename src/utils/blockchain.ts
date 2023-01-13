@@ -2,34 +2,10 @@ import { useEtherStore } from "@/store/ether";
 import { BigNumber, ethers } from "ethers";
 
 // Smart contract imports
-import mockToken from "./smart_contract_files/MockToken.json";
 import p2pix from "./smart_contract_files/P2PIX.json";
 import addresses from "./smart_contract_files/localhost.json";
 // Mock wallets import
-import { wallets } from "./smart_contract_files/wallets.json";
 import { getProvider } from "../blockchain/provider";
-
-//  Split tokens between wallets in wallets.json
-const splitTokens = async () => {
-  const provider = getProvider();
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-  const tokenContract = new ethers.Contract(
-    addresses.token,
-    mockToken.abi,
-    signer
-  );
-
-  for (let i = 0; i < wallets.length; i++) {
-    const tx = await tokenContract.transfer(
-      wallets[i],
-      ethers.utils.parseEther("4000000.0")
-    );
-    await tx.wait();
-    // updateWalletStatus();
-  }
-};
 
 // get all wallet transactions
 const listAllTransactionByWalletAddress = async (
@@ -231,39 +207,6 @@ const updateLockReleasedEvents = async () => {
   console.log("RELEASES", eventsReleases);
 };
 
-const mockDeposit = async (tokenQty: Number, pixKey: String) => {
-  const provider = getProvider();
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-
-  const tokenContract = new ethers.Contract(
-    addresses.token,
-    mockToken.abi,
-    signer
-  );
-
-  const apprv = await tokenContract.approve(
-    addresses.p2pix,
-    formatEther(String(tokenQty))
-  );
-  await apprv.wait();
-
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-
-  const deposit = await p2pContract.deposit(
-    addresses.token,
-    formatEther(String(tokenQty)),
-    pixKey,
-    ethers.utils.formatBytes32String("")
-  );
-  await deposit.wait();
-
-  // await updateWalletStatus();
-  await updateValidDeposits();
-  await updateDepositAddedEvents();
-};
-
 // Get specific deposit data by its ID
 const mapDeposits = async (depositId: BigNumber): Promise<any> => {
   const provider = getProvider();
@@ -303,13 +246,11 @@ const formatBigNumber = (num: BigNumber) => {
 
 export default {
   formatEther,
-  splitTokens,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
-  mockDeposit,
   mapDeposits,
   formatBigNumber,
   mapLocks,
@@ -317,4 +258,5 @@ export default {
   updateValidDeposits,
   getValidDeposits,
   updateLockReleasedEvents,
+  updateDepositAddedEvents,
 };

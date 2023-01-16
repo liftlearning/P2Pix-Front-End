@@ -2,7 +2,7 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import blockchain from "../utils/blockchain";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
 

@@ -2,7 +2,7 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import blockchain from "../utils/blockchain";
 
 const etherStore = useEtherStore();

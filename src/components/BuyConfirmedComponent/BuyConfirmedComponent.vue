@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 
 // props
 const props = defineProps<{

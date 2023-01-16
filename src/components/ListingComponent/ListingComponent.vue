@@ -85,7 +85,7 @@ showInitialItems();
       </span>
 
       <!-- TODO: change this hardcoded date -->
-      <span class="last-release-info"> 20 out 2022 </span>
+      <span class="last-release-info transaction-date"> 20 out 2022 </span>
 
       <div
         v-if="props.isManageMode"
@@ -97,21 +97,21 @@ showInitialItems();
       </div>
 
       <span
-        class="last-release-info"
+        class="last-release-info transfer-type"
         v-if="item.event == 'DepositAdded' && !props.isManageMode"
       >
         {{ "Oferta" }}
       </span>
 
       <span
-        class="last-release-info"
+        class="last-release-info transfer-type"
         v-if="item.event == 'LockAdded' && !props.isManageMode"
       >
         {{ "Reserva" }}
       </span>
 
       <span
-        class="last-release-info"
+        class="last-release-info transfer-type"
         v-if="item.event == 'LockReleased' && !props.isManageMode"
       >
         {{ "Compra" }}

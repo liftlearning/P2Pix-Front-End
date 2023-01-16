@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
-import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
+import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
 import blockchain from "../utils/blockchain";
 import { ref } from "vue";
 

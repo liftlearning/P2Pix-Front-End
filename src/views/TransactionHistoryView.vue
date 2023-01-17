@@ -3,22 +3,21 @@ import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import ListingComponent from "@/components/ListingComponent.vue";
-import blockchain from "../utils/blockchain";
+import { listAllTransactionByWalletAddress } from "@/blockchain/wallet";
 
 const etherStore = useEtherStore();
 const { walletAddress } = storeToRefs(etherStore);
 const allUserTransactions = ref<any[]>([]);
 
 if (walletAddress.value) {
-  await blockchain
-    .listAllTransactionByWalletAddress(walletAddress.value)
+  await listAllTransactionByWalletAddress(walletAddress.value)
     .then((res) => {
       if (res) allUserTransactions.value = res;
     });
 }
 
 watch(walletAddress, async (newValue) => {
-  await blockchain.listAllTransactionByWalletAddress(newValue).then((res) => {
+  await listAllTransactionByWalletAddress(newValue).then((res) => {
     if (res) allUserTransactions.value = res;
   });
 });

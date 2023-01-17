@@ -2,7 +2,6 @@
 import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
-import blockchain from "../utils/blockchain";
 import { ref, onMounted } from "vue";
 
 import { useEtherStore } from "@/store/ether";
@@ -11,6 +10,8 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
+import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet"
+
 enum Step {
   Search,
   Buy,
@@ -74,8 +75,7 @@ const releaseTransaction = async ({ e2eId }: any) => {
     );
     release.wait();
 
-    await blockchain
-      .listReleaseTransactionByWalletAddress(walletAddress.value.toLowerCase())
+    await listReleaseTransactionByWalletAddress(walletAddress.value.toLowerCase())
       .then((releaseTransactions) => {
         if (releaseTransactions)
           lastWalletReleaseTransactions.value = releaseTransactions;

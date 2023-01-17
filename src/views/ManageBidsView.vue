@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
 import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
 import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
+import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet"
 
 const etherStore = useEtherStore();
 
@@ -14,7 +14,7 @@ const depositList = ref<any[]>([]);
 
 if (walletAddress.value) {
   const walletDeposits =
-    await blockchain.listValidDepositTransactionsByWalletAddress(
+    await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
   if (walletDeposits) {
@@ -40,7 +40,7 @@ const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
 
 watch(walletAddress, async () => {
   const walletDeposits =
-    await blockchain.listValidDepositTransactionsByWalletAddress(
+    await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
   if (walletDeposits) {

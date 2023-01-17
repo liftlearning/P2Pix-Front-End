@@ -11,7 +11,12 @@ import { NetworkEnum } from "@/model/NetworkEnum";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, networkName, depositsValidListGoerli, depositsValidListMumbai } = storeToRefs(etherStore);
+const {
+  walletAddress,
+  networkName,
+  depositsValidListGoerli,
+  depositsValidListMumbai,
+} = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
@@ -33,9 +38,12 @@ const connectAccount = async () => {
 };
 
 const emitConfirmButton = () => {
-  const selectedDeposit = networkName.value == NetworkEnum.ethereum ? selectedGoerliDeposit.value : selectedMumbaiDeposit.value;
-  emit('tokenBuy', selectedDeposit, tokenValue.value)
-}
+  const selectedDeposit =
+    networkName.value == NetworkEnum.ethereum
+      ? selectedGoerliDeposit.value
+      : selectedMumbaiDeposit.value;
+  emit("tokenBuy", selectedDeposit, tokenValue.value);
+};
 
 // Debounce methods
 const handleInputEvent = (event: any) => {
@@ -74,31 +82,37 @@ const verifyLiquidity = () => {
     return;
   }
 
-  selectedGoerliDeposit.value = verifyNetworkLiquidity(tokenValue.value, walletAddress.value, depositsValidListGoerli.value);
-  selectedMumbaiDeposit.value = verifyNetworkLiquidity(tokenValue.value, walletAddress.value, depositsValidListMumbai.value);
+  selectedGoerliDeposit.value = verifyNetworkLiquidity(
+    tokenValue.value,
+    walletAddress.value,
+    depositsValidListGoerli.value
+  );
+  selectedMumbaiDeposit.value = verifyNetworkLiquidity(
+    tokenValue.value,
+    walletAddress.value,
+    depositsValidListMumbai.value
+  );
 
-  enableOrDisableConfirmButton()
-  if(selectedGoerliDeposit.value || selectedMumbaiDeposit.value){
+  enableOrDisableConfirmButton();
+  if (selectedGoerliDeposit.value || selectedMumbaiDeposit.value) {
     hasLiquidity.value = true;
     enableWalletButton.value = true;
-  }
-  else{
+  } else {
     hasLiquidity.value = false;
     enableWalletButton.value = true;
   }
 };
 
 const enableOrDisableConfirmButton = (): void => {
-  if(selectedGoerliDeposit.value && networkName.value == NetworkEnum.ethereum)
+  if (selectedGoerliDeposit.value && networkName.value == NetworkEnum.ethereum)
     enableConfirmButton.value = true;
-  if(selectedMumbaiDeposit.value && networkName.value == NetworkEnum.polygon)
+  if (selectedMumbaiDeposit.value && networkName.value == NetworkEnum.polygon)
     enableConfirmButton.value = true;
-  else
-    enableConfirmButton.value = false;
-}
+  else enableConfirmButton.value = false;
+};
 
 watch(networkName, async () => {
-  enableOrDisableConfirmButton()
+  enableOrDisableConfirmButton();
 });
 </script>
 

@@ -5,7 +5,7 @@ import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
 import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
-import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet"
+import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
 
 const etherStore = useEtherStore();
 
@@ -13,10 +13,9 @@ const { walletAddress } = storeToRefs(etherStore);
 const depositList = ref<any[]>([]);
 
 if (walletAddress.value) {
-  const walletDeposits =
-    await listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
+  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+    walletAddress.value
+  );
   if (walletDeposits) {
     depositList.value = walletDeposits;
   }
@@ -39,10 +38,9 @@ const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
 };
 
 watch(walletAddress, async () => {
-  const walletDeposits =
-    await listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
+  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+    walletAddress.value
+  );
   if (walletDeposits) {
     depositList.value = walletDeposits;
   }

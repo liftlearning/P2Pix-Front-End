@@ -10,10 +10,9 @@ const { walletAddress } = storeToRefs(etherStore);
 const allUserTransactions = ref<any[]>([]);
 
 if (walletAddress.value) {
-  await listAllTransactionByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) allUserTransactions.value = res;
-    });
+  await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
+    if (res) allUserTransactions.value = res;
+  });
 }
 
 watch(walletAddress, async (newValue) => {

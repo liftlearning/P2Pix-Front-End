@@ -10,7 +10,7 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet"
+import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
 
 enum Step {
   Search,
@@ -46,7 +46,7 @@ const confirmBuyClick = async (selectedDeposit: any, tokenValue: number) => {
         lockTransactionHash.value = lock.transactionHash;
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         flowStep.value = Step.Search;
       });
 
@@ -75,21 +75,21 @@ const releaseTransaction = async ({ e2eId }: any) => {
     );
     release.wait();
 
-    await listReleaseTransactionByWalletAddress(walletAddress.value.toLowerCase())
-      .then((releaseTransactions) => {
-        if (releaseTransactions)
-          lastWalletReleaseTransactions.value = releaseTransactions;
-      });
+    await listReleaseTransactionByWalletAddress(
+      walletAddress.value.toLowerCase()
+    ).then((releaseTransactions) => {
+      if (releaseTransactions)
+        lastWalletReleaseTransactions.value = releaseTransactions;
+    });
 
     await updateWalletStatus();
     loadingRelease.value = false;
   }
 };
 
-
 onMounted(async () => {
   await getNetworksLiquidity();
-})
+});
 </script>
 
 <template>

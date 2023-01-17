@@ -41,13 +41,12 @@ const getNetworksLiquidity = async () => {
   console.log(depositListMumbai);
 };
 
-const getValidDeposits = async ( contract?: Contract ): Promise<any[]> => {
+const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
   let p2pContract: Contract;
 
-  if (contract){
+  if (contract) {
     p2pContract = contract;
-  }
-  else{
+  } else {
     const provider = getProvider();
     const signer = provider.getSigner();
 
@@ -60,7 +59,9 @@ const getValidDeposits = async ( contract?: Contract ): Promise<any[]> => {
   const depositList: any[] = await Promise.all(
     eventsDeposits
       .map(async (deposit) => {
-        const mappedDeposit = await p2pContract.mapDeposits(deposit.args?.depositID);
+        const mappedDeposit = await p2pContract.mapDeposits(
+          deposit.args?.depositID
+        );
         let validDeposit = {};
 
         if (mappedDeposit.valid) {
@@ -69,7 +70,7 @@ const getValidDeposits = async ( contract?: Contract ): Promise<any[]> => {
             depositID: deposit.args?.depositID,
             remaining: formatEther(mappedDeposit.remaining),
             seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget
+            pixKey: mappedDeposit.pixTarget,
           };
         }
 

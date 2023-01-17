@@ -46,7 +46,6 @@ const listValidDepositTransactionsByWalletAddress = async (
   return [];
 };
 
-
 const listAllTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<any[] | undefined> => {
@@ -94,10 +93,9 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
-
-export { 
+export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
-  listReleaseTransactionByWalletAddress
+  listReleaseTransactionByWalletAddress,
 };

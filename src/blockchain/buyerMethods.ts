@@ -1,52 +1,12 @@
 import { useEtherStore } from "@/store/ether";
 
 import { getProvider } from "./provider";
-import { getTokenAddress, getP2PixAddress } from "./addresses";
+import { getP2PixAddress } from "./addresses";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
-import mockToken from "../utils/smart_contract_files/MockToken.json";
 
 import { BigNumber, ethers, type Event } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils";
-
-const addDeposit = async (tokenQty: string, pixKey: string) => {
-  const provider = getProvider();
-
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
-
-  const deposit = await p2pContract.deposit(
-    getTokenAddress(),
-    parseEther(tokenQty),
-    pixKey,
-    ethers.utils.formatBytes32String("")
-  );
-  await deposit.wait();
-
-  // await updateWalletStatus();
-  // await updateDepositAddedEvents();
-  // await updateValidDeposits();
-};
-
-const approveTokens = async (tokenQty: string) => {
-  const provider = getProvider();
-
-  const signer = provider.getSigner();
-
-  const tokenContract = new ethers.Contract(
-    getTokenAddress(),
-    mockToken.abi,
-    signer
-  );
-
-  const apprv = await tokenContract.approve(
-    getP2PixAddress(),
-    parseEther(tokenQty)
-  );
-
-  await apprv.wait();
-  return apprv;
-};
+import { formatEther } from "ethers/lib/utils";
 
 const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const provider = getProvider();
@@ -55,7 +15,7 @@ const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   const contract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
   await contract.cancelDeposit(depositId);
 
-  // // await updateWalletBalance();
+  // await updateWalletBalance();
   // await updateValidDeposits();
   return true;
 };
@@ -149,11 +109,4 @@ const releaseLock = async (
   return release;
 };
 
-export {
-  approveTokens,
-  addDeposit,
-  cancelDeposit,
-  withdrawDeposit,
-  addLock,
-  releaseLock,
-};
+export { cancelDeposit, withdrawDeposit, addLock, releaseLock };

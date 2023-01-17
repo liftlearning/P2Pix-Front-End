@@ -8,8 +8,10 @@ export const useEtherStore = defineStore("ether", {
     networkName: NetworkEnum.ethereum,
     loadingLock: false,
     sellerView: false,
-    // Depósitos válidos para compra
-    depositsValidList: [] as any[],
+    // Depósitos válidos para compra GOERLI
+    depositsValidListGoerli: [] as any[],
+    // Depósitos válidos para compra MUMBAI
+    depositsValidListMumbai: [] as any[],
     // Depósitos adicionados na blockchain
     depositsAddedList: [] as any[],
     // Depósitos expirados na blockchain
@@ -37,8 +39,11 @@ export const useEtherStore = defineStore("ether", {
     setSellerView(sellerView: boolean) {
       this.sellerView = sellerView;
     },
-    setDepositsValidList(depositsValidList: any[]) {
-      this.depositsValidList = depositsValidList;
+    setDepositsValidListGoerli(depositsValidList: any[]) {
+      this.depositsValidListGoerli = depositsValidList;
+    },
+    setDepositsValidListMumbai(depositsValidList: any[]) {
+      this.depositsValidListMumbai = depositsValidList;
     },
     setDepositsAddedList(depositsAddedList: any[]) {
       this.depositsAddedList = depositsAddedList;
@@ -56,10 +61,11 @@ export const useEtherStore = defineStore("ether", {
       this.locksExpiredList = locksExpiredList;
     },
   },
+  // Alterar para integrar com mumbai
   getters: {
     getValidDepositByWalletAddress: (state) => {
       return (walletAddress: string) =>
-        state.depositsValidList
+        state.depositsValidListGoerli
           .filter((deposit) => deposit.seller == walletAddress)
           .sort((a, b) => {
             return b.blockNumber - a.blockNumber;

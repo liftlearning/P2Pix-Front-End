@@ -8,8 +8,9 @@ import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
-import { addLock, releaseLock } from "@/blockchain/methods";
+import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
+import { getNetworksLiquidity } from "@/blockchain/events";
 
 enum Step {
   Search,
@@ -19,6 +20,7 @@ enum Step {
 
 const etherStore = useEtherStore();
 etherStore.setSellerView(false);
+getNetworksLiquidity();
 
 // States
 const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);

@@ -5,7 +5,7 @@ import blockchain from "../utils/blockchain";
 import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch } from "vue";
-import { cancelDeposit, withdrawDeposit } from "@/blockchain/methods";
+import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
 
 const etherStore = useEtherStore();
 

@@ -106,45 +106,6 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
-//get valid deposits
-const getValidDeposits = async (): Promise<any[] | undefined> => {
-  const window_ = window as any;
-  const connection = window_.ethereum;
-  let provider: ethers.providers.Web3Provider | null = null;
-
-  if (!connection) return [];
-
-  provider = new ethers.providers.Web3Provider(connection);
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-
-  const filterDeposits = p2pContract.filters.DepositAdded(null);
-  const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
-
-  const depositList: any[] = await Promise.all(
-    eventsDeposits
-      .map(async (deposit) => {
-        const mappedDeposit = await mapDeposits(deposit.args?.depositID);
-        let validDeposit = {};
-
-        if (mappedDeposit.valid) {
-          validDeposit = {
-            blockNumber: deposit.blockNumber,
-            depositID: deposit.args?.depositID,
-            remaining: formatBigNumber(mappedDeposit.remaining),
-            seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget,
-          };
-        }
-
-        return validDeposit;
-      })
-      .filter((deposit) => deposit)
-  );
-
-  return depositList;
-};
-
 // Update events at store methods
 const updateValidDeposits = async () => {
   const etherStore = useEtherStore();
@@ -207,19 +168,6 @@ const updateLockReleasedEvents = async () => {
   console.log("RELEASES", eventsReleases);
 };
 
-// Get specific deposit data by its ID
-const mapDeposits = async (depositId: BigNumber): Promise<any> => {
-  const provider = getProvider();
-
-  if (!provider) return;
-
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(addresses.p2pix, p2pix.abi, signer);
-  const deposit = await contract.mapDeposits(depositId);
-
-  return deposit;
-};
-
 // Get specific lock data by its ID
 const mapLocks = async (lockId: string) => {
   const provider = getProvider();
@@ -251,12 +199,10 @@ export default {
   listReleaseTransactionByWalletAddress,
   listDepositTransactionByWalletAddress,
   listLockTransactionByWalletAddress,
-  mapDeposits,
   formatBigNumber,
   mapLocks,
   updateLockAddedEvents,
   updateValidDeposits,
-  getValidDeposits,
   updateLockReleasedEvents,
   updateDepositAddedEvents,
 };

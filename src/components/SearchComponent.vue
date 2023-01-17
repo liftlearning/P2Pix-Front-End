@@ -9,7 +9,7 @@ import { connectProvider } from "@/blockchain/provider";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, depositsValidList } = storeToRefs(etherStore);
+const { walletAddress, depositsValidListGoerli } = storeToRefs(etherStore);
 
 // Reactive state
 const tokenValue = ref(0);
@@ -59,7 +59,7 @@ const verifyLiquidity = () => {
   selectedDeposit.value = null;
   if (!walletAddress.value || tokenValue.value <= 0) return;
 
-  depositsValidList.value.find((element) => {
+  depositsValidListGoerli.value.find((element) => {
     const remaining = element.remaining;
     if (
       tokenValue.value!! <= remaining &&

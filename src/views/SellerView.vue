@@ -2,7 +2,7 @@
 import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
 import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
-import { approveTokens, addDeposit } from "../blockchain/methods";
+import { approveTokens, addDeposit } from "../blockchain/sellerMethods";
 
 import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";

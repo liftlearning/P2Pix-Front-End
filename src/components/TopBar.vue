@@ -49,6 +49,7 @@ const closeMenu = () => {
 };
 
 const networkChange = async (network: NetworkEnum) => {
+  currencyMenuOpenToggle.value = false;
   const change = await requestNetworkChange(network);
   if (change) etherStore.setNetworkName(network);
 };

@@ -3,7 +3,7 @@ import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
 import blockchain from "../utils/blockchain";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
@@ -11,7 +11,6 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-
 enum Step {
   Search,
   Buy,
@@ -20,7 +19,6 @@ enum Step {
 
 const etherStore = useEtherStore();
 etherStore.setSellerView(false);
-getNetworksLiquidity();
 
 // States
 const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);
@@ -32,23 +30,22 @@ const lockId = ref<string>("");
 const loadingRelease = ref<Boolean>(false);
 const lastWalletReleaseTransactions = ref<any[]>([]);
 
-const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
+const confirmBuyClick = async (selectedDeposit: any, tokenValue: number) => {
   // finish buy screen
-  const depositDetail = selectedDeposit;
-  const depositId = selectedDeposit.depositID;
   pixTarget.value = selectedDeposit.pixKey;
   tokenAmount.value = tokenValue;
 
   // Makes lock with deposit ID and the Amount
-  if (depositDetail) {
+  if (selectedDeposit) {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await addLock(depositId, tokenValue)
+    await addLock(selectedDeposit.depositID, tokenValue)
       .then((lock) => {
         lockTransactionHash.value = lock.transactionHash;
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err)
         flowStep.value = Step.Search;
       });
 
@@ -88,6 +85,11 @@ const releaseTransaction = async ({ e2eId }: any) => {
     loadingRelease.value = false;
   }
 };
+
+
+onMounted(async () => {
+  await getNetworksLiquidity();
+})
 </script>
 
 <template>

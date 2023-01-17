@@ -1,14 +1,13 @@
 import { useEtherStore } from "@/store/ether";
 import { Contract, ethers } from "ethers";
 
-import { mapDeposits } from "./sellerMethods";
-
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
 import { getProvider } from "./provider";
 import { getP2PixAddress } from "./addresses";
 
 const getNetworksLiquidity = async () => {
+  const etherStore = useEtherStore();
   console.log("Loading events");
 
   const goerliProvider = new ethers.providers.JsonRpcProvider(
@@ -31,10 +30,9 @@ const getNetworksLiquidity = async () => {
     mumbaiProvider
   );
 
-  const depositListGoerli = await getValidDeposits(p2pContractGoerli)
-  const depositListMumbai = await getValidDeposits(p2pContractMumbai)
+  const depositListGoerli = await getValidDeposits(p2pContractGoerli);
 
-  const etherStore = useEtherStore();
+  const depositListMumbai = await getValidDeposits(p2pContractMumbai);
 
   etherStore.setDepositsValidListGoerli(depositListGoerli);
   console.log(depositListGoerli);
@@ -43,9 +41,9 @@ const getNetworksLiquidity = async () => {
   console.log(depositListMumbai);
 };
 
-const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
+const getValidDeposits = async ( contract?: Contract ): Promise<any[]> => {
   let p2pContract: Contract;
-  
+
   if (contract){
     p2pContract = contract;
   }
@@ -62,7 +60,7 @@ const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
   const depositList: any[] = await Promise.all(
     eventsDeposits
       .map(async (deposit) => {
-        const mappedDeposit = await mapDeposits(deposit.args?.depositID);
+        const mappedDeposit = await p2pContract.mapDeposits(deposit.args?.depositID);
         let validDeposit = {};
 
         if (mappedDeposit.valid) {
@@ -71,7 +69,7 @@ const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
             depositID: deposit.args?.depositID,
             remaining: formatEther(mappedDeposit.remaining),
             seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget,
+            pixKey: mappedDeposit.pixTarget
           };
         }
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatEther } from "@ethersproject/units";
 import type { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -86,10 +87,10 @@ const mapLock = (lockId: string) => {
         class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
         v-for="deposit in depositsAddedList"
         :key="deposit.blockNumber"
-        @click="mapDeposit(deposit.args.depositID)"
+        @click="mapDeposit(deposit.args?.depositID)"
       >
-        Seller:<br />{{ formatWalletAddress(deposit.args.seller) }}<br />
-        MRBZ: {{ blockchain.formatBigNumber(deposit.args.amount) }}
+        Seller:<br />{{ formatWalletAddress(deposit.args?.seller) }}<br />
+        MRBZ: {{ blockchain.formatBigNumber(deposit.args?.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">
@@ -97,17 +98,17 @@ const mapLock = (lockId: string) => {
         class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
         v-for="lock in locksAddedList"
         :key="lock.blockNumber"
-        @click="mapLock(lock.args.lockID)"
+        @click="mapLock(lock.args?.lockID)"
       >
-        Buyer:<br />{{ formatWalletAddress(lock.args.buyer) }}<br />
-        MRBZ: {{ blockchain.formatBigNumber(lock.args.amount) }}
+        Buyer:<br />{{ formatWalletAddress(lock.args?.buyer) }}<br />
+        MRBZ: {{ blockchain.formatBigNumber(lock.args?.amount) }}
       </li>
     </ul>
     <ul class="flex flex-col justify-center items-center gap-4">
       <li
         class="text-gray-900 font-semibold text-lg cursor-pointer border-2 border-amber-400 p-2 rounded-md bg-amber-200"
         v-for="valid in depositsValidList"
-        :key="valid.depositID"
+        :key ="formatEther(valid.depositID)"
         @click="mapDeposit(valid.depositID)"
       >
         Buyer:<br />{{ formatWalletAddress(valid.seller) }}<br />

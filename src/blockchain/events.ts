@@ -1,12 +1,12 @@
 import { useEtherStore } from "@/store/ether";
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 
-import { getProvider } from "./provider";
 import { mapDeposits } from "./sellerMethods";
-import { getP2PixAddress } from "./addresses";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
+import { getProvider } from "./provider";
+import { getP2PixAddress } from "./addresses";
 
 const getNetworksLiquidity = async () => {
   console.log("Loading events");
@@ -31,61 +31,8 @@ const getNetworksLiquidity = async () => {
     mumbaiProvider
   );
 
-  const filterDepositsGoerli = p2pContractGoerli.filters.DepositAdded(null);
-  const eventsDepositsGoerli = await p2pContractGoerli.queryFilter(
-    filterDepositsGoerli
-  );
-
-  const filterDepositsMumbai = p2pContractMumbai.filters.DepositAdded(null);
-  const eventsDepositsMumbai = await p2pContractMumbai.queryFilter(
-    filterDepositsMumbai
-  );
-
-  const depositListGoerli: any[] = await Promise.all(
-    eventsDepositsGoerli
-      .map(async (deposit) => {
-        const mappedDeposit = await p2pContractGoerli.mapDeposits(
-          deposit.args?.depositID
-        );
-        let validDepositGoerli = {};
-
-        if (mappedDeposit.valid) {
-          validDepositGoerli = {
-            blockNumber: deposit.blockNumber,
-            depositID: deposit.args?.depositID,
-            remaining: formatEther(mappedDeposit.remaining),
-            seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget,
-          };
-        }
-
-        return validDepositGoerli;
-      })
-      .filter((deposit) => deposit)
-  );
-
-  const depositListMumbai: any[] = await Promise.all(
-    eventsDepositsMumbai
-      .map(async (deposit) => {
-        const mappedDeposit = await p2pContractMumbai.mapDeposits(
-          deposit.args?.depositID
-        );
-        let validDepositMumbai = {};
-
-        if (mappedDeposit.valid) {
-          validDepositMumbai = {
-            blockNumber: deposit.blockNumber,
-            depositID: deposit.args?.depositID,
-            remaining: formatEther(mappedDeposit.remaining),
-            seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget,
-          };
-        }
-
-        return validDepositMumbai;
-      })
-      .filter((deposit) => deposit)
-  );
+  const depositListGoerli = await getValidDeposits(p2pContractGoerli)
+  const depositListMumbai = await getValidDeposits(p2pContractMumbai)
 
   const etherStore = useEtherStore();
 
@@ -96,11 +43,18 @@ const getNetworksLiquidity = async () => {
   console.log(depositListMumbai);
 };
 
-const getValidDeposits = async (): Promise<any[] | undefined> => {
-  const provider = getProvider();
-  const signer = provider.getSigner();
+const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
+  let p2pContract: Contract;
+  
+  if (contract){
+    p2pContract = contract;
+  }
+  else{
+    const provider = getProvider();
+    const signer = provider.getSigner();
 
-  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+    p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+  }
 
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
@@ -125,10 +79,6 @@ const getValidDeposits = async (): Promise<any[] | undefined> => {
       })
       .filter((deposit) => deposit)
   );
-
-  // const etherStore = useEtherStore();
-  // etherStore.setDepositsValidList(depositList);
-  // console.log(depositList)
 
   return depositList;
 };

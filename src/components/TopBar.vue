@@ -263,12 +263,6 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
             </div>
           </div>
         </div>
-        <div class="top-bar-info">
-          <span class="default-text text-sm">
-            MBRL: {{ formatWalletBalance() }}
-          </span>
-        </div>
-        <!-- Temporary div, just to show a wallet's balance -->
       </div>
     </div>
   </header>

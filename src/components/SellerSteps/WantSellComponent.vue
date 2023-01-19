@@ -7,15 +7,15 @@ import { debounce } from "@/utils/debounce";
 const offer = ref<string | number>("");
 const pixKey = ref<string>("");
 
-const enableSelectButton = ref(false);
-const hasLiquidity = ref(true);
-const validDecimals = ref(true);
+const enableSelectButton = ref<boolean>(false);
+const hasLiquidity = ref<boolean>(true);
+const validDecimals = ref<boolean>(true);
 
 // Emits
 const emit = defineEmits(["approveTokens"]);
 
 // Debounce methods
-const handleInputEvent = (event: any) => {
+const handleInputEvent = (event: any): void => {
   const { value } = event.target;
 
   offer.value = Number(value);
@@ -30,7 +30,7 @@ const handleInputEvent = (event: any) => {
 
 // Enable button methods
 // Check if has more than 2 decimal places
-const decimalCount = (num: Number) => {
+const decimalCount = (num: Number): number => {
   const numStr = String(num);
   if (numStr.includes(".")) {
     return numStr.split(".")[1].length;

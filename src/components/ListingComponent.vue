@@ -1,34 +1,33 @@
 <script setup lang="ts">
+import type { ValidDeposit } from "@/model/ValidDeposit";
 import { formatEther } from "@ethersproject/units";
+import type { Event } from "ethers";
 import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
-  walletTransactions: any[];
+  walletTransactions: (Event | ValidDeposit)[];
   isManageMode: boolean;
 }>();
 
-const itemsToShow = ref<any[]>([]);
+const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
 
 // Methods
-const showInitialItems = () => {
+const isValidDeposit = (
+  deposit: Event | ValidDeposit
+): deposit is ValidDeposit => {
+  return (deposit as ValidDeposit).depositID !== undefined;
+};
+
+const showInitialItems = (): void => {
   itemsToShow.value = props.walletTransactions.slice(0, 3);
 };
 
-const formatEventsAmount = (amount: any) => {
-  try {
-    const formated = formatEther(amount);
-    return formated;
-  } catch {
-    return "";
-  }
-};
-
-const openEtherscanUrl = (url: string) => {
+const openEtherscanUrl = (url: string): void => {
   window.open(url, "_blank");
 };
 
-const loadMore = () => {
+const loadMore = (): void => {
   const itemsShowing = itemsToShow.value.length;
   itemsToShow.value?.push(
     ...props.walletTransactions.slice(itemsShowing, itemsShowing + 3)
@@ -36,7 +35,7 @@ const loadMore = () => {
 };
 
 // watch props changes
-watch(props, async () => {
+watch(props, async (): Promise<void> => {
   const itemsToShowQty = itemsToShow.value.length;
   if (itemsToShowQty == 0) showInitialItems();
   else
@@ -75,11 +74,11 @@ showInitialItems();
     <div
       class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
       v-for="(item, index) in itemsToShow"
-      :key="item.depositID"
+      :key="item.blockNumber"
     >
       <span class="last-release-info">
         {{
-          item?.args ? formatEventsAmount(item?.args.amount) : item?.remaining
+          isValidDeposit(item) ? item.remaining : formatEther(item.args?.amount)
         }}
         BRZ
       </span>
@@ -90,7 +89,7 @@ showInitialItems();
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', item.depositID, index)"
+        @click="emit('cancelDeposit', (item as ValidDeposit).depositID, index)"
       >
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
@@ -98,21 +97,21 @@ showInitialItems();
 
       <span
         class="last-release-info"
-        v-if="item.event == 'DepositAdded' && !props.isManageMode"
+        v-if="(item as Event).event == 'DepositAdded' && !props.isManageMode"
       >
         {{ "Oferta" }}
       </span>
 
       <span
         class="last-release-info"
-        v-if="item.event == 'LockAdded' && !props.isManageMode"
+        v-if="(item as Event).event == 'LockAdded' && !props.isManageMode"
       >
         {{ "Reserva" }}
       </span>
 
       <span
         class="last-release-info"
-        v-if="item.event == 'LockReleased' && !props.isManageMode"
+        v-if="(item as Event).event == 'LockReleased' && !props.isManageMode"
       >
         {{ "Compra" }}
       </span>
@@ -120,7 +119,9 @@ showInitialItems();
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('withdrawDeposit', item.depositID, index)"
+        @click="
+          emit('withdrawDeposit', (item as ValidDeposit).depositID, index)
+        "
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Cancel image" src="@/assets/withdraw.svg" />
@@ -130,7 +131,9 @@ showInitialItems();
         v-if="!props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
         @click="
-          openEtherscanUrl(`https://etherscan.io/tx/${item?.transactionHash}`)
+          openEtherscanUrl(
+            `https://etherscan.io/tx/${(item as Event)?.transactionHash}`
+          )
         "
       >
         <span class="last-release-info">Etherscan</span>

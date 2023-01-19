@@ -1,5 +1,4 @@
 import { getProvider } from "./provider";
-import { updateWalletStatus } from "./wallet";
 import { getTokenAddress, getP2PixAddress } from "./addresses";
 import { parseEther } from "ethers/lib/utils";
 
@@ -8,9 +7,6 @@ import { ethers } from "ethers";
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import mockToken from "../utils/smart_contract_files/MockToken.json";
 
-// Seller Flow methods //
-
-// Approve Tokens
 const approveTokens = async (tokenQty: string): Promise<any> => {
   const provider = getProvider();
   const signer = provider.getSigner();
@@ -31,7 +27,6 @@ const approveTokens = async (tokenQty: string): Promise<any> => {
   return apprv;
 };
 
-// Add deposit
 const addDeposit = async (tokenQty: string, pixKey: string): Promise<any> => {
   const provider = getProvider();
 

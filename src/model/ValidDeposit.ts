@@ -3,7 +3,7 @@ import type { BigNumber } from "ethers";
 export type ValidDeposit = {
   depositID: BigNumber;
   blockNumber: number;
-  remaining: string;
+  remaining: number;
   seller: string;
   pixKey: string;
   pixTarget?: string;

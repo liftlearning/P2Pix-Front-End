@@ -19,8 +19,8 @@ const currencyMenuOpenToggle = ref<boolean>(false);
 const currencyMenuHoverToggle = ref<boolean>(false);
 
 //Methods
-const connectMetaMask = () => {
-  connectProvider();
+const connectMetaMask = async (): Promise<void> => {
+  await connectProvider();
 };
 
 const formatWalletAddress = (): string => {
@@ -33,28 +33,28 @@ const formatWalletAddress = (): string => {
   return `${initialText}...${finalText}`;
 };
 
-const formatWalletBalance = (): String => {
+const formatWalletBalance = (): string => {
   const fixed = Number(balance.value);
   return fixed.toFixed(2);
 };
 
-const disconnectUser = () => {
+const disconnectUser = (): void => {
   etherStore.setWalletAddress("");
   closeMenu();
   window.location.reload();
 };
 
-const closeMenu = () => {
+const closeMenu = (): void => {
   menuOpenToggle.value = false;
 };
 
-const networkChange = async (network: NetworkEnum) => {
+const networkChange = async (network: NetworkEnum): Promise<void> => {
   currencyMenuOpenToggle.value = false;
   const change = await requestNetworkChange(network);
   if (change) etherStore.setNetworkName(network);
 };
 
-const getNetworkImage = (networkName: NetworkEnum) => {
+const getNetworkImage = (networkName: NetworkEnum): string => {
   let validImages = {
     Ethereum: ethereumImage,
     Polygon: polygonImage,

@@ -35,7 +35,7 @@ const addLock = async (depositId: BigNumber, amount: number): Promise<any> => {
 // Release lock
 const releaseLock = async (
   pixKey: string,
-  amount: Number,
+  amount: number,
   e2eId: string,
   lockId: string
 ): Promise<any> => {

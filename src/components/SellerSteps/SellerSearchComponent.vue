@@ -4,16 +4,16 @@ import CustomButton from "../../components/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 
 // Reactive state
-const tokenValue = ref(0);
-const enableSelectButton = ref(false);
-const hasLiquidity = ref(true);
-const validDecimals = ref(true);
+const tokenValue = ref<number>(0);
+const enableSelectButton = ref<boolean>(false);
+const hasLiquidity = ref<boolean>(true);
+const validDecimals = ref<boolean>(true);
 
 // Emits
 const emit = defineEmits(["tokenBuy"]);
 
 // Debounce methods
-const handleInputEvent = (event: any) => {
+const handleInputEvent = (event: any): void => {
   const { value } = event.target;
 
   tokenValue.value = Number(value);
@@ -28,7 +28,7 @@ const handleInputEvent = (event: any) => {
 
 // Enable button methods
 // Check if has more than 2 decimal places
-const decimalCount = (num: Number) => {
+const decimalCount = (num: number): number => {
   const numStr = String(num);
   if (numStr.includes(".")) {
     return numStr.split(".")[1].length;

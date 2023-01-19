@@ -24,19 +24,20 @@ const pixQrCode = pix({
   pixKey: props.pixTarget ?? "",
   value: props.tokenValue,
 });
+
 pixQrCode.base64QrCode().then((code: string) => {
   qrCode.value = code;
 });
 
 qrCodePayload.value = pixQrCode.payload();
 
-const handleInputEvent = (event: any) => {
+const handleInputEvent = async (event: any): Promise<void> => {
   const { value } = event.target;
   e2eId.value = value;
-  validatePix();
+  await validatePix();
 };
 
-const validatePix = async () => {
+const validatePix = async (): Promise<void> => {
   if (e2eId.value == "") {
     isPixValid.value = false;
     isCodeInputEmpty.value = true;

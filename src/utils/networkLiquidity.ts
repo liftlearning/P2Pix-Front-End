@@ -1,8 +1,10 @@
+import type { ValidDeposit } from "@/model/ValidDeposit";
+
 const verifyNetworkLiquidity = (
   tokenValue: number,
   walletAddress: string,
-  validDepositList: any[]
-) => {
+  validDepositList: ValidDeposit[]
+): ValidDeposit | undefined => {
   const element = validDepositList.find((element) => {
     const remaining = element.remaining;
     if (

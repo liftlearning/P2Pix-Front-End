@@ -65,13 +65,13 @@ const getValidDeposits = async (
         const mappedDeposit = await p2pContract.mapDeposits(
           deposit.args?.depositID
         );
-        let validDeposit = {};
+        let validDeposit: ValidDeposit | undefined = undefined;
 
         if (mappedDeposit.valid) {
           validDeposit = {
             blockNumber: deposit.blockNumber,
             depositID: deposit.args?.depositID,
-            remaining: formatEther(mappedDeposit.remaining),
+            remaining: Number(formatEther(mappedDeposit.remaining)),
             seller: mappedDeposit.seller,
             pixKey: mappedDeposit.pixTarget,
           };

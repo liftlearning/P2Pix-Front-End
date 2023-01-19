@@ -65,7 +65,7 @@ const getValidDeposits = async (
         const mappedDeposit = await p2pContract.mapDeposits(
           deposit.args?.depositID
         );
-        let validDeposit: ValidDeposit | undefined = undefined;
+        let validDeposit: ValidDeposit | null = null;
 
         if (mappedDeposit.valid) {
           validDeposit = {
@@ -79,10 +79,9 @@ const getValidDeposits = async (
 
         return validDeposit;
       })
-      .filter((deposit) => deposit)
-  );
+  );  
 
-  return depositList as ValidDeposit[];
+  return depositList.filter((deposit) => deposit) as ValidDeposit[];
 };
 
 export { getValidDeposits, getNetworksLiquidity };

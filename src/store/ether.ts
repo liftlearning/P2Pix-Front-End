@@ -9,6 +9,8 @@ export const useEtherStore = defineStore("ether", {
     balance: "",
     networkName: NetworkEnum.ethereum,
     loadingLock: false,
+    loadingWalletTransactionHistory: false,
+    loadingWalletBids: false,
     sellerView: false,
     // Depósitos válidos para compra GOERLI
     depositsValidListGoerli: [] as ValidDeposit[],
@@ -40,6 +42,12 @@ export const useEtherStore = defineStore("ether", {
     },
     setSellerView(sellerView: boolean) {
       this.sellerView = sellerView;
+    },
+    setLoadingWalletTransactionHistory(loadingWalletTransactionHistory: boolean) {
+      this.loadingWalletTransactionHistory = loadingWalletTransactionHistory;
+    },
+    setLoadingWalletBids(loadingWalletBids: boolean) {
+      this.loadingWalletBids = loadingWalletBids;
     },
     setDepositsValidListGoerli(depositsValidList: ValidDeposit[]) {
       this.depositsValidListGoerli = depositsValidList;

@@ -1,5 +1,4 @@
-export const decimalCount = (num: number): number => {
-  const numStr = String(num);
+export const decimalCount = (numStr: string): number => {
   if (numStr.includes(".")) {
     return numStr.split(".")[1].length;
   }

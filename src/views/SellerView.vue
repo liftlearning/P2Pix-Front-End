@@ -19,16 +19,16 @@ etherStore.setSellerView(true);
 const flowStep = ref<Step>(Step.Sell);
 const loading = ref<boolean>(false);
 
-const offerValue = ref<number>();
+const offerValue = ref<string>("");
 const pixKeyBuyer = ref<string>("");
 
 // Verificar tipagem
-const approveOffer = async (args: { offer: number; pixKey: string }) => {
+const approveOffer = async (args: { offer: string; pixKey: string }) => {
   loading.value = true;
   try {
     offerValue.value = args.offer;
     pixKeyBuyer.value = args.pixKey;
-    await approveTokens(String(offerValue.value));
+    await approveTokens(args.offer);
     flowStep.value = Step.Network;
     loading.value = false;
   } catch (err) {

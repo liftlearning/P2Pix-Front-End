@@ -11,7 +11,7 @@ import { connectProvider } from "@/blockchain/provider";
 const etherStore = useEtherStore();
 const { walletAddress } = storeToRefs(etherStore);
 
-const offer = ref<string | number>("");
+const offer = ref<string>("");
 const pixKey = ref<string>("");
 
 const enableSelectButton = ref<boolean>(false);
@@ -25,7 +25,7 @@ const emit = defineEmits(["approveTokens"]);
 const handleInputEvent = (event: any): void => {
   const { value } = event.target;
 
-  offer.value = Number(value);
+  offer.value = value;
 
   if (decimalCount(offer.value) > 2) {
     validDecimals.value = false;
@@ -35,7 +35,7 @@ const handleInputEvent = (event: any): void => {
   validDecimals.value = true;
 };
 
-const handleButtonClick = async (): Promise<void> => {
+const handleButtonClick = async (offer: string, pixKey: string): Promise<void> => {
   if (walletAddress.value) emit("approveTokens", { offer, pixKey });
   else await connectProvider();
 };
@@ -102,7 +102,7 @@ const handleButtonClick = async (): Promise<void> => {
       </div>
       <CustomButton
         :text="walletAddress ? 'Aprovar tokens' : 'Conectar Carteira'"
-        @buttonClicked="handleButtonClick()"
+        @buttonClicked="handleButtonClick(offer, pixKey)"
       />
     </div>
   </div>

@@ -28,8 +28,7 @@ const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
-const lockTransactionHash = ref<string>("");
-const lockId = ref<string>("");
+const _lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 
@@ -47,8 +46,8 @@ const confirmBuyClick = async (
     etherStore.setLoadingLock(true);
 
     await addLock(selectedDeposit.depositID, tokenValue)
-      .then((lock) => {
-        lockTransactionHash.value = lock.transactionHash;
+      .then((lockID) => {
+        _lockID.value = lockID;
       })
       .catch((err) => {
         console.log(err);
@@ -63,20 +62,12 @@ const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  const findLock = locksAddedList.value.find((element) => {
-    if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args?.lockID;
-      return true;
-    }
-    return false;
-  });
-
-  if (findLock && tokenAmount.value) {
+  if (_lockID.value && tokenAmount.value) {
     const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
       e2eId,
-      lockId.value
+      _lockID.value
     );
     release.wait();
 

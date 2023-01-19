@@ -27,9 +27,11 @@ const addLock = async (depositId: BigNumber, amount: number): Promise<any> => {
     [],
     []
   );
-  lock.wait();
 
-  return lock;
+  const lock_rec = await lock.wait();
+  const [t] = lock_rec.events;
+
+  return t.args.lockID;
 };
 
 // Release lock
@@ -47,7 +49,7 @@ const releaseLock = async (
     ["string", "uint256", "bytes32"],
     [
       pixKey,
-      formatEther(String(amount)),
+      parseEther(String(amount)),
       ethers.utils.formatBytes32String(e2eId),
     ]
   );
@@ -69,7 +71,7 @@ const releaseLock = async (
     sig.s,
     sig.v
   );
-  release.wait();
+  await release.wait();
 
   return release;
 };

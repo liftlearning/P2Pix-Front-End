@@ -78,7 +78,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
       <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>
-      <div class="flex flex-col">
+      <div class="flex flex-col" v-if="walletAddress">
         <div
           class="group top-bar-info cursor-pointer hover:bg-white"
           @click="

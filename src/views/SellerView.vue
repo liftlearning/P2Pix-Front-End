@@ -23,11 +23,11 @@ const offerValue = ref<number>();
 const pixKeyBuyer = ref<string>("");
 
 // Verificar tipagem
-const approveOffer = async ({ offer, pixKey }: any) => {
+const approveOffer = async (args: { offer: number; pixKey: string }) => {
   loading.value = true;
   try {
-    offerValue.value = offer;
-    pixKeyBuyer.value = pixKey;
+    offerValue.value = args.offer;
+    pixKeyBuyer.value = args.pixKey;
     await approveTokens(String(offerValue.value));
     flowStep.value = Step.Network;
     loading.value = false;

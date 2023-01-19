@@ -2,15 +2,16 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent.vue";
-import type { BigNumber } from "ethers";
+import type { BigNumber, Event } from "ethers";
 import { ref, watch } from "vue";
 import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
 import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
 
 const { walletAddress } = storeToRefs(etherStore);
-const depositList = ref<any[]>([]);
+const depositList = ref<ValidDeposit[]>([]);
 
 if (walletAddress.value) {
   const walletDeposits = await listValidDepositTransactionsByWalletAddress(

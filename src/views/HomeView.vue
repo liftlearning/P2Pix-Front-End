@@ -11,6 +11,8 @@ import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
+import type { Event } from "ethers";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 enum Step {
   Search,
@@ -28,10 +30,13 @@ const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
 const lockTransactionHash = ref<string>("");
 const lockId = ref<string>("");
-const loadingRelease = ref<Boolean>(false);
-const lastWalletReleaseTransactions = ref<any[]>([]);
+const loadingRelease = ref<boolean>(false);
+const lastWalletReleaseTransactions = ref<Event[]>([]);
 
-const confirmBuyClick = async (selectedDeposit: any, tokenValue: number) => {
+const confirmBuyClick = async (
+  selectedDeposit: ValidDeposit,
+  tokenValue: number
+) => {
   // finish buy screen
   pixTarget.value = selectedDeposit.pixKey;
   tokenAmount.value = tokenValue;
@@ -54,13 +59,13 @@ const confirmBuyClick = async (selectedDeposit: any, tokenValue: number) => {
   }
 };
 
-const releaseTransaction = async ({ e2eId }: any) => {
+const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
   const findLock = locksAddedList.value.find((element) => {
     if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args.lockID;
+      lockId.value = element.args?.lockID;
       return true;
     }
     return false;

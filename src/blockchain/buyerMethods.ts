@@ -11,10 +11,7 @@ import { formatEther, parseEther } from "ethers/lib/utils";
 // Buyer Flow methods //
 
 // Make lock
-const addLock = async (
-  depositId: BigNumber,
-  amount: number
-): Promise<any> => {
+const addLock = async (depositId: BigNumber, amount: number): Promise<any> => {
   const etherStore = useEtherStore();
 
   const provider = getProvider();

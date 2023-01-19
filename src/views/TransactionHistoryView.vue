@@ -4,10 +4,12 @@ import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import ListingComponent from "@/components/ListingComponent.vue";
 import { listAllTransactionByWalletAddress } from "@/blockchain/wallet";
+import type { Event } from "ethers";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
 const { walletAddress } = storeToRefs(etherStore);
-const allUserTransactions = ref<any[]>([]);
+const allUserTransactions = ref<(Event | ValidDeposit)[]>([]);
 
 if (walletAddress.value) {
   await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {

@@ -42,7 +42,9 @@ const getNetworksLiquidity = async (): Promise<void> => {
   console.log(depositListMumbai);
 };
 
-const getValidDeposits = async (contract?: Contract): Promise<ValidDeposit[]> => {
+const getValidDeposits = async (
+  contract?: Contract
+): Promise<ValidDeposit[]> => {
   let p2pContract: Contract;
 
   if (contract) {

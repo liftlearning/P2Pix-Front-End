@@ -1,4 +1,6 @@
 import { NetworkEnum } from "@/model/NetworkEnum";
+import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { Event } from "ethers";
 import { defineStore } from "pinia";
 
 export const useEtherStore = defineStore("ether", {
@@ -9,19 +11,19 @@ export const useEtherStore = defineStore("ether", {
     loadingLock: false,
     sellerView: false,
     // Depósitos válidos para compra GOERLI
-    depositsValidListGoerli: [] as any[],
+    depositsValidListGoerli: [] as ValidDeposit[],
     // Depósitos válidos para compra MUMBAI
-    depositsValidListMumbai: [] as any[],
+    depositsValidListMumbai: [] as ValidDeposit[],
     // Depósitos adicionados na blockchain
-    depositsAddedList: [] as any[],
+    depositsAddedList: [] as Event[],
     // Depósitos expirados na blockchain
-    depositsExpiredList: [] as any[],
+    depositsExpiredList: [] as Event[],
     // Locks adicionados na blockchain
-    locksAddedList: [] as any[],
+    locksAddedList: [] as Event[],
     // Locks 'released' na blockchain
-    locksReleasedList: [] as any[],
+    locksReleasedList: [] as Event[],
     // Locks expirados na blockchain
-    locksExpiredList: [] as any[],
+    locksExpiredList: [] as Event[],
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -39,25 +41,25 @@ export const useEtherStore = defineStore("ether", {
     setSellerView(sellerView: boolean) {
       this.sellerView = sellerView;
     },
-    setDepositsValidListGoerli(depositsValidList: any[]) {
+    setDepositsValidListGoerli(depositsValidList: ValidDeposit[]) {
       this.depositsValidListGoerli = depositsValidList;
     },
-    setDepositsValidListMumbai(depositsValidList: any[]) {
+    setDepositsValidListMumbai(depositsValidList: ValidDeposit[]) {
       this.depositsValidListMumbai = depositsValidList;
     },
-    setDepositsAddedList(depositsAddedList: any[]) {
+    setDepositsAddedList(depositsAddedList: Event[]) {
       this.depositsAddedList = depositsAddedList;
     },
-    setDepositsExpiredList(depositsExpiredList: any[]) {
+    setDepositsExpiredList(depositsExpiredList: Event[]) {
       this.depositsExpiredList = depositsExpiredList;
     },
-    setLocksAddedList(locksAddedList: any[]) {
+    setLocksAddedList(locksAddedList: Event[]) {
       this.locksAddedList = locksAddedList;
     },
-    setLocksReleasedList(locksReleasedList: any[]) {
+    setLocksReleasedList(locksReleasedList: Event[]) {
       this.locksReleasedList = locksReleasedList;
     },
-    setLocksExpiredList(locksExpiredList: any[]) {
+    setLocksExpiredList(locksExpiredList: Event[]) {
       this.locksExpiredList = locksExpiredList;
     },
   },

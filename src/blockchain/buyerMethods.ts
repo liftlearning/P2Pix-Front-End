@@ -6,12 +6,12 @@ import { getP2PixAddress } from "./addresses";
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 
 import { BigNumber, ethers } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils";
+import { parseEther } from "ethers/lib/utils";
 
-// Buyer Flow methods //
-
-// Make lock
-const addLock = async (depositId: BigNumber, amount: number): Promise<any> => {
+const addLock = async (
+  depositId: BigNumber,
+  amount: number
+): Promise<string> => {
   const etherStore = useEtherStore();
 
   const provider = getProvider();
@@ -34,7 +34,6 @@ const addLock = async (depositId: BigNumber, amount: number): Promise<any> => {
   return t.args.lockID;
 };
 
-// Release lock
 const releaseLock = async (
   pixKey: string,
   amount: number,
@@ -83,8 +82,6 @@ const cancelDeposit = async (depositId: BigNumber): Promise<boolean> => {
   const contract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
   await contract.cancelDeposit(depositId);
 
-  // await updateWalletBalance();
-  // await updateValidDeposits();
   return true;
 };
 
@@ -97,11 +94,7 @@ const withdrawDeposit = async (depositId: BigNumber): Promise<boolean> => {
   const contract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
   await contract.withdraw(depositId, []);
 
-  // // await updateWalletBalance();
-  // await updateValidDeposits();
   return true;
 };
-
-// Releases lock by specific ID and other additional data
 
 export { cancelDeposit, withdrawDeposit, addLock, releaseLock };

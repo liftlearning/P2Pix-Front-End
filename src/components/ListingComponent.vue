@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import { useEtherStore } from "@/store/ether";
 import { formatEther } from "@ethersproject/units";
 import type { Event } from "ethers";
 import { ref, watch } from "vue";
@@ -9,6 +11,8 @@ const props = defineProps<{
   walletTransactions: (Event | ValidDeposit)[];
   isManageMode: boolean;
 }>();
+
+const etherStore = useEtherStore();
 
 const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
 
@@ -23,7 +27,12 @@ const showInitialItems = (): void => {
   itemsToShow.value = props.walletTransactions.slice(0, 3);
 };
 
-const openEtherscanUrl = (url: string): void => {
+const openEtherscanUrl = (transactionHash: string): void => {
+  const networkUrl =
+    etherStore.networkName == NetworkEnum.ethereum
+      ? "goerli.etherscan.io"
+      : "mumbai.polygonscan.com";
+  const url = `https://${networkUrl}/tx/${transactionHash}`;
   window.open(url, "_blank");
 };
 
@@ -130,11 +139,7 @@ showInitialItems();
       <div
         v-if="!props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="
-          openEtherscanUrl(
-            `https://etherscan.io/tx/${(item as Event)?.transactionHash}`
-          )
-        "
+        @click="openEtherscanUrl((item as Event)?.transactionHash)"
       >
         <span class="last-release-info">Etherscan</span>
         <img alt="Redirect image" src="@/assets/redirect.svg" />

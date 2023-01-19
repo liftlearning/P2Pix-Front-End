@@ -8,6 +8,7 @@ import { connectProvider } from "@/blockchain/provider";
 import { verifyNetworkLiquidity } from "@/utils/networkLiquidity";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import { decimalCount } from "@/utils/decimalCount";
 
 // Store reference
 const etherStore = useEtherStore();
@@ -60,16 +61,6 @@ const handleInputEvent = (event: any): void => {
   validDecimals.value = true;
 
   verifyLiquidity();
-};
-
-// Enable button methods
-// Check if has more than 2 decimal places
-const decimalCount = (num: number): number => {
-  const numStr = String(num);
-  if (numStr.includes(".")) {
-    return numStr.split(".")[1].length;
-  }
-  return 0;
 };
 
 // Verify if there is a valid deposit to buy

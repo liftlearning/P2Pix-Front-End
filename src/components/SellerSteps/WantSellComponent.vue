@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import CustomButton from "../CustomButton.vue";
 import { debounce } from "@/utils/debounce";
+import { decimalCount } from "@/utils/decimalCount";
 
 // Reactive state
 const offer = ref<string | number>("");
@@ -26,16 +27,6 @@ const handleInputEvent = (event: any): void => {
     return;
   }
   validDecimals.value = true;
-};
-
-// Enable button methods
-// Check if has more than 2 decimal places
-const decimalCount = (num: Number): number => {
-  const numStr = String(num);
-  if (numStr.includes(".")) {
-    return numStr.split(".")[1].length;
-  }
-  return 0;
 };
 </script>
 

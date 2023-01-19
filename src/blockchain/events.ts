@@ -60,26 +60,25 @@ const getValidDeposits = async (
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
   const depositList = await Promise.all(
-    eventsDeposits
-      .map(async (deposit) => {
-        const mappedDeposit = await p2pContract.mapDeposits(
-          deposit.args?.depositID
-        );
-        let validDeposit: ValidDeposit | null = null;
+    eventsDeposits.map(async (deposit) => {
+      const mappedDeposit = await p2pContract.mapDeposits(
+        deposit.args?.depositID
+      );
+      let validDeposit: ValidDeposit | null = null;
 
-        if (mappedDeposit.valid) {
-          validDeposit = {
-            blockNumber: deposit.blockNumber,
-            depositID: deposit.args?.depositID,
-            remaining: Number(formatEther(mappedDeposit.remaining)),
-            seller: mappedDeposit.seller,
-            pixKey: mappedDeposit.pixTarget,
-          };
-        }
+      if (mappedDeposit.valid) {
+        validDeposit = {
+          blockNumber: deposit.blockNumber,
+          depositID: deposit.args?.depositID,
+          remaining: Number(formatEther(mappedDeposit.remaining)),
+          seller: mappedDeposit.seller,
+          pixKey: mappedDeposit.pixTarget,
+        };
+      }
 
-        return validDeposit;
-      })
-  );  
+      return validDeposit;
+    })
+  );
 
   return depositList.filter((deposit) => deposit) as ValidDeposit[];
 };

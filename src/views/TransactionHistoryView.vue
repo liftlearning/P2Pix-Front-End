@@ -13,11 +13,11 @@ const allUserTransactions = ref<(Event | ValidDeposit)[]>([]);
 
 onMounted(async () => {
   if (walletAddress.value) {
-  await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
-    if (res) allUserTransactions.value = res;
-  });
-}
-})
+    await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
+      if (res) allUserTransactions.value = res;
+    });
+  }
+});
 
 watch(walletAddress, async (newValue) => {
   await listAllTransactionByWalletAddress(newValue).then((res) => {

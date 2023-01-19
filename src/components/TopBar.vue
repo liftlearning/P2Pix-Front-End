@@ -10,7 +10,7 @@ import polygonImage from "../assets/polygon.svg";
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, balance, sellerView } = storeToRefs(etherStore);
+const { walletAddress, sellerView } = storeToRefs(etherStore);
 
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
@@ -31,11 +31,6 @@ const formatWalletAddress = (): string => {
     walletAddressLength
   );
   return `${initialText}...${finalText}`;
-};
-
-const formatWalletBalance = (): string => {
-  const fixed = Number(balance.value);
-  return fixed.toFixed(2);
 };
 
 const disconnectUser = (): void => {

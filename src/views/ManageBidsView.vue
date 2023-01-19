@@ -10,18 +10,19 @@ import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
 
-const { walletAddress, networkName, loadingWalletBids } = storeToRefs(etherStore);
+const { walletAddress, networkName } = storeToRefs(etherStore);
 const depositList = ref<ValidDeposit[]>([]);
 
 onMounted(async () => {
   if (walletAddress.value) {
-  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-    walletAddress.value
-  );
-  if (walletDeposits) {
-    depositList.value = walletDeposits;
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+    if (walletDeposits) {
+      depositList.value = walletDeposits;
+    }
   }
-}})
+});
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
   const response = await cancelDeposit(depositID);
@@ -49,9 +50,11 @@ watch(walletAddress, async () => {
 });
 
 watch(networkName, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value).then((res) => {
-    if (res) depositList.value = res;
-  });
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value).then(
+    (res) => {
+      if (res) depositList.value = res;
+    }
+  );
 });
 </script>
 

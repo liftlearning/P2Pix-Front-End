@@ -35,7 +35,10 @@ const handleInputEvent = (event: any): void => {
   validDecimals.value = true;
 };
 
-const handleButtonClick = async (offer: string, pixKey: string): Promise<void> => {
+const handleButtonClick = async (
+  offer: string,
+  pixKey: string
+): Promise<void> => {
   if (walletAddress.value) emit("approveTokens", { offer, pixKey });
   else await connectProvider();
 };

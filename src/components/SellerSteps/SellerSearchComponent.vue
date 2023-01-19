@@ -19,7 +19,7 @@ const handleInputEvent = (event: any): void => {
 
   tokenValue.value = Number(value);
 
-  if (decimalCount(tokenValue.value) > 2) {
+  if (decimalCount(String(tokenValue.value)) > 2) {
     validDecimals.value = false;
     enableSelectButton.value = false;
     return;

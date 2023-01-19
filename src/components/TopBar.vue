@@ -170,20 +170,6 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
               <div class="w-full flex justify-center">
                 <hr class="w-4/5" />
               </div>
-              <div
-                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
-                @click="networkChange(NetworkEnum.localhost)"
-              >
-                <img
-                  alt="Localhost"
-                  width="20"
-                  height="20"
-                  src="@/assets/ethereum.svg"
-                />
-                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
-                  Localhost
-                </span>
-              </div>
             </div>
           </div>
         </div>

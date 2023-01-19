@@ -98,7 +98,7 @@ const verifyLiquidity = (): void => {
 const enableOrDisableConfirmButton = (): void => {
   if (selectedGoerliDeposit.value && networkName.value == NetworkEnum.ethereum)
     enableConfirmButton.value = true;
-  if (selectedMumbaiDeposit.value && networkName.value == NetworkEnum.polygon)
+  else if (selectedMumbaiDeposit.value && networkName.value == NetworkEnum.polygon)
     enableConfirmButton.value = true;
   else enableConfirmButton.value = false;
 };

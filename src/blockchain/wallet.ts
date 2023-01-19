@@ -6,11 +6,12 @@ import { getP2PixAddress, getTokenAddress, possibleChains } from "./addresses";
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import mockToken from "../utils/smart_contract_files/MockToken.json";
 
-import { ethers } from "ethers";
+import { ethers, type Event } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
-const updateWalletStatus = async () => {
+const updateWalletStatus = async (): Promise<void> => {
   const etherStore = useEtherStore();
 
   const provider = getProvider();
@@ -34,8 +35,9 @@ const updateWalletStatus = async () => {
 
 const listValidDepositTransactionsByWalletAddress = async (
   walletAddress: string
-): Promise<any[]> => {
+): Promise<ValidDeposit[]> => {
   const walletDeposits = await getValidDeposits();
+
   if (walletDeposits) {
     return walletDeposits
       .filter((deposit) => deposit.seller == walletAddress)
@@ -43,14 +45,14 @@ const listValidDepositTransactionsByWalletAddress = async (
         return b.blockNumber - a.blockNumber;
       });
   }
+
   return [];
 };
 
 const listAllTransactionByWalletAddress = async (
   walletAddress: string
-): Promise<any[] | undefined> => {
+): Promise<Event[]> => {
   const provider = getProvider();
-  if (!provider) return;
 
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
@@ -76,9 +78,8 @@ const listAllTransactionByWalletAddress = async (
 // get wallet's release transactions
 const listReleaseTransactionByWalletAddress = async (
   walletAddress: string
-): Promise<any[] | undefined> => {
+): Promise<Event[]> => {
   const provider = getProvider();
-  if (!provider) return;
 
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);

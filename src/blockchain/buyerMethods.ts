@@ -5,7 +5,7 @@ import { getP2PixAddress } from "./addresses";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 
-import { BigNumber, ethers, type Event } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 
 // Buyer Flow methods //
@@ -14,7 +14,7 @@ import { formatEther, parseEther } from "ethers/lib/utils";
 const addLock = async (
   depositId: BigNumber,
   amount: number
-): Promise<Event> => {
+): Promise<any> => {
   const etherStore = useEtherStore();
 
   const provider = getProvider();
@@ -41,7 +41,7 @@ const releaseLock = async (
   amount: Number,
   e2eId: string,
   lockId: string
-) => {
+): Promise<any> => {
   const mockBacenSigner = new ethers.Wallet(
     "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
   );
@@ -77,7 +77,7 @@ const releaseLock = async (
   return release;
 };
 
-const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+const cancelDeposit = async (depositId: BigNumber): Promise<boolean> => {
   const provider = getProvider();
 
   const signer = provider.getSigner();
@@ -89,7 +89,7 @@ const cancelDeposit = async (depositId: BigNumber): Promise<Boolean> => {
   return true;
 };
 
-const withdrawDeposit = async (depositId: BigNumber): Promise<Boolean> => {
+const withdrawDeposit = async (depositId: BigNumber): Promise<boolean> => {
   const provider = getProvider();
 
   if (!provider) return false;

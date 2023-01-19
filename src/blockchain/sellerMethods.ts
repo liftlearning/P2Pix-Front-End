@@ -11,7 +11,7 @@ import mockToken from "../utils/smart_contract_files/MockToken.json";
 // Seller Flow methods //
 
 // Approve Tokens
-const approveTokens = async (tokenQty: string) => {
+const approveTokens = async (tokenQty: string): Promise<any> => {
   const provider = getProvider();
   const signer = provider.getSigner();
 
@@ -27,11 +27,12 @@ const approveTokens = async (tokenQty: string) => {
   );
 
   await apprv.wait();
+  console.log(apprv);
   return apprv;
 };
 
 // Add deposit
-const addDeposit = async (tokenQty: string, pixKey: string) => {
+const addDeposit = async (tokenQty: string, pixKey: string): Promise<any> => {
   const provider = getProvider();
 
   const signer = provider.getSigner();
@@ -46,9 +47,7 @@ const addDeposit = async (tokenQty: string, pixKey: string) => {
 
   await deposit.wait();
 
-  await updateWalletStatus();
-  // await updateDepositAddedEvents();
-  // await updateValidDeposits();
+  return deposit;
 };
 
 export { approveTokens, addDeposit };

@@ -5,8 +5,9 @@ import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
 import { getProvider } from "./provider";
 import { getP2PixAddress } from "./addresses";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
-const getNetworksLiquidity = async () => {
+const getNetworksLiquidity = async (): Promise<void> => {
   const etherStore = useEtherStore();
   console.log("Loading events");
 
@@ -41,7 +42,7 @@ const getNetworksLiquidity = async () => {
   console.log(depositListMumbai);
 };
 
-const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
+const getValidDeposits = async (contract?: Contract): Promise<ValidDeposit[]> => {
   let p2pContract: Contract;
 
   if (contract) {
@@ -56,7 +57,7 @@ const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
-  const depositList: any[] = await Promise.all(
+  const depositList = await Promise.all(
     eventsDeposits
       .map(async (deposit) => {
         const mappedDeposit = await p2pContract.mapDeposits(
@@ -79,7 +80,7 @@ const getValidDeposits = async (contract?: Contract): Promise<any[]> => {
       .filter((deposit) => deposit)
   );
 
-  return depositList;
+  return depositList as ValidDeposit[];
 };
 
 export { getValidDeposits, getNetworksLiquidity };

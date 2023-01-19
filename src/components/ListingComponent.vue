@@ -43,6 +43,18 @@ const loadMore = (): void => {
   );
 };
 
+const getEventName = (event: string | undefined): string => {
+  if (!event) return "Desconhecido";
+
+  const possibleEventName: { [key: string]: string } = {
+    DepositAdded: "Oferta",
+    LockAdded: "Compra",
+    LockReleased: "Reserva",
+  };
+
+  return possibleEventName[event];
+};
+
 // watch props changes
 watch(props, async (): Promise<void> => {
   const itemsToShowQty = itemsToShow.value.length;
@@ -95,6 +107,19 @@ showInitialItems();
       <!-- TODO: change this hardcoded date -->
       <span class="last-release-info"> 20 out 2022 </span>
 
+      <span class="last-release-info" v-if="!props.isManageMode">
+        {{ getEventName((item as Event).event) }}
+      </span>
+
+      <div
+        v-if="!props.isManageMode"
+        class="flex gap-2 cursor-pointer items-center justify-self-center"
+        @click="openEtherscanUrl((item as Event)?.transactionHash)"
+      >
+        <span class="last-release-info">Etherscan</span>
+        <img alt="Redirect image" src="@/assets/redirect.svg" />
+      </div>
+
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
@@ -103,27 +128,6 @@ showInitialItems();
         <span class="last-release-info">Cancelar</span>
         <img alt="Cancel image" src="@/assets/cancel.svg" />
       </div>
-
-      <span
-        class="last-release-info"
-        v-if="(item as Event).event == 'DepositAdded' && !props.isManageMode"
-      >
-        {{ "Oferta" }}
-      </span>
-
-      <span
-        class="last-release-info"
-        v-if="(item as Event).event == 'LockAdded' && !props.isManageMode"
-      >
-        {{ "Reserva" }}
-      </span>
-
-      <span
-        class="last-release-info"
-        v-if="(item as Event).event == 'LockReleased' && !props.isManageMode"
-      >
-        {{ "Compra" }}
-      </span>
 
       <div
         v-if="props.isManageMode"
@@ -134,15 +138,6 @@ showInitialItems();
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Cancel image" src="@/assets/withdraw.svg" />
-      </div>
-
-      <div
-        v-if="!props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="openEtherscanUrl((item as Event)?.transactionHash)"
-      >
-        <span class="last-release-info">Etherscan</span>
-        <img alt="Redirect image" src="@/assets/redirect.svg" />
       </div>
     </div>
     <div

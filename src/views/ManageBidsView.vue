@@ -10,7 +10,7 @@ import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
 
-const { walletAddress } = storeToRefs(etherStore);
+const { walletAddress, networkName } = storeToRefs(etherStore);
 const depositList = ref<ValidDeposit[]>([]);
 
 if (walletAddress.value) {
@@ -45,6 +45,12 @@ watch(walletAddress, async () => {
   if (walletDeposits) {
     depositList.value = walletDeposits;
   }
+});
+
+watch(networkName, async () => {
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value).then((res) => {
+    if (res) depositList.value = res;
+  });
 });
 </script>
 

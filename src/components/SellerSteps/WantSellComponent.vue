@@ -3,8 +3,14 @@ import { ref } from "vue";
 import CustomButton from "../CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { decimalCount } from "@/utils/decimalCount";
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import { connectProvider } from "@/blockchain/provider";
 
 // Reactive state
+const etherStore = useEtherStore();
+const { walletAddress } = storeToRefs(etherStore);
+
 const offer = ref<string | number>("");
 const pixKey = ref<string>("");
 
@@ -27,6 +33,11 @@ const handleInputEvent = (event: any): void => {
     return;
   }
   validDecimals.value = true;
+};
+
+const handleButtonClick = async (): Promise<void> => {
+  if (walletAddress.value) emit("approveTokens", { offer, pixKey });
+  else await connectProvider();
 };
 </script>
 
@@ -90,8 +101,8 @@ const handleInputEvent = (event: any): void => {
         </div>
       </div>
       <CustomButton
-        :text="'Aprovar tokens'"
-        @buttonClicked="emit('approveTokens', { offer, pixKey })"
+        :text="walletAddress ? 'Aprovar tokens' : 'Conectar Carteira'"
+        @buttonClicked="handleButtonClick()"
       />
     </div>
   </div>

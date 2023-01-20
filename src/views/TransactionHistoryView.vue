@@ -20,15 +20,23 @@ onMounted(async () => {
 });
 
 watch(walletAddress, async (newValue) => {
-  await listAllTransactionByWalletAddress(newValue).then((res) => {
-    if (res) allUserTransactions.value = res;
-  });
+  await listAllTransactionByWalletAddress(newValue)
+    .then((res) => {
+      if (res) allUserTransactions.value = res;
+    })
+    .catch(() => {
+      allUserTransactions.value = [];
+    });
 });
 
 watch(networkName, async () => {
-  await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
-    if (res) allUserTransactions.value = res;
-  });
+  await listAllTransactionByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) allUserTransactions.value = res;
+    })
+    .catch(() => {
+      allUserTransactions.value = [];
+    });
 });
 </script>
 

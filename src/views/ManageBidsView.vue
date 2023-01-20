@@ -41,20 +41,23 @@ const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
 };
 
 watch(walletAddress, async () => {
-  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-    walletAddress.value
-  );
-  if (walletDeposits) {
-    depositList.value = walletDeposits;
-  }
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) depositList.value = res;
+    })
+    .catch(() => {
+      depositList.value = [];
+    });
 });
 
 watch(networkName, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value).then(
-    (res) => {
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
+    .then((res) => {
       if (res) depositList.value = res;
-    }
-  );
+    })
+    .catch(() => {
+      depositList.value = [];
+    });
 });
 </script>
 

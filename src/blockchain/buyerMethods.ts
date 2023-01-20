@@ -1,6 +1,6 @@
 import { useEtherStore } from "@/store/ether";
 
-import { getProvider } from "./provider";
+import { getContract, getProvider } from "./provider";
 import { getP2PixAddress } from "./addresses";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
@@ -14,9 +14,7 @@ const addLock = async (
 ): Promise<string> => {
   const etherStore = useEtherStore();
 
-  const provider = getProvider();
-  const signer = provider.getSigner();
-  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+  const p2pContract = getContract();
 
   const lock = await p2pContract.lock(
     depositId, // BigNumber
@@ -75,26 +73,22 @@ const releaseLock = async (
   return release;
 };
 
-const cancelDeposit = async (depositId: BigNumber): Promise<boolean> => {
-  const provider = getProvider();
+const cancelDeposit = async (depositId: BigNumber): Promise<any> => {
+  const contract = getContract();
 
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
-  await contract.cancelDeposit(depositId);
+  const cancel = await contract.cancelDeposit(depositId);
+  await cancel.wait();
 
-  return true;
+  return cancel;
 };
 
-const withdrawDeposit = async (depositId: BigNumber): Promise<boolean> => {
-  const provider = getProvider();
+const withdrawDeposit = async (depositId: BigNumber): Promise<any> => {
+  const contract = getContract();
 
-  if (!provider) return false;
+  const withdraw = await contract.withdraw(depositId, []);
+  await withdraw.wait();
 
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
-  await contract.withdraw(depositId, []);
-
-  return true;
+  return withdraw;
 };
 
 export { cancelDeposit, withdrawDeposit, addLock, releaseLock };

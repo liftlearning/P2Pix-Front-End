@@ -3,8 +3,7 @@ import { Contract, ethers } from "ethers";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
-import { getProvider } from "./provider";
-import { getP2PixAddress } from "./addresses";
+import { getContract } from "./provider";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const getNetworksLiquidity = async (): Promise<void> => {
@@ -50,14 +49,13 @@ const getValidDeposits = async (
   if (contract) {
     p2pContract = contract;
   } else {
-    const provider = getProvider();
-    const signer = provider.getSigner();
-
-    p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+    p2pContract = getContract(true);
   }
 
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+
+  p2pContract = getContract(); // get metamask provider contract
 
   const depositList = await Promise.all(
     eventsDeposits.map(async (deposit) => {

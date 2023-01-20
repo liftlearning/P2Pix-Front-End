@@ -1,25 +1,34 @@
 import { useEtherStore } from "@/store/ether";
 
+import p2pix from "../utils/smart_contract_files/P2PIX.json";
+
 import { updateWalletStatus } from "./wallet";
 import {
   getProviderUrl,
   isPossibleNetwork,
   possibleChains,
   network2Chain,
+  getP2PixAddress,
 } from "./addresses";
 
 import { ethers } from "ethers";
 
-const getProvider = ():
-  | ethers.providers.Web3Provider
-  | ethers.providers.JsonRpcProvider => {
+const getProvider = (
+  onlyAlchemyProvider: boolean = false
+): ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider => {
   const window_ = window as any;
   const connection = window_.ethereum;
 
-  if (!connection)
+  if (!connection || onlyAlchemyProvider)
     return new ethers.providers.JsonRpcProvider(getProviderUrl()); // alchemy provider
 
   return new ethers.providers.Web3Provider(connection); // metamask provider
+};
+
+const getContract = (onlyAlchemyProvider: boolean = false) => {
+  const provider = getProvider(onlyAlchemyProvider);
+  const signer = provider.getSigner();
+  return new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 };
 
 const connectProvider = async (): Promise<void> => {
@@ -79,6 +88,7 @@ const requestNetworkChange = async (network: string): Promise<boolean> => {
 
 export {
   getProvider,
+  getContract,
   connectProvider,
   listenToNetworkChange,
   requestNetworkChange,

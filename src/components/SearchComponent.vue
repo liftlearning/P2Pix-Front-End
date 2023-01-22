@@ -1,41 +1,61 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import CustomButton from "../components/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
+import { connectProvider } from "@/blockchain/provider";
+import { verifyNetworkLiquidity } from "@/utils/networkLiquidity";
+import { NetworkEnum } from "@/model/NetworkEnum";
+import type { ValidDeposit } from "@/model/ValidDeposit";
+import { decimalCount } from "@/utils/decimalCount";
 
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, depositsValidList } = storeToRefs(etherStore);
+const {
+  walletAddress,
+  networkName,
+  depositsValidListGoerli,
+  depositsValidListMumbai,
+} = storeToRefs(etherStore);
 
 // Reactive state
-const tokenValue = ref(0);
-const enableSelectButton = ref(false);
-const hasLiquidity = ref(true);
-const validDecimals = ref(true);
-const selectedDeposit = ref();
+const tokenValue = ref<number>(0);
+const enableConfirmButton = ref<boolean>(false);
+const enableWalletButton = ref<boolean>(false);
+const hasLiquidity = ref<boolean>(true);
+const validDecimals = ref<boolean>(true);
+const selectedGoerliDeposit = ref<ValidDeposit>();
+const selectedMumbaiDeposit = ref<ValidDeposit>();
 
 // Emits
 const emit = defineEmits(["tokenBuy"]);
 
 // Blockchain methods
-const connectAccount = async () => {
-  await blockchain.connectProvider();
-  verifyLiquidity();
+const connectAccount = async (): Promise<void> => {
+  await connectProvider();
+
+  enableOrDisableConfirmButton();
+};
+
+const emitConfirmButton = (): void => {
+  const selectedDeposit =
+    networkName.value == NetworkEnum.ethereum
+      ? selectedGoerliDeposit.value
+      : selectedMumbaiDeposit.value;
+  emit("tokenBuy", selectedDeposit, tokenValue.value);
 };
 
 // Debounce methods
-const handleInputEvent = (event: any) => {
+const handleInputEvent = (event: any): void => {
   const { value } = event.target;
 
   tokenValue.value = Number(value);
 
-  if (decimalCount(tokenValue.value) > 2) {
+  if (decimalCount(String(tokenValue.value)) > 2) {
     validDecimals.value = false;
-    enableSelectButton.value = false;
+    enableConfirmButton.value = false;
     return;
   }
   validDecimals.value = true;
@@ -43,41 +63,52 @@ const handleInputEvent = (event: any) => {
   verifyLiquidity();
 };
 
-// Enable button methods
-// Check if has more than 2 decimal places
-const decimalCount = (num: Number) => {
-  const numStr = String(num);
-  if (numStr.includes(".")) {
-    return numStr.split(".")[1].length;
-  }
-  return 0;
-};
-
 // Verify if there is a valid deposit to buy
-const verifyLiquidity = () => {
-  enableSelectButton.value = false;
-  selectedDeposit.value = null;
-  if (!walletAddress.value || tokenValue.value <= 0) return;
+const verifyLiquidity = (): void => {
+  enableConfirmButton.value = false;
+  selectedGoerliDeposit.value = undefined;
+  selectedMumbaiDeposit.value = undefined;
 
-  depositsValidList.value.find((element) => {
-    const remaining = element.remaining;
-    if (
-      tokenValue.value!! <= remaining &&
-      tokenValue.value!! != 0 &&
-      element.seller !== walletAddress.value
-    ) {
-      enableSelectButton.value = true;
-      hasLiquidity.value = true;
-      selectedDeposit.value = element;
-      return true;
-    }
-    return false;
-  });
+  if (tokenValue.value <= 0) {
+    enableWalletButton.value = false;
+    return;
+  }
 
-  if (!enableSelectButton.value) {
+  selectedGoerliDeposit.value = verifyNetworkLiquidity(
+    tokenValue.value,
+    walletAddress.value,
+    depositsValidListGoerli.value
+  );
+  selectedMumbaiDeposit.value = verifyNetworkLiquidity(
+    tokenValue.value,
+    walletAddress.value,
+    depositsValidListMumbai.value
+  );
+
+  enableOrDisableConfirmButton();
+  if (selectedGoerliDeposit.value || selectedMumbaiDeposit.value) {
+    hasLiquidity.value = true;
+    enableWalletButton.value = true;
+  } else {
     hasLiquidity.value = false;
+    enableWalletButton.value = true;
   }
 };
+
+const enableOrDisableConfirmButton = (): void => {
+  if (selectedGoerliDeposit.value && networkName.value == NetworkEnum.ethereum)
+    enableConfirmButton.value = true;
+  else if (
+    selectedMumbaiDeposit.value &&
+    networkName.value == NetworkEnum.polygon
+  )
+    enableConfirmButton.value = true;
+  else enableConfirmButton.value = false;
+};
+
+watch(networkName, (): void => {
+  enableOrDisableConfirmButton();
+});
 </script>
 
 <template>
@@ -126,12 +157,14 @@ const verifyLiquidity = () => {
               src="@/assets/polygon.svg"
               width="24"
               height="24"
+              v-if="selectedMumbaiDeposit"
             />
             <img
               alt="Ethereum image"
               src="@/assets/ethereum.svg"
               width="24"
               height="24"
+              v-if="selectedGoerliDeposit"
             />
           </div>
         </div>
@@ -149,13 +182,14 @@ const verifyLiquidity = () => {
       <CustomButton
         v-if="!walletAddress"
         :text="'Conectar carteira'"
+        :is-disabled="!enableWalletButton"
         @buttonClicked="connectAccount()"
       />
       <CustomButton
         v-if="walletAddress"
         :text="'Confirmar compra'"
-        :is-disabled="!enableSelectButton"
-        @buttonClicked="emit('tokenBuy', { selectedDeposit, tokenValue })"
+        :is-disabled="!enableConfirmButton"
+        @buttonClicked="emitConfirmButton()"
       />
     </div>
   </div>

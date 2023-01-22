@@ -14,6 +14,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.3",
     "@heroicons/vue": "^2.0.12",
+    "alchemy-sdk": "^2.3.0",
     "axios": "^1.2.1",
     "crc": "^3.8.0",
     "pinia": "^2.0.23",

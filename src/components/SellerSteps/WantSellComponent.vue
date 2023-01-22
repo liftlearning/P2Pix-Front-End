@@ -2,23 +2,30 @@
 import { ref } from "vue";
 import CustomButton from "../CustomButton.vue";
 import { debounce } from "@/utils/debounce";
+import { decimalCount } from "@/utils/decimalCount";
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import { connectProvider } from "@/blockchain/provider";
 
 // Reactive state
-const offer = ref<string | number>("");
+const etherStore = useEtherStore();
+const { walletAddress } = storeToRefs(etherStore);
+
+const offer = ref<string>("");
 const pixKey = ref<string>("");
 
-const enableSelectButton = ref(false);
-const hasLiquidity = ref(true);
-const validDecimals = ref(true);
+const enableSelectButton = ref<boolean>(false);
+const hasLiquidity = ref<boolean>(true);
+const validDecimals = ref<boolean>(true);
 
 // Emits
 const emit = defineEmits(["approveTokens"]);
 
 // Debounce methods
-const handleInputEvent = (event: any) => {
+const handleInputEvent = (event: any): void => {
   const { value } = event.target;
 
-  offer.value = Number(value);
+  offer.value = value;
 
   if (decimalCount(offer.value) > 2) {
     validDecimals.value = false;
@@ -28,14 +35,12 @@ const handleInputEvent = (event: any) => {
   validDecimals.value = true;
 };
 
-// Enable button methods
-// Check if has more than 2 decimal places
-const decimalCount = (num: Number) => {
-  const numStr = String(num);
-  if (numStr.includes(".")) {
-    return numStr.split(".")[1].length;
-  }
-  return 0;
+const handleButtonClick = async (
+  offer: string,
+  pixKey: string
+): Promise<void> => {
+  if (walletAddress.value) emit("approveTokens", { offer, pixKey });
+  else await connectProvider();
 };
 </script>
 
@@ -99,8 +104,8 @@ const decimalCount = (num: Number) => {
         </div>
       </div>
       <CustomButton
-        :text="'Aprovar tokens'"
-        @buttonClicked="emit('approveTokens', { offer, pixKey })"
+        :text="walletAddress ? 'Aprovar tokens' : 'Conectar Carteira'"
+        @buttonClicked="handleButtonClick(offer, pixKey)"
       />
     </div>
   </div>

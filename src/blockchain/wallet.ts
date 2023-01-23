@@ -1,8 +1,9 @@
 import { useEtherStore } from "@/store/ether";
 
-import { getContract, getProvider } from "./provider";
-import { getTokenAddress, possibleChains } from "./addresses";
+import { getProvider } from "./provider";
+import { getP2PixAddress, getTokenAddress, possibleChains } from "./addresses";
 
+import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import mockToken from "../utils/smart_contract_files/MockToken.json";
 
 import { ethers, type Event } from "ethers";
@@ -51,7 +52,10 @@ const listValidDepositTransactionsByWalletAddress = async (
 const listAllTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]> => {
-  const p2pContract = getContract();
+  const provider = getProvider();
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
@@ -75,7 +79,10 @@ const listAllTransactionByWalletAddress = async (
 const listReleaseTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]> => {
-  const p2pContract = getContract();
+  const provider = getProvider();
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
   const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
   const eventsReleasedLocks = await p2pContract.queryFilter(
@@ -87,9 +94,78 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
+// list all Locks added by wallet adress
+const listValidLocksByWalletAddress = async (
+  walletAddress: string
+): Promise<Event[]>=> {
+  const provider = getProvider();
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+
+  const filterAddedLocks = p2pContract.filters.LockAdded(null);
+  const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
+
+  return eventsAddedLocks;
+};
+
+// list all Locks released by wallet adress
+const listReleasedLocksByWalletAddress = async (
+  walletAddress: string
+): Promise<Event[]> => {
+  const provider = getProvider();
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+
+  const filterReleasedLocks = p2pContract.filters.LockReleased(null);
+  const eventsReleasedLocks = await p2pContract.queryFilter(
+    filterReleasedLocks
+  );
+  return eventsReleasedLocks;
+};
+
+// check locks added but didnt released
+const checkUnreleasedLocks = async (
+  walletAddress: string
+): Promise<any> => {
+  const addedLocks = await listValidLocksByWalletAddress(walletAddress);
+  const releasedLocks = await listReleasedLocksByWalletAddress(walletAddress);
+
+  if (addedLocks.length === 0) {
+    return false;
+  }
+
+  if (addedLocks.length === releasedLocks.length) {
+    return false;
+  };
+
+  const lock = addedLocks.find((addedLock) =>
+    releasedLocks.some(
+      (releasedLock) => releasedLock?.args?.lockId == addedLock?.args?.lockID
+    )
+  );
+
+  const provider = getProvider();
+
+  const signer = provider.getSigner();
+  const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
+
+  const mappedDeposit = await p2pContract.mapDeposits(lock?.args?.depositID);
+
+  const pixTarget = mappedDeposit.pixTarget;
+  const amount = formatEther(lock?.args?.amount);
+
+  // addedLocks.forEach(lock => )
+  return [amount, pixTarget];
+};
+
 export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
+  listValidLocksByWalletAddress,
+  listReleasedLocksByWalletAddress,
+  checkUnreleasedLocks,
 };

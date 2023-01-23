@@ -27,7 +27,7 @@ const pix = ({
     value = undefined;
   }
   if (value) {
-    payload.push(formatEMV("54", value.toFixed(2)));
+    payload.push(formatEMV("54", Number(value).toFixed(2)));
   }
 
   payload.push(formatEMV("58", countryCode.toUpperCase())); // Country Code

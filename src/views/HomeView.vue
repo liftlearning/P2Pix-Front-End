@@ -2,7 +2,7 @@
 import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
@@ -10,7 +10,7 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
+import { listReleaseTransactionByWalletAddress, checkUnreleasedLocks } from "@/blockchain/wallet";
 import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 
@@ -29,6 +29,7 @@ const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
 const _lockID = ref<string>("");
+const currentLock = ref<any>();
 const loadingRelease = ref<boolean>(false);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 
@@ -82,6 +83,18 @@ const releaseTransaction = async (e2eId: string) => {
     loadingRelease.value = false;
   }
 };
+
+watch(walletAddress, async () => {
+  const walletLocks = await checkUnreleasedLocks(
+    walletAddress.value
+  );
+  if (walletLocks) {
+    console.log(walletLocks);
+    flowStep.value = Step.Buy;
+    tokenAmount.value = walletLocks[0];
+    pixTarget.value = walletLocks[1];
+  }
+});
 
 onMounted(async () => {
   await getNetworksLiquidity();

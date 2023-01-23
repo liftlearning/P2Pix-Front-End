@@ -103,7 +103,7 @@ const listValidLocksByWalletAddress = async (
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
-  const filterAddedLocks = p2pContract.filters.LockAdded(null);
+  const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
   const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
 
   return eventsAddedLocks;
@@ -118,7 +118,7 @@ const listReleasedLocksByWalletAddress = async (
   const signer = provider.getSigner();
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
-  const filterReleasedLocks = p2pContract.filters.LockReleased(null);
+  const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
   const eventsReleasedLocks = await p2pContract.queryFilter(
     filterReleasedLocks
   );

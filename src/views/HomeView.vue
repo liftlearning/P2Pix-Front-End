@@ -89,7 +89,6 @@ watch(walletAddress, async () => {
     walletAddress.value
   );
   if (walletLocks) {
-    console.log(walletLocks);
     flowStep.value = Step.Buy;
     tokenAmount.value = walletLocks[0];
     pixTarget.value = walletLocks[1];

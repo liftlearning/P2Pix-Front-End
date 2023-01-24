@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import CustomButton from "@/components/CustomButton/CustomButton.vue";
-import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
+import CustomButton from "@/components/CustomButton.vue";
+import ListingComponent from "@/components/ListingComponent.vue";
+import type { Event } from "ethers";
 
 // props
 const props = defineProps<{
-  lastWalletReleaseTransactions: any[];
-  tokenAmount: Number | undefined;
+  lastWalletReleaseTransactions: Event[];
+  tokenAmount: number | undefined;
 }>();
 
 // Emits

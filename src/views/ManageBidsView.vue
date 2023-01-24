@@ -1,28 +1,31 @@
 <script setup lang="ts">
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import blockchain from "../utils/blockchain";
-import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent.vue";
 import type { BigNumber } from "ethers";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
+import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
 
-const { walletAddress } = storeToRefs(etherStore);
-const depositList = ref<any[]>([]);
+const { walletAddress, networkName } = storeToRefs(etherStore);
+const depositList = ref<ValidDeposit[]>([]);
 
-if (walletAddress.value) {
-  const walletDeposits =
-    await blockchain.listValidDepositTransactionsByWalletAddress(
+onMounted(async () => {
+  if (walletAddress.value) {
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
-  if (walletDeposits) {
-    depositList.value = walletDeposits;
+    if (walletDeposits) {
+      depositList.value = walletDeposits;
+    }
   }
-}
+});
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await blockchain.cancelDeposit(depositID);
+  const response = await cancelDeposit(depositID);
   if (response == true) {
     console.log("Depósito cancelado com sucesso.");
     depositList.value.splice(index, 1);
@@ -30,7 +33,7 @@ const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
 };
 
 const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await blockchain.withdrawDeposit(depositID);
+  const response = await withdrawDeposit(depositID);
   if (response == true) {
     console.log("Token retirado com sucesso.");
     depositList.value.splice(index, 1);
@@ -38,13 +41,23 @@ const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
 };
 
 watch(walletAddress, async () => {
-  const walletDeposits =
-    await blockchain.listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
-  if (walletDeposits) {
-    depositList.value = walletDeposits;
-  }
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) depositList.value = res;
+    })
+    .catch(() => {
+      depositList.value = [];
+    });
+});
+
+watch(networkName, async () => {
+  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) depositList.value = res;
+    })
+    .catch(() => {
+      depositList.value = [];
+    });
 });
 </script>
 

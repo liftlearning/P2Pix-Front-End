@@ -1,23 +1,18 @@
+import { NetworkEnum } from "@/model/NetworkEnum";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 import { defineStore } from "pinia";
 
 export const useEtherStore = defineStore("ether", {
   state: () => ({
     walletAddress: "",
     balance: "",
+    networkName: NetworkEnum.ethereum,
     loadingLock: false,
     sellerView: false,
-    // Depósitos válidos para compra
-    depositsValidList: [] as any[],
-    // Depósitos adicionados na blockchain
-    depositsAddedList: [] as any[],
-    // Depósitos expirados na blockchain
-    depositsExpiredList: [] as any[],
-    // Locks adicionados na blockchain
-    locksAddedList: [] as any[],
-    // Locks 'released' na blockchain
-    locksReleasedList: [] as any[],
-    // Locks expirados na blockchain
-    locksExpiredList: [] as any[],
+    // Depósitos válidos para compra GOERLI
+    depositsValidListGoerli: [] as ValidDeposit[],
+    // Depósitos válidos para compra MUMBAI
+    depositsValidListMumbai: [] as ValidDeposit[],
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -26,35 +21,27 @@ export const useEtherStore = defineStore("ether", {
     setBalance(balance: string) {
       this.balance = balance;
     },
+    setNetworkName(networkName: NetworkEnum) {
+      this.networkName = networkName;
+    },
     setLoadingLock(isLoadingLock: boolean) {
       this.loadingLock = isLoadingLock;
     },
     setSellerView(sellerView: boolean) {
       this.sellerView = sellerView;
     },
-    setDepositsValidList(depositsValidList: any[]) {
-      this.depositsValidList = depositsValidList;
+    setDepositsValidListGoerli(depositsValidList: ValidDeposit[]) {
+      this.depositsValidListGoerli = depositsValidList;
     },
-    setDepositsAddedList(depositsAddedList: any[]) {
-      this.depositsAddedList = depositsAddedList;
-    },
-    setDepositsExpiredList(depositsExpiredList: any[]) {
-      this.depositsExpiredList = depositsExpiredList;
-    },
-    setLocksAddedList(locksAddedList: any[]) {
-      this.locksAddedList = locksAddedList;
-    },
-    setLocksReleasedList(locksReleasedList: any[]) {
-      this.locksReleasedList = locksReleasedList;
-    },
-    setLocksExpiredList(locksExpiredList: any[]) {
-      this.locksExpiredList = locksExpiredList;
+    setDepositsValidListMumbai(depositsValidList: ValidDeposit[]) {
+      this.depositsValidListMumbai = depositsValidList;
     },
   },
+  // Alterar para integrar com mumbai
   getters: {
     getValidDepositByWalletAddress: (state) => {
       return (walletAddress: string) =>
-        state.depositsValidList
+        state.depositsValidListGoerli
           .filter((deposit) => deposit.seller == walletAddress)
           .sort((a, b) => {
             return b.blockNumber - a.blockNumber;

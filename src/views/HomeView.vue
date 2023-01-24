@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import SearchComponent from "../components/SearchComponent.vue";
 import ValidationComponent from "../components/LoadingComponent.vue";
-import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
-import blockchain from "../utils/blockchain";
-import { ref } from "vue";
-
+import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
+import { ref, onMounted } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "../components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
+import { addLock, releaseLock } from "@/blockchain/buyerMethods";
+import { updateWalletStatus } from "@/blockchain/wallet";
+import { getNetworksLiquidity } from "@/blockchain/events";
+import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
+import type { Event } from "ethers";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 enum Step {
   Search,
@@ -19,33 +23,33 @@ const etherStore = useEtherStore();
 etherStore.setSellerView(false);
 
 // States
-const { loadingLock, walletAddress, locksAddedList } = storeToRefs(etherStore);
+const { loadingLock, walletAddress } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
-const lockTransactionHash = ref<string>("");
-const lockId = ref<string>("");
-const loadingRelease = ref<Boolean>(false);
-const lastWalletReleaseTransactions = ref<any[]>([]);
+const _lockID = ref<string>("");
+const loadingRelease = ref<boolean>(false);
+const lastWalletReleaseTransactions = ref<Event[]>([]);
 
-const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
+const confirmBuyClick = async (
+  selectedDeposit: ValidDeposit,
+  tokenValue: number
+) => {
   // finish buy screen
-  const depositDetail = selectedDeposit;
-  const depositId = selectedDeposit.depositID;
   pixTarget.value = selectedDeposit.pixKey;
   tokenAmount.value = tokenValue;
 
   // Makes lock with deposit ID and the Amount
-  if (depositDetail) {
+  if (selectedDeposit) {
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await blockchain
-      .addLock(depositId, tokenValue)
-      .then((lock) => {
-        lockTransactionHash.value = lock.hash;
+    await addLock(selectedDeposit.depositID, tokenValue)
+      .then((lockID) => {
+        _lockID.value = lockID;
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         flowStep.value = Step.Search;
       });
 
@@ -53,38 +57,34 @@ const confirmBuyClick = async ({ selectedDeposit, tokenValue }: any) => {
   }
 };
 
-const releaseTransaction = async ({ e2eId }: any) => {
+const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  const findLock = locksAddedList.value.find((element) => {
-    if (element.transactionHash === lockTransactionHash.value) {
-      lockId.value = element.args.lockID;
-      return true;
-    }
-    return false;
-  });
-
-  if (findLock && tokenAmount.value) {
-    const release = await blockchain.releaseLock(
+  if (_lockID.value && tokenAmount.value) {
+    const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
       e2eId,
-      lockId.value
+      _lockID.value
     );
     release.wait();
 
-    await blockchain
-      .listReleaseTransactionByWalletAddress(walletAddress.value.toLowerCase())
-      .then((releaseTransactions) => {
-        if (releaseTransactions)
-          lastWalletReleaseTransactions.value = releaseTransactions;
-      });
+    await listReleaseTransactionByWalletAddress(
+      walletAddress.value.toLowerCase()
+    ).then((releaseTransactions) => {
+      if (releaseTransactions)
+        lastWalletReleaseTransactions.value = releaseTransactions;
+    });
 
-    await blockchain.updateWalletStatus();
+    await updateWalletStatus();
     loadingRelease.value = false;
   }
 };
+
+onMounted(async () => {
+  await getNetworksLiquidity();
+});
 </script>
 
 <template>

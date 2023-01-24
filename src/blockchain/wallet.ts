@@ -3,13 +3,13 @@ import { useEtherStore } from "@/store/ether";
 import { getProvider, getContract } from "./provider";
 import { getTokenAddress, possibleChains } from "./addresses";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
 import mockToken from "../utils/smart_contract_files/MockToken.json";
 
 import { ethers, type Event } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { Pix } from "@/model/Pix";
 
 const updateWalletStatus = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -116,17 +116,17 @@ const listReleasedLocksByWalletAddress = async (
 // check locks added but didnt released
 const checkUnreleasedLocks = async (
   walletAddress: string
-): Promise<any> => {
+): Promise<Pix> => {
   const addedLocks = await listValidLocksByWalletAddress(walletAddress);
   const releasedLocks = await listReleasedLocksByWalletAddress(walletAddress);
 
-  if (addedLocks.length === 0) {
-    return false;
-  }
-
-  if (addedLocks.length === releasedLocks.length) {
-    return false;
+  const pixData: Pix = {
+    pixKey: "",
   };
+
+  if (addedLocks.length === 0 || addedLocks.length === releasedLocks.length) {
+    return pixData;
+  }
 
   const lock = addedLocks.find((addedLock) =>
     releasedLocks.some(
@@ -140,9 +140,10 @@ const checkUnreleasedLocks = async (
 
   const pixTarget = mappedDeposit.pixTarget;
   const amount = formatEther(lock?.args?.amount);
-
+  pixData.pixKey = pixTarget;
+  pixData.value = Number(amount)
   // addedLocks.forEach(lock => )
-  return [amount, pixTarget];
+  return pixData;
 };
 
 export {

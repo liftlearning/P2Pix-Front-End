@@ -85,13 +85,11 @@ const releaseTransaction = async (e2eId: string) => {
 };
 
 watch(walletAddress, async () => {
-  const walletLocks = await checkUnreleasedLocks(
-    walletAddress.value
-  );
-  if (walletLocks) {
+  const walletLocks = await checkUnreleasedLocks(walletAddress.value);
+  if (walletLocks.pixKey != ""){
     flowStep.value = Step.Buy;
-    tokenAmount.value = walletLocks[0];
-    pixTarget.value = walletLocks[1];
+    tokenAmount.value = walletLocks.value;
+    pixTarget.value = walletLocks.pixKey;
   }
 });
 

@@ -67,7 +67,7 @@ p {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 .blur-container-row {
   @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;

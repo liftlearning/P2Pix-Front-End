@@ -45,7 +45,7 @@ const handleButtonClick = async (
 </script>
 
 <template>
-  <div class="page">
+  <div class="page w-full">
     <div class="text-container">
       <span class="text font-extrabold text-5xl max-w-[29rem]"
         >Venda cripto e receba em Pix</span
@@ -59,7 +59,7 @@ const handleButtonClick = async (
       <div
         class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
       >
-        <div class="flex justify-between w-full items-center">
+        <div class="flex justify-between items-center">
           <input
             type="number"
             v-model="offer"
@@ -131,11 +131,11 @@ const handleButtonClick = async (
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
 }
 
 input[type="number"] {

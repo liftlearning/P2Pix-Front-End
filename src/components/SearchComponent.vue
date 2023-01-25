@@ -215,7 +215,7 @@ watch(networkName, (): void => {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 
 .blur-container {

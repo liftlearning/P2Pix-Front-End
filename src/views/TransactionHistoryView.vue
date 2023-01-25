@@ -1,34 +1,42 @@
 <script setup lang="ts">
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import ListingComponent from "@/components/ListingComponent.vue";
-import blockchain from "../utils/blockchain";
+import { listAllTransactionByWalletAddress } from "@/blockchain/wallet";
+import type { Event } from "ethers";
+import type { ValidDeposit } from "@/model/ValidDeposit";
 
 const etherStore = useEtherStore();
-const { walletAddress } = storeToRefs(etherStore);
-const allUserTransactions = ref<any[]>([]);
+const { walletAddress, networkName } = storeToRefs(etherStore);
+const allUserTransactions = ref<(Event | ValidDeposit)[]>([]);
 
-if (walletAddress.value) {
-  await blockchain
-    .listAllTransactionByWalletAddress(walletAddress.value)
-    .then((res) => {
+onMounted(async () => {
+  if (walletAddress.value) {
+    await listAllTransactionByWalletAddress(walletAddress.value).then((res) => {
       if (res) allUserTransactions.value = res;
     });
-}
-
-watch(walletAddress, async (newValue) => {
-  await blockchain.listAllTransactionByWalletAddress(newValue).then((res) => {
-    if (res) allUserTransactions.value = res;
-  });
+  }
 });
 
 watch(walletAddress, async (newValue) => {
-  console.log(newValue);
+  await listAllTransactionByWalletAddress(newValue)
+    .then((res) => {
+      if (res) allUserTransactions.value = res;
+    })
+    .catch(() => {
+      allUserTransactions.value = [];
+    });
 });
 
-watch(allUserTransactions, (newValue) => {
-  console.log(newValue);
+watch(networkName, async () => {
+  await listAllTransactionByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) allUserTransactions.value = res;
+    })
+    .catch(() => {
+      allUserTransactions.value = [];
+    });
 });
 </script>
 

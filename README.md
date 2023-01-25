@@ -6,9 +6,30 @@
 This application aims to create a democratic and secure solution for the purchase and sale of ERC20 tokens, through the PIX, integrating the functionalities of smart contracts (smart contracts) of the blockchain with a receipt by digital signature. Allowing the integration of national financial system transactions to public blockchains, dispensing with custody through intermediaries.
 
 # Table of Contents
+* [Metamask Tutorial](#metamask-tutorial)
 * [Recommended IDE Setup](#recommended-ide-setup)
 * [Dependencies](#dependencies)
 * [Build Setup](#build-setup)
+## Metamask Tutorial
+### Installation
+
+Install the Metamask extension at https://metamask.io/download/
+
+### Enable Testnets on Metamask
+
+Go to Settings -> Advanced -> Show Testnets
+
+Now you can select the Goerli testnet.
+
+### Add Polygon Mumbai to your Metamask
+
+To add the Mumbai network, follow the instructions at:
+https://www.youtube.com/watch?v=Jegmru0Q0j4
+
+### Import the MBRL token
+
+Go to Import Tokens and paste the following address: `0x294003F602c321627152c6b7DED3EAb5bEa853Ee`
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
@@ -31,11 +52,13 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Dependencies
 
-### Smart Contract
-It is necessary to be running the smart contract locally to have access to all the functionalities of the application. The smart contract repository and instructions on how to run it can be found at [https://github.com/doiim/p2pix-smart-contracts](https://github.com/doiim/p2pix-smart-contracts)
-
 ### API
 For full operation of the application, it is necessary to correctly configure the variable that points to the api in the .env file, in the repository there is an .env.example file, just rename it to just .env and modify the variable `VITE_API_URL`. The api can be run locally see [https://github.com/liftlearning/Pix-Explorer-Back-End](https://github.com/liftlearning/Pix-Explorer-Back-End), or it can be pointed to just her staging address: [https://p2pix-block-explorer-api-staging.vercel.app/](https://p2pix-block-explorer-api-staging.vercel.app/)
+
+### Alchemy Keys
+In the .env file, set `VITE_GOERLI_API_URL=https://eth-goerli.g.alchemy.com/v2/Zu9m4b2U_EzVU_zd-vgZDOleY8OF1DNP` and `VITE_MUMBAI_API_URL=https://polygon-mumbai.g.alchemy.com/v2/ZANeCqfj6VsXGpOH6gWAP6SIVIgD9Pwv`
+
+You can also replace it with your own Alchemy Keys if you have one.
 
 ## Build Setup
 

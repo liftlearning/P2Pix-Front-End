@@ -2,12 +2,15 @@
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "../store/ether";
 import { ref } from "vue";
-import blockchain from "../utils/blockchain";
+import { NetworkEnum } from "@/model/NetworkEnum";
+import { connectProvider, requestNetworkChange } from "../blockchain/provider";
+import ethereumImage from "../assets/ethereum.svg";
+import polygonImage from "../assets/polygon.svg";
 
 // Store reference
 const etherStore = useEtherStore();
 
-const { walletAddress, balance, sellerView } = storeToRefs(etherStore);
+const { walletAddress, sellerView } = storeToRefs(etherStore);
 
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
@@ -16,8 +19,8 @@ const currencyMenuOpenToggle = ref<boolean>(false);
 const currencyMenuHoverToggle = ref<boolean>(false);
 
 //Methods
-const connectMetaMask = () => {
-  blockchain.connectProvider();
+const connectMetaMask = async (): Promise<void> => {
+  await connectProvider();
 };
 
 const formatWalletAddress = (): string => {
@@ -30,19 +33,30 @@ const formatWalletAddress = (): string => {
   return `${initialText}...${finalText}`;
 };
 
-const formatWalletBalance = (): String => {
-  const fixed = Number(balance.value);
-  return fixed.toFixed(2);
-};
-
-const disconnectUser = () => {
+const disconnectUser = (): void => {
   etherStore.setWalletAddress("");
   closeMenu();
   window.location.reload();
 };
 
-const closeMenu = () => {
+const closeMenu = (): void => {
   menuOpenToggle.value = false;
+};
+
+const networkChange = async (network: NetworkEnum): Promise<void> => {
+  currencyMenuOpenToggle.value = false;
+  const change = await requestNetworkChange(network);
+  if (change) etherStore.setNetworkName(network);
+};
+
+const getNetworkImage = (networkName: NetworkEnum): string => {
+  let validImages = {
+    Ethereum: ethereumImage,
+    Polygon: polygonImage,
+    Localhost: ethereumImage,
+  };
+
+  return validImages[networkName];
 };
 </script>
 
@@ -63,6 +77,102 @@ const closeMenu = () => {
       <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>
+      <div class="flex flex-col" v-if="walletAddress">
+        <div
+          class="group top-bar-info cursor-pointer hover:bg-white"
+          @click="
+            [
+              (currencyMenuOpenToggle = !currencyMenuOpenToggle),
+              (menuOpenToggle = false),
+            ]
+          "
+          @mouseover="currencyMenuHoverToggle = true"
+          @mouseout="currencyMenuHoverToggle = false"
+          :style="{
+            backgroundColor: currencyMenuOpenToggle
+              ? '#F9F9F9'
+              : currencyMenuHoverToggle
+              ? '#F9F9F9'
+              : 'transparent',
+          }"
+        >
+          <img
+            alt="Choosed network image"
+            :src="getNetworkImage(etherStore.networkName)"
+          />
+          <span
+            class="default-text group-hover:text-gray-900"
+            :style="{
+              color: currencyMenuOpenToggle
+                ? '#000000'
+                : currencyMenuHoverToggle
+                ? '#000000'
+                : 'rgb(249 250 251)',
+            }"
+          >
+            {{ etherStore.networkName }}
+          </span>
+          <img
+            class="text-gray-900"
+            v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
+            alt="Chevron Down"
+            src="@/assets/chevronDown.svg"
+          />
+          <img
+            v-if="currencyMenuOpenToggle"
+            alt="Chevron Up"
+            src="@/assets/chevronUp.svg"
+          />
+          <img
+            v-if="currencyMenuHoverToggle && !currencyMenuOpenToggle"
+            alt="Chevron Down Black"
+            src="@/assets/chevronDownBlack.svg"
+          />
+        </div>
+        <div
+          v-show="currencyMenuOpenToggle"
+          class="mt-10 pl-3 absolute w-full text-gray-900"
+        >
+          <div class="mt-2">
+            <div class="bg-white rounded-md z-10">
+              <div
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+                @click="networkChange(NetworkEnum.ethereum)"
+              >
+                <img
+                  alt="Ethereum image"
+                  width="20"
+                  height="20"
+                  src="@/assets/ethereum.svg"
+                />
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
+                  Ethereum
+                </span>
+              </div>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+              <div
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+                @click="networkChange(NetworkEnum.polygon)"
+              >
+                <img
+                  alt="Polygon image"
+                  width="20"
+                  height="20"
+                  src="@/assets/polygon.svg"
+                />
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
+                  Polygon
+                </span>
+              </div>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <button
         type="button"
         v-if="!walletAddress"
@@ -72,95 +182,6 @@ const closeMenu = () => {
         Conectar carteira
       </button>
       <div v-if="walletAddress" class="account-info">
-        <div class="flex flex-col">
-          <div
-            class="group top-bar-info cursor-pointer hover:bg-white"
-            @click="
-              [
-                (currencyMenuOpenToggle = !currencyMenuOpenToggle),
-                (menuOpenToggle = false),
-              ]
-            "
-            @mouseover="currencyMenuHoverToggle = true"
-            @mouseout="currencyMenuHoverToggle = false"
-            :style="{
-              backgroundColor: currencyMenuOpenToggle
-                ? '#F9F9F9'
-                : currencyMenuHoverToggle
-                ? '#F9F9F9'
-                : 'transparent',
-            }"
-          >
-            <img alt="Ethereum image" src="@/assets/ethereum.svg" />
-            <span
-              class="default-text group-hover:text-gray-900"
-              :style="{
-                color: currencyMenuOpenToggle
-                  ? '#000000'
-                  : currencyMenuHoverToggle
-                  ? '#000000'
-                  : 'rgb(249 250 251)',
-              }"
-            >
-              Ethereum
-            </span>
-            <img
-              class="text-gray-900"
-              v-if="!currencyMenuHoverToggle && !currencyMenuOpenToggle"
-              alt="Chevron Down"
-              src="@/assets/chevronDown.svg"
-            />
-            <img
-              v-if="currencyMenuOpenToggle"
-              alt="Chevron Up"
-              src="@/assets/chevronUp.svg"
-            />
-            <img
-              v-if="currencyMenuHoverToggle && !currencyMenuOpenToggle"
-              alt="Chevron Down Black"
-              src="@/assets/chevronDownBlack.svg"
-            />
-          </div>
-          <div
-            v-show="currencyMenuOpenToggle"
-            class="mt-10 pl-3 absolute w-full text-gray-900"
-          >
-            <div class="mt-2">
-              <div class="bg-white rounded-md z-10">
-                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
-                  <img
-                    alt="Ethereum image"
-                    width="20"
-                    height="20"
-                    src="@/assets/ethereum.svg"
-                  />
-                  <span
-                    class="text-gray-900 py-4 text-end font-semibold text-sm"
-                  >
-                    Ethereum
-                  </span>
-                </div>
-                <div class="w-full flex justify-center">
-                  <hr class="w-4/5" />
-                </div>
-                <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
-                  <img
-                    alt="Polygon image"
-                    width="20"
-                    height="20"
-                    src="@/assets/polygon.svg"
-                  />
-                  <span
-                    class="text-gray-900 py-4 text-end font-semibold text-sm"
-                  >
-                    Polygon
-                  </span>
-                  <hr />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="flex flex-col">
           <div
             class="top-bar-info cursor-pointer"
@@ -241,12 +262,6 @@ const closeMenu = () => {
             </div>
           </div>
         </div>
-        <div class="top-bar-info">
-          <span class="default-text text-sm">
-            MBRZ: {{ formatWalletBalance() }}
-          </span>
-        </div>
-        <!-- Temporary div, just to show a wallet's balance -->
       </div>
     </div>
   </header>

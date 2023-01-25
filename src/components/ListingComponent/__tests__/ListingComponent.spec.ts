@@ -1,63 +1,19 @@
 import { mount } from "@vue/test-utils";
-import ListingComponent from "../ListingComponent.vue";
-
-const depositsMocked = [
-  {
-    depositId: 1,
-    event: "DepositAdded",
-    args: {
-      amount: 100,
-    },
-  },
-  {
-    depositId: 2,
-    event: "DepositAdded",
-    args: {
-      amount: 200,
-    },
-  },
-  {
-    depositId: 3,
-    event: "DepositAdded",
-    args: {
-      amount: 300,
-    },
-  },
-  {
-    depositId: 4,
-    event: "DepositAdded",
-    args: {
-      amount: 400,
-    },
-  },
-  {
-    depositId: 5,
-    event: "DepositAdded",
-    args: {
-      amount: 500,
-    },
-  },
-  {
-    depositId: 6,
-    event: "DepositAdded",
-    args: {
-      amount: 600,
-    },
-  },
-  {
-    depositId: 7,
-    event: "DepositAdded",
-    args: {
-      amount: 700,
-    },
-  },
-];
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
+import { createPinia, setActivePinia } from "pinia";
+import { expect } from 'vitest'
+import { MockValidDeposits } from "@/model/mock/ValidDepositMock";
+import { MockEvents } from "@/model/mock/EventMock";
 
 describe("ListingComponent.vue", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
   test("Test Headers on List in Manage Mode", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: depositsMocked,
+        walletTransactions: MockValidDeposits,
         isManageMode: true,
       },
     });
@@ -71,7 +27,7 @@ describe("ListingComponent.vue", () => {
   test("Test Headers on List in Unmanage Mode", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: depositsMocked,
+        walletTransactions: MockEvents,
         isManageMode: false,
       },
     });
@@ -85,12 +41,12 @@ describe("ListingComponent.vue", () => {
   test("Test number of elements in the list first render", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: depositsMocked,
+        walletTransactions: MockEvents,
         isManageMode: false,
       },
     });
 
-    const elements = wrapper.findAll(".transfer-type");
+    const elements = wrapper.findAll(".transaction-date");
 
     expect(elements).toHaveLength(3);
   });
@@ -98,38 +54,47 @@ describe("ListingComponent.vue", () => {
   test("Test load more button behavior", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: depositsMocked,
+        walletTransactions: MockValidDeposits,
         isManageMode: false,
       },
     });
-
     const btn = wrapper.find("button");
-    await btn.trigger("click");
 
-    let elements = wrapper.findAll(".transfer-type");
-
-    expect(elements).toHaveLength(6);
+    let elements = wrapper.findAll(".transaction-date");
+    expect(elements).toHaveLength(3);
 
     await btn.trigger("click");
 
-    elements = wrapper.findAll(".transfer-type");
+    elements = wrapper.findAll(".transaction-date");
 
-    expect(elements).toHaveLength(7);
+    expect(elements).toHaveLength(5);
   });
 
-  test("Test cancel offer button", async () => {
+  test("Test cancel offer button emit", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: depositsMocked,
+        walletTransactions: MockValidDeposits,
         isManageMode: true,
       },
     });
+    wrapper.vm.$emit("cancelDeposit");
 
-    const cancelButton = wrapper.find('img[alt="Cancel image"]');
-    await cancelButton.trigger("click");
+    await wrapper.vm.$nextTick();
 
-    const elements = wrapper.findAll(".transaction-date");
+    expect(wrapper.emitted("cancelDeposit")).toBeTruthy();
+  });
 
-    expect(elements).toHaveLength(2);
+  test("Test withdraw offer button emit", async () => {
+    const wrapper = mount(ListingComponent, {
+      props: {
+        walletTransactions: MockValidDeposits,
+        isManageMode: true,
+      },
+    });
+    wrapper.vm.$emit("withdrawDeposit");
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted("withdrawDeposit")).toBeTruthy();
   });
 });

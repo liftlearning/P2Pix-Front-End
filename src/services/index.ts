@@ -8,7 +8,7 @@ const defaultConfig = {
 
 const api = axios.create({
   ...defaultConfig,
-  baseURL: process.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 export default api;

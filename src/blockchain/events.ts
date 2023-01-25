@@ -11,11 +11,11 @@ const getNetworksLiquidity = async (): Promise<void> => {
   console.log("Loading events");
 
   const goerliProvider = new ethers.providers.JsonRpcProvider(
-    process.env.VITE_GOERLI_API_URL,
+    import.meta.env.VITE_GOERLI_API_URL,
     5
   ); // goerli provider
   const mumbaiProvider = new ethers.providers.JsonRpcProvider(
-    process.env.VITE_MUMBAI_API_URL,
+    import.meta.env.VITE_MUMBAI_API_URL,
     80001
   ); // mumbai provider
   
@@ -54,6 +54,7 @@ const getValidDeposits = async (
 
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
+  console.log(eventsDeposits);
 
   if(!contract) p2pContract = getContract(); // get metamask provider contract
 

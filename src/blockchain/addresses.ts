@@ -27,8 +27,8 @@ const getProviderUrl = (): string => {
   const etherStore = useEtherStore();
 
   const possibleProvidersUrls: { [key: string]: string } = {
-    Ethereum: process.env.VITE_GOERLI_API_URL ? process.env.VITE_GOERLI_API_URL : "",
-    Polygon: process.env.VITE_MUMBAI_API_URL ? process.env.VITE_MUMBAI_API_URL : "",
+    Ethereum: import.meta.env.VITE_GOERLI_API_URL,
+    Polygon: import.meta.env.VITE_MUMBAI_API_URL,
   };
 
   return possibleProvidersUrls[etherStore.networkName];

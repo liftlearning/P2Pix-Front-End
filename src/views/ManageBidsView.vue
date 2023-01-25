@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch, onMounted } from "vue";
 import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";

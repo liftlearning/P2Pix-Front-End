@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useEtherStore } from "../../store/ether";
+import { useEtherStore } from "@/store/ether";
 import { ref } from "vue";
 import { NetworkEnum } from "@/model/NetworkEnum";
-import { connectProvider, requestNetworkChange } from "../blockchain/provider";
-import ethereumImage from "../assets/ethereum.svg";
-import polygonImage from "../assets/polygon.svg";
+import { connectProvider, requestNetworkChange } from "@/blockchain/provider";
+import ethereumImage from "@/assets/ethereum.svg";
+import polygonImage from "@/assets/polygon.svg";
 
 // Store reference
 const etherStore = useEtherStore();

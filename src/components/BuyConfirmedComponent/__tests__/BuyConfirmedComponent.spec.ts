@@ -1,13 +1,20 @@
-import { mount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import BuyConfirmedComponent from "../BuyConfirmedComponent.vue";
+import { createPinia, setActivePinia } from "pinia";
+import { MockEvents } from "@/model/mock/EventMock";
 
 describe("BuyConfirmedComponent.vue", () => {
-  const wrapper = mount(BuyConfirmedComponent, {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  const wrapper = shallowMount(BuyConfirmedComponent, {
     props: {
-      lastWalletReleaseTransactions: [],
+      lastWalletReleaseTransactions: MockEvents,
       tokenAmount: 1,
     },
   });
+
   test("Test component Header Text", () => {
     expect(wrapper.html()).toContain("Os tokens já foram transferidos");
     expect(wrapper.html()).toContain("para a sua carteira!");

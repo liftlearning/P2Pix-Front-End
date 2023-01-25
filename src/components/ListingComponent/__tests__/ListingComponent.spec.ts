@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import { createPinia, setActivePinia } from "pinia";
-import { expect } from 'vitest'
+import { expect } from "vitest";
 import { MockValidDeposits } from "@/model/mock/ValidDepositMock";
 import { MockEvents } from "@/model/mock/EventMock";
 

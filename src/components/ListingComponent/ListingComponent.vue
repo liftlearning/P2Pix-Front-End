@@ -56,9 +56,9 @@ const getEventName = (event: string | undefined): string => {
 };
 
 const getAmountFormatted = (amount?: BigNumber): string => {
-  if(!amount) return ""
+  if (!amount) return "";
   return formatEther(amount);
-}
+};
 
 // watch props changes
 watch(props, async (): Promise<void> => {
@@ -104,7 +104,9 @@ showInitialItems();
     >
       <span class="last-release-info">
         {{
-          isValidDeposit(item) ? item.remaining : getAmountFormatted(item.args?.amount)
+          isValidDeposit(item)
+            ? item.remaining
+            : getAmountFormatted(item.args?.amount)
         }}
         BRZ
       </span>

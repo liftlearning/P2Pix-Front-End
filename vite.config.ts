@@ -8,7 +8,7 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: "jsdom",
   },
   plugins: [vue(), vueJsx()],
   resolve: {

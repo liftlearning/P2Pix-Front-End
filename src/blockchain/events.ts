@@ -18,7 +18,7 @@ const getNetworksLiquidity = async (): Promise<void> => {
     import.meta.env.VITE_MUMBAI_API_URL,
     80001
   ); // mumbai provider
-  
+
   const p2pContractGoerli = new ethers.Contract(
     "0x5f3EFA9A90532914545CEf527C530658af87e196",
     p2pix.abi,
@@ -29,7 +29,7 @@ const getNetworksLiquidity = async (): Promise<void> => {
     p2pix.abi,
     mumbaiProvider
   );
-  
+
   const depositListGoerli = await getValidDeposits(p2pContractGoerli);
 
   const depositListMumbai = await getValidDeposits(p2pContractMumbai);
@@ -56,7 +56,7 @@ const getValidDeposits = async (
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
   console.log(eventsDeposits);
 
-  if(!contract) p2pContract = getContract(); // get metamask provider contract
+  if (!contract) p2pContract = getContract(); // get metamask provider contract
 
   const depositList = await Promise.all(
     eventsDeposits.map(async (deposit) => {

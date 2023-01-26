@@ -111,7 +111,6 @@ showInitialItems();
         BRZ
       </span>
 
-      <!-- TODO: change this hardcoded date -->
       <span class="last-release-info transaction-date"> 20 out 2022 </span>
 
       <span class="last-release-info" v-if="!props.isManageMode">

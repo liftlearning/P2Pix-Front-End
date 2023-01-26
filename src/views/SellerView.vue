@@ -75,5 +75,3 @@ const sendNetwork = async () => {
     />
   </div>
 </template>
-
-<style scoped></style>

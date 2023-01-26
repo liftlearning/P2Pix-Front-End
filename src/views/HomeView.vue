@@ -29,7 +29,6 @@ const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
 const _lockID = ref<string>("");
-const currentLock = ref<any>();
 const loadingRelease = ref<boolean>(false);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 

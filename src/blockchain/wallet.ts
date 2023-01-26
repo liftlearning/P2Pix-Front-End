@@ -106,7 +106,7 @@ const listReleasedLocksByWalletAddress = async (
 ): Promise<Event[]> => {
   const p2pContract = getContract();
 
-  const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
+  const filterReleasedLocks = p2pContract.filters.LockReleased(null);
   const eventsReleasedLocks = await p2pContract.queryFilter(
     filterReleasedLocks
   );
@@ -114,9 +114,7 @@ const listReleasedLocksByWalletAddress = async (
 };
 
 // check locks added but didnt released
-const checkUnreleasedLocks = async (
-  walletAddress: string
-): Promise<Pix> => {
+const checkUnreleasedLocks = async (walletAddress: string): Promise<Pix> => {
   const addedLocks = await listValidLocksByWalletAddress(walletAddress);
   const releasedLocks = await listReleasedLocksByWalletAddress(walletAddress);
 
@@ -124,25 +122,39 @@ const checkUnreleasedLocks = async (
     pixKey: "",
   };
 
+  // check if there is any addedLock or if all addedLock has been released
   if (addedLocks.length === 0 || addedLocks.length === releasedLocks.length) {
     return pixData;
   }
 
-  const lock = addedLocks.find((addedLock) =>
-    releasedLocks.some(
-      (releasedLock) => releasedLock?.args?.lockId == addedLock?.args?.lockID
-    )
-  );
-
   const p2pContract = getContract();
 
-  const mappedDeposit = await p2pContract.mapDeposits(lock?.args?.depositID);
+  // check if there is any releasedLock
+  if (releasedLocks.length === 0) {
+    const lock = addedLocks[0];
 
-  const pixTarget = mappedDeposit.pixTarget;
-  const amount = formatEther(lock?.args?.amount);
-  pixData.pixKey = pixTarget;
-  pixData.value = Number(amount)
-  // addedLocks.forEach(lock => )
+    const mappedDeposit = await p2pContract.mapDeposits(lock?.args?.depositID);
+
+    const pixTarget = mappedDeposit.pixTarget;
+    const amount = formatEther(lock?.args?.amount);
+    pixData.pixKey = pixTarget;
+    pixData.value = Number(amount);
+  } else {
+    // pick the first lock added that hasnt been released
+    const lock = addedLocks.find((addedLock) =>
+      releasedLocks.some(
+        (releasedLock) => releasedLock?.args?.lockId != addedLock?.args?.lockID
+      )
+    );
+
+    const mappedDeposit = await p2pContract.mapDeposits(lock?.args?.depositID);
+
+    const pixTarget = mappedDeposit.pixTarget;
+    const amount = formatEther(lock?.args?.amount);
+    pixData.pixKey = pixTarget;
+    pixData.value = Number(amount);
+  }
+
   return pixData;
 };
 

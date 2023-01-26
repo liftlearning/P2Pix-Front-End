@@ -92,7 +92,7 @@ const listReleaseTransactionByWalletAddress = async (
 const listValidLocksByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]>=> {
-  const p2pContract = getContract();
+  const p2pContract = getContract(true);
 
   const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
   const eventsAddedLocks = await p2pContract.queryFilter(filterAddedLocks);
@@ -104,7 +104,7 @@ const listValidLocksByWalletAddress = async (
 const listReleasedLocksByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]> => {
-  const p2pContract = getContract();
+  const p2pContract = getContract(true);
 
   const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
   const eventsReleasedLocks = await p2pContract.queryFilter(

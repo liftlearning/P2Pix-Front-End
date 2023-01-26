@@ -89,6 +89,8 @@ watch(walletAddress, async () => {
     flowStep.value = Step.Buy;
     tokenAmount.value = walletLocks.value;
     pixTarget.value = walletLocks.pixKey;
+  } else {
+    flowStep.value = Step.Search;
   }
 });
 

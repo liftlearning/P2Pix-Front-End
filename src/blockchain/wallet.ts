@@ -91,7 +91,7 @@ const listReleaseTransactionByWalletAddress = async (
 // list all Locks added by wallet adress
 const listValidLocksByWalletAddress = async (
   walletAddress: string
-): Promise<Event[]>=> {
+): Promise<Event[]> => {
   const p2pContract = getContract(true);
 
   const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);

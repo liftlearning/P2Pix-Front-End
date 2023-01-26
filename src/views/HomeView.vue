@@ -10,7 +10,10 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import { listReleaseTransactionByWalletAddress, checkUnreleasedLocks } from "@/blockchain/wallet";
+import {
+  listReleaseTransactionByWalletAddress,
+  checkUnreleasedLocks,
+} from "@/blockchain/wallet";
 import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 
@@ -85,7 +88,7 @@ const releaseTransaction = async (e2eId: string) => {
 
 watch(walletAddress, async () => {
   const walletLocks = await checkUnreleasedLocks(walletAddress.value);
-  if (walletLocks.pixKey != ""){
+  if (walletLocks.pixKey != "") {
     flowStep.value = Step.Buy;
     tokenAmount.value = walletLocks.value;
     pixTarget.value = walletLocks.pixKey;

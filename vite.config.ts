@@ -9,6 +9,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    coverage: {
+      provider: "c8",
+      all: true,
+      src: ["./src"],
+      reporter: ["text", "lcov", "html"],
+    },
   },
   plugins: [vue(), vueJsx()],
   resolve: {

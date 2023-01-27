@@ -30,7 +30,7 @@ const getProviderUrl = (): string => {
     Ethereum: import.meta.env.VITE_GOERLI_API_URL,
     Polygon: import.meta.env.VITE_MUMBAI_API_URL,
   };
-
+  
   return possibleProvidersUrls[etherStore.networkName];
 };
 

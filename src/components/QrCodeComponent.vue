@@ -43,11 +43,11 @@ const validatePix = async (): Promise<void> => {
     isCodeInputEmpty.value = true;
     return;
   }
-  var sellerPixKey = props.pixTarget;
-  var transactionValue = props.tokenValue;
+  const sellerPixKey = props.pixTarget;
+  const transactionValue = props.tokenValue;
 
   if (sellerPixKey && transactionValue) {
-    var body_req = {
+    const body_req = {
       e2e_id: e2eId.value,
       pix_key: sellerPixKey,
       pix_value: transactionValue,

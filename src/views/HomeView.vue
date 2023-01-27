@@ -7,9 +7,11 @@ import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
-import { updateWalletStatus } from "@/blockchain/wallet";
+import {
+  updateWalletStatus,
+  listReleaseTransactionByWalletAddress,
+} from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
 import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 

@@ -26,7 +26,7 @@ onMounted(async () => {
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
   const response = await cancelDeposit(depositID);
-  if (response == true) {
+  if (response) {
     console.log("Depósito cancelado com sucesso.");
     depositList.value.splice(index, 1);
   }
@@ -34,7 +34,7 @@ const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
 
 const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
   const response = await withdrawDeposit(depositID);
-  if (response == true) {
+  if (response) {
     console.log("Token retirado com sucesso.");
     depositList.value.splice(index, 1);
   }

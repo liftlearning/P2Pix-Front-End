@@ -11,7 +11,7 @@ import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import {
-  listReleaseTransactionByWalletAddress,
+  listReleasedLocksByWalletAddress,
   checkUnreleasedLocks,
 } from "@/blockchain/wallet";
 import type { Event } from "ethers";
@@ -31,7 +31,7 @@ const { loadingLock, walletAddress, networkName } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
-const _lockID = ref<string>("");
+const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 
@@ -49,8 +49,8 @@ const confirmBuyClick = async (
     etherStore.setLoadingLock(true);
 
     await addLock(selectedDeposit.depositID, tokenValue)
-      .then((lockID) => {
-        _lockID.value = lockID;
+      .then((_lockID) => {
+        lockID.value = _lockID;
       })
       .catch((err) => {
         console.log(err);
@@ -65,16 +65,16 @@ const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  if (_lockID.value && tokenAmount.value) {
+  if (lockID.value && tokenAmount.value) {
     const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
       e2eId,
-      _lockID.value
+      lockID.value
     );
     release.wait();
 
-    await listReleaseTransactionByWalletAddress(
+    await listReleasedLocksByWalletAddress(
       walletAddress.value.toLowerCase()
     ).then((releaseTransactions) => {
       if (releaseTransactions)
@@ -88,10 +88,11 @@ const releaseTransaction = async (e2eId: string) => {
 
 watch(walletAddress, async () => {
   const walletLocks = await checkUnreleasedLocks(walletAddress.value);
-  if (walletLocks.pixKey != "") {
+  if (walletLocks) {
     flowStep.value = Step.Buy;
-    tokenAmount.value = walletLocks.value;
-    pixTarget.value = walletLocks.pixKey;
+    lockID.value = walletLocks.lockID;
+    tokenAmount.value = walletLocks.pix.value;
+    pixTarget.value = walletLocks.pix.pixKey;
   } else {
     flowStep.value = Step.Search;
   }
@@ -99,10 +100,11 @@ watch(walletAddress, async () => {
 
 watch(networkName, async () => {
   const walletLocks = await checkUnreleasedLocks(walletAddress.value);
-  if (walletLocks.pixKey != "") {
+  if (walletLocks) {
     flowStep.value = Step.Buy;
-    tokenAmount.value = walletLocks.value;
-    pixTarget.value = walletLocks.pixKey;
+    lockID.value = walletLocks.lockID;
+    tokenAmount.value = walletLocks.pix.value;
+    pixTarget.value = walletLocks.pix.pixKey;
   } else {
     flowStep.value = Step.Search;
   }

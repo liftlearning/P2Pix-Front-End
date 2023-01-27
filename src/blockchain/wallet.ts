@@ -10,6 +10,7 @@ import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { Pix } from "@/model/Pix";
+import type { UnreleasedLock } from "@/model/UnreleasedLock";
 
 const updateWalletStatus = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -72,22 +73,6 @@ const listAllTransactionByWalletAddress = async (
   );
 };
 
-// get wallet's release transactions
-const listReleaseTransactionByWalletAddress = async (
-  walletAddress: string
-): Promise<Event[]> => {
-  const p2pContract = getContract();
-
-  const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
-  const eventsReleasedLocks = await p2pContract.queryFilter(
-    filterReleasedLocks
-  );
-
-  return eventsReleasedLocks.sort((a, b) => {
-    return b.blockNumber - a.blockNumber;
-  });
-};
-
 // list all Locks added by wallet adress
 const listValidLocksByWalletAddress = async (
   walletAddress: string
@@ -114,7 +99,9 @@ const listReleasedLocksByWalletAddress = async (
 };
 
 // check locks added but didnt released
-const checkUnreleasedLocks = async (walletAddress: string): Promise<Pix> => {
+const checkUnreleasedLocks = async (
+  walletAddress: string
+): Promise<UnreleasedLock | undefined> => {
   const addedLocks = await listValidLocksByWalletAddress(walletAddress);
   const releasedLocks = await listReleasedLocksByWalletAddress(walletAddress);
 
@@ -124,14 +111,14 @@ const checkUnreleasedLocks = async (walletAddress: string): Promise<Pix> => {
 
   // check if there is any addedLock or if all addedLock has been released
   if (addedLocks.length === 0 || addedLocks.length === releasedLocks.length) {
-    return pixData;
+    return;
   }
 
   const p2pContract = getContract();
-
+  let lock: Event | undefined;
   // check if there is any releasedLock
   if (releasedLocks.length === 0) {
-    const lock = addedLocks[0];
+    lock = addedLocks[0];
 
     const mappedDeposit = await p2pContract.mapDeposits(lock?.args?.depositID);
 
@@ -141,7 +128,7 @@ const checkUnreleasedLocks = async (walletAddress: string): Promise<Pix> => {
     pixData.value = Number(amount);
   } else {
     // pick the first lock added that hasnt been released
-    const lock = addedLocks.find((addedLock) =>
+    lock = addedLocks.find((addedLock) =>
       releasedLocks.some(
         (releasedLock) => releasedLock?.args?.lockId != addedLock?.args?.lockID
       )
@@ -155,14 +142,16 @@ const checkUnreleasedLocks = async (walletAddress: string): Promise<Pix> => {
     pixData.value = Number(amount);
   }
 
-  return pixData;
+  return {
+    lockID: lock?.args?.lockID,
+    pix: pixData,
+  };
 };
 
 export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
-  listReleaseTransactionByWalletAddress,
   listValidLocksByWalletAddress,
   listReleasedLocksByWalletAddress,
   checkUnreleasedLocks,

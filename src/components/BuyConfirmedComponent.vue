@@ -16,7 +16,7 @@ const emit = defineEmits(["makeAnotherTransaction"]);
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-5xl max-w-[50rem]"
+      <span class="text font-extrabold sm:text-5xl text-xl max-w-[50rem]"
         >Os tokens já foram transferidos <br />
         para a sua carteira!
       </span>
@@ -30,8 +30,8 @@ const emit = defineEmits(["makeAnotherTransaction"]);
           <p class="text-2xl text-gray-900">{{ props.tokenAmount }} BRZ</p>
         </div>
         <div class="my-5">
-          <p>
-            <b>Não encontrou os tokens? </b>Clique no botão abaixo para <br />
+          <p class="text-sm">
+            <b>Não encontrou os tokens? </b><br/>Clique no botão abaixo para <br />
             cadastrar o BRZ em sua carteira.
           </p>
         </div>
@@ -48,18 +48,21 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         Fazer nova transação
       </button>
     </div>
-    <div class="text-container mt-16">
+    <div class="text-container mt-16 lg-view">
       <span class="text font-extrabold text-3xl max-w-[50rem]"
         >Histórico de compras
       </span>
     </div>
-    <div class="w-full max-w-4xl">
+    <div class="w-full max-w-4xl lg-view">
       <ListingComponent
         :walletTransactions="lastWalletReleaseTransactions"
         :isManageMode="false"
       >
       </ListingComponent>
     </div>
+    <RouterLink to="/transaction_history" class="mt-8 text-white text-2xl font-bold">
+      Gerenciar Transações
+    </RouterLink>
   </div>
 </template>
 
@@ -98,5 +101,23 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

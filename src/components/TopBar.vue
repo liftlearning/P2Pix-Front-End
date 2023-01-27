@@ -155,7 +155,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
         <div
           v-show="currencyMenuOpenToggle"
-          class="mt-10 pl-3 absolute w-full text-gray-900 lg-view"
+          class="mt-10 pl-3 absolute w-full text-gray-900"
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10">

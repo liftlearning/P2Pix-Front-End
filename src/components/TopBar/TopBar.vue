@@ -62,14 +62,18 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
 
 <template>
   <header>
-    <img
-      alt="P2Pix logo"
-      class="logo"
-      src="@/assets/logo.svg"
-      width="75"
-      height="75"
-    />
+    <RouterLink :to="'/'" class="default-button">
+      <img
+        alt="P2Pix logo"
+        class="logo"
+        src="@/assets/logo.svg"
+        width="75"
+        height="75"
+      />
+    </RouterLink>
+
     <div class="flex gap-4 items-center">
+      <RouterLink :to="'/faq'" class="default-button"> FAQ </RouterLink>
       <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>

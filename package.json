@@ -19,9 +19,11 @@
     "alchemy-sdk": "^2.3.0",
     "axios": "^1.2.1",
     "crc": "^3.8.0",
+    "marked": "^4.2.12",
     "pinia": "^2.0.23",
     "qrcode": "^1.5.1",
     "vue": "^3.2.41",
+    "vue-markdown": "^2.2.4",
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
@@ -31,8 +33,10 @@
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/crc": "^3.8.0",
     "@types/jest": "^27.0.0",
+    "@types/marked": "^4.0.8",
     "@types/node": "^16.11.68",
     "@types/qrcode": "^1.5.0",
+    "@types/vue-markdown": "^2.2.1",
     "@vitejs/plugin-vue": "^3.1.2",
     "@vitejs/plugin-vue-jsx": "^2.0.1",
     "@vitest/coverage-c8": "^0.28.2",

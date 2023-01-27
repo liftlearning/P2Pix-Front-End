@@ -114,22 +114,24 @@ watch(networkName, (): void => {
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-5xl max-w-[29rem]"
-        >Adquira cripto com apenas um Pix</span
+      <span
+        class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] msx-w-[20rem]"
       >
-      <span class="text font-medium text-base max-w-[28rem]"
+        Adquira cripto com apenas um Pix</span
+      >
+      <span class="text font-medium sm:text-base text-sm max-w-[28rem]"
         >Digite um valor, confira a oferta, conecte sua carteira e receba os
         tokens após realizar o Pix</span
       >
     </div>
     <div class="blur-container">
       <div
-        class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
+        class="flex flex-col w-full bg-white sm:px-10 px-6 py-5 rounded-lg border-y-10"
       >
-        <div class="flex justify-between w-full items-center">
+        <div class="flex justify-between sm:w-full items-center">
           <input
             type="number"
-            class="border-none outline-none text-lg text-gray-900 w-fit"
+            class="border-none outline-none text-lg text-gray-900 w-2/6"
             v-bind:class="{
               'font-semibold': tokenValue != undefined,
               'text-xl': tokenValue != undefined,

@@ -9,16 +9,18 @@ const props = defineProps({
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-bold text-3xl max-w-[29rem]">{{
-        props.title ? props.title : "Confirme em sua carteira"
-      }}</span>
+      <span
+        class="text font-bold sm:text-3xl text-2xl sm:max-w-[29rem] msx-w-[20rem]"
+      >
+        {{ props.title ? props.title : "Confirme em sua carteira" }}
+      </span>
     </div>
-    <div class="blur-container w-[26rem]">
+    <div class="blur-container sm:w-[26rem] w-[20rem]">
       <div
-        class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
+        class="flex flex-col w-full bg-white sm:px-10 px-4 py-5 rounded-lg border-y-10"
       >
         <div
-          class="flex flex-col text-center justify-center w-full items-center p-2 px-3 rounded-3xl min-w-fit gap-1"
+          class="flex flex-col text-center justify-center w-full items-center p-2 px-3 rounded-3xl lg:min-w-fit gap-1"
         >
           <img
             alt="Polygon image"
@@ -26,7 +28,7 @@ const props = defineProps({
             width="96"
             height="48"
           />
-          <span class="text-black font-medium text-sm px-12 mt-4">
+          <span class="text-black font-medium text-sm lg:px-12 px-4 mt-4">
             {{ $props.message }}
           </span>
         </div>
@@ -59,7 +61,7 @@ const props = defineProps({
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
+  @apply flex flex-col justify-center items-center sm:px-8 px-6 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
 }
 
 input[type="number"] {

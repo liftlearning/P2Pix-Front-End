@@ -65,21 +65,45 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
     <RouterLink :to="'/'" class="default-button">
       <img
         alt="P2Pix logo"
-        class="logo"
+        class="logo lg-view"
         src="@/assets/logo.svg"
         width="75"
         height="75"
       />
+      <img
+        alt="P2Pix logo"
+        class="logo sm-view w-10/12"
+        src="@/assets/logo2.svg"
+        width="40"
+        height="40"
+      />
     </RouterLink>
 
-    <div class="flex gap-4 items-center">
-      <RouterLink :to="'/faq'" class="default-button"> FAQ </RouterLink>
-      <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
+    <div class="flex sm:gap-4 gap-2 items-center">
+      <RouterLink :to="'/faq'" class="default-button lg-view"> FAQ </RouterLink>
+      <RouterLink
+        :to="'/faq'"
+        v-if="!walletAddress"
+        class="default-button sm-view"
+      >
+        FAQ
+      </RouterLink>
+      <RouterLink
+        :to="sellerView ? '/' : '/seller'"
+        class="default-button sm:whitespace-normal whitespace-nowrap lg-view"
+      >
+        {{ sellerView ? "Quero comprar" : "Quero vender" }}
+      </RouterLink>
+      <RouterLink
+        :to="sellerView ? '/' : '/seller'"
+        v-if="!walletAddress"
+        class="default-button sm:whitespace-normal whitespace-nowrap sm-view"
+      >
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>
       <div class="flex flex-col" v-if="walletAddress">
         <div
-          class="group top-bar-info cursor-pointer hover:bg-white"
+          class="group top-bar-info cursor-pointer hover:bg-white h-10"
           @click="
             [
               (currencyMenuOpenToggle = !currencyMenuOpenToggle),
@@ -101,7 +125,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
             :src="getNetworkImage(etherStore.networkName)"
           />
           <span
-            class="default-text group-hover:text-gray-900"
+            class="default-text group-hover:text-gray-900 lg-view"
             :style="{
               color: currencyMenuOpenToggle
                 ? '#000000'
@@ -131,7 +155,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
         <div
           v-show="currencyMenuOpenToggle"
-          class="mt-10 pl-3 absolute w-full text-gray-900"
+          class="mt-10 pl-3 absolute w-full text-gray-900 lg-view"
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10">
@@ -176,15 +200,23 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
       <button
         type="button"
         v-if="!walletAddress"
-        class="border-amber-500 border-2 rounded default-button"
+        class="border-amber-500 border-2 rounded default-button lg-view"
         @click="connectMetaMask()"
       >
         Conectar carteira
       </button>
+      <button
+        type="button"
+        v-if="!walletAddress"
+        class="border-amber-500 border-2 rounded default-button sm-view"
+        @click="connectMetaMask()"
+      >
+        Conectar
+      </button>
       <div v-if="walletAddress" class="account-info">
         <div class="flex flex-col">
           <div
-            class="top-bar-info cursor-pointer"
+            class="top-bar-info cursor-pointer h-10"
             @click="
               [
                 (menuOpenToggle = !menuOpenToggle),
@@ -203,7 +235,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
           >
             <img alt="Account image" src="@/assets/account.svg" />
             <span
-              class="default-text text-sm"
+              class="default-text"
               :style="{
                 color: menuOpenToggle
                   ? '#000000'
@@ -215,7 +247,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
               {{ formatWalletAddress() }}
             </span>
             <img
-              class="text-gray-900"
+              class="text-gray-900 lg-view"
               v-if="!menuHoverToggle && !menuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"
@@ -273,7 +305,7 @@ header {
 }
 
 .default-button {
-  @apply px-4 py-2 rounded text-gray-50 font-semibold text-base hover:bg-transparent;
+  @apply sm:px-4 px-3 py-2 rounded text-gray-50 font-semibold sm:text-base text-xs hover:bg-transparent;
 }
 
 .account-info {
@@ -285,7 +317,7 @@ header {
 }
 
 .top-bar-info {
-  @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 rounded;
+  @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 sm:rounded rounded-lg items-center;
 }
 
 .redirect_button {
@@ -298,5 +330,23 @@ header {
 
 a:hover {
   @apply bg-gray-200 rounded;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

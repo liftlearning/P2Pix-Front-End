@@ -3,6 +3,7 @@ import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
+import AttentionModal from "./AttentionModal.vue";
 import api from "../services/index";
 
 // props and store references
@@ -15,6 +16,7 @@ const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const isPixValid = ref<boolean>(false);
 const isCodeInputEmpty = ref<boolean>(true);
+const showModal = ref<boolean>(true);
 const e2eId = ref<string>("");
 
 // Emits
@@ -71,19 +73,19 @@ const validatePix = async (): Promise<void> => {
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-2xl max-w-[30rem]">
+      <span class="text font-extrabold lg:text-2xl text-xl sm:max-w-[30rem] max-w-[24rem]">
         Utilize o QR Code ou copie o código para realizar o Pix
       </span>
-      <span class="text font-medium text-md max-w-[28rem]">
+      <span class="text font-medium lg:text-md text-sm max-w-[28rem]">
         Após realizar o Pix no banco de sua preferência, insira o código de
         autenticação para enviar a transação para a rede.
       </span>
     </div>
-    <div class="blur-container max-w-[28rem] text-black">
+    <div class="blur-container sm:max-w-[28rem] max-w-[20rem] text-black">
       <div
-        class="flex-col items-center justify-center flex w-full bg-white p-8 rounded-lg break-normal"
+        class="flex-col items-center justify-center flex w-full bg-white sm:p-8 p-4 rounded-lg break-normal"
       >
-        <img :src="qrCode" class="w-48 h-48" />
+        <img :src="qrCode" class="sm:w-48 sm:h-48 w-40 h-40" />
         <span class="text-center font-bold">Código pix</span>
         <div class="break-words w-4/5">
           <span class="text-center text-xs">
@@ -95,9 +97,9 @@ const validatePix = async (): Promise<void> => {
           src="@/assets/copyPix.svg"
           width="16"
           height="16"
-          class="pt-2 mb-5 cursor-pointer"
+          class="pt-2 lg:mb-5 cursor-pointer"
         />
-        <span class="text-xs text-start">
+        <span class="text-xs text-start lg-view">
           <strong>ATENÇÃO!</strong> A transação só será processada após inserir
           o código de autenticação. Caso contrário não conseguiremos comprovar o
           seu depósito e não será possível transferir os tokens para sua
@@ -111,7 +113,7 @@ const validatePix = async (): Promise<void> => {
           type="text"
           placeholder="Digite o código do comprovante PIX"
           @input="debounce(handleInputEvent, 500)($event)"
-          class="text-md w-full box-border p-2 h-6 mb-2 outline-none"
+          class="sm:text-md text-sm w-full box-border p-2 sm:h-6 h-2 mb-2 outline-none"
         />
         <div class="custom-divide" v-if="!isCodeInputEmpty"></div>
         <div
@@ -150,6 +152,7 @@ const validatePix = async (): Promise<void> => {
         @button-clicked="emit('pixValidated', e2eId)"
       />
     </div>
+    <AttentionModal v-show="showModal" @close-modal="showModal = false" />
   </div>
 </template>
 
@@ -213,5 +216,23 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

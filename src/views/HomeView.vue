@@ -27,7 +27,7 @@ const etherStore = useEtherStore();
 etherStore.setSellerView(false);
 
 // States
-const { loadingLock, walletAddress } = storeToRefs(etherStore);
+const { loadingLock, walletAddress, networkName } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<string>("");
 const tokenAmount = ref<number>();
@@ -97,6 +97,17 @@ watch(walletAddress, async () => {
   }
 });
 
+watch(networkName, async () => {
+  const walletLocks = await checkUnreleasedLocks(walletAddress.value);
+  if (walletLocks.pixKey != "") {
+    flowStep.value = Step.Buy;
+    tokenAmount.value = walletLocks.value;
+    pixTarget.value = walletLocks.pixKey;
+  } else {
+    flowStep.value = Step.Search;
+  }
+});
+
 onMounted(async () => {
   await getNetworksLiquidity();
 });
@@ -109,6 +120,7 @@ onMounted(async () => {
   />
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
+      :key="pixTarget"
       :pixTarget="pixTarget"
       :tokenValue="tokenAmount"
       @pix-validated="releaseTransaction"

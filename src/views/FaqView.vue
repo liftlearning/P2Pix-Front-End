@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Faq, Section } from "@/model/Faq";
+import type { Faq } from "@/model/Faq";
 import { ref } from "vue";
 import { marked } from "marked";
 
@@ -100,6 +100,7 @@ const openItem = (index: number) => {
         <h3
           :class="index == selectedSection ? 'selected-sumario' : 'sumario'"
           v-for="(f, index) in faq"
+          v-bind:key="f.name"
           @click="setSelectedSection(index)"
         >
           {{ f.name }}
@@ -107,7 +108,10 @@ const openItem = (index: number) => {
       </div>
 
       <div class="w-4/6">
-        <div v-for="(item, index) in faq[selectedSection].items">
+        <div
+          v-for="(item, index) in faq[selectedSection].items"
+          v-bind:key="item.title"
+        >
           <div class="flex cursor-pointer" @click="openItem(index)">
             <img
               alt="plus"

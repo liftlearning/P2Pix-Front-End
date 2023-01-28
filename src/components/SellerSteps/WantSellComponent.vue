@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomButton from "../CustomButton.vue";
+import CustomButton from "../CustomButton/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { decimalCount } from "@/utils/decimalCount";
 import { useEtherStore } from "@/store/ether";

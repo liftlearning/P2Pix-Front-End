@@ -2,7 +2,7 @@
 import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
-import CustomButton from "./CustomButton.vue";
+import CustomButton from "./CustomButton/CustomButton.vue";
 import api from "../services/index";
 
 // props and store references
@@ -43,11 +43,11 @@ const validatePix = async (): Promise<void> => {
     isCodeInputEmpty.value = true;
     return;
   }
-  var sellerPixKey = props.pixTarget;
-  var transactionValue = props.tokenValue;
+  const sellerPixKey = props.pixTarget;
+  const transactionValue = props.tokenValue;
 
   if (sellerPixKey && transactionValue) {
-    var body_req = {
+    const body_req = {
       e2e_id: e2eId.value,
       pix_key: sellerPixKey,
       pix_value: transactionValue,
@@ -83,7 +83,7 @@ const validatePix = async (): Promise<void> => {
       <div
         class="flex-col items-center justify-center flex w-full bg-white p-8 rounded-lg break-normal"
       >
-        <img :src="qrCode" class="w-48 h-48" />
+        <img alt="Qr code image" :src="qrCode" class="w-48 h-48" />
         <span class="text-center font-bold">Código pix</span>
         <div class="break-words w-4/5">
           <span class="text-center text-xs">
@@ -188,10 +188,6 @@ h2 {
   top: -20px;
   right: 50%;
   transform: translateX(50%);
-}
-
-.page {
-  @apply flex flex-col items-center justify-center w-full mt-16;
 }
 
 .text-container {

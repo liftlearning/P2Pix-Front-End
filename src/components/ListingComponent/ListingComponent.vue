@@ -3,7 +3,7 @@ import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import { useEtherStore } from "@/store/ether";
 import { formatEther } from "@ethersproject/units";
-import type { Event } from "ethers";
+import type { BigNumber, Event } from "ethers";
 import { ref, watch } from "vue";
 
 // props
@@ -55,6 +55,11 @@ const getEventName = (event: string | undefined): string => {
   return possibleEventName[event];
 };
 
+const getAmountFormatted = (amount?: BigNumber): string => {
+  if (!amount) return "";
+  return formatEther(amount);
+};
+
 // watch props changes
 watch(props, async (): Promise<void> => {
   const itemsToShowQty = itemsToShow.value.length;
@@ -99,13 +104,14 @@ showInitialItems();
     >
       <span class="last-release-info">
         {{
-          isValidDeposit(item) ? item.remaining : formatEther(item.args?.amount)
+          isValidDeposit(item)
+            ? item.remaining
+            : getAmountFormatted(item.args?.amount)
         }}
         BRZ
       </span>
 
-      <!-- TODO: change this hardcoded date -->
-      <span class="last-release-info"> 20 out 2022 </span>
+      <span class="last-release-info transaction-date"> 20 out 2022 </span>
 
       <span class="last-release-info" v-if="!props.isManageMode">
         {{ getEventName((item as Event).event) }}
@@ -137,7 +143,7 @@ showInitialItems();
         "
       >
         <span class="last-release-info">Retirar</span>
-        <img alt="Cancel image" src="@/assets/withdraw.svg" />
+        <img alt="Withdraw image" src="@/assets/withdraw.svg" />
       </div>
     </div>
     <div

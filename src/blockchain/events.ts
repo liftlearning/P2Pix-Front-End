@@ -20,19 +20,25 @@ const getNetworksLiquidity = async (): Promise<void> => {
   ); // mumbai provider
 
   const p2pContractGoerli = new ethers.Contract(
-    "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    "0xefa5cE4351cda51192509cf8De7d8881ADAE95DD",
     p2pix.abi,
     goerliProvider
   );
   const p2pContractMumbai = new ethers.Contract(
-    "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    "0xA9258eBb157E4cf5e756b77FDD0DF09C2F73240b",
     p2pix.abi,
     mumbaiProvider
   );
 
-  const depositListGoerli = await getValidDeposits(p2pContractGoerli);
+  const depositListGoerli = await getValidDeposits(
+    "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
+    p2pContractGoerli
+  );
 
-  const depositListMumbai = await getValidDeposits(p2pContractMumbai);
+  const depositListMumbai = await getValidDeposits(
+    "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29",
+    p2pContractMumbai
+  );
 
   etherStore.setDepositsValidListGoerli(depositListGoerli);
   console.log(depositListGoerli);
@@ -42,6 +48,7 @@ const getNetworksLiquidity = async (): Promise<void> => {
 };
 
 const getValidDeposits = async (
+  token: string,
   contract?: Contract
 ): Promise<ValidDeposit[]> => {
   let p2pContract: Contract;
@@ -59,18 +66,28 @@ const getValidDeposits = async (
 
   const depositList = await Promise.all(
     eventsDeposits.map(async (deposit) => {
-      const mappedDeposit = await p2pContract.mapDeposits(
-        deposit.args?.depositID
+      // Get liquidity only for the selected token
+      if (deposit.args?.token != token) return null;
+
+      const mappedBalance = await p2pContract.getBalance(
+        deposit.args?.seller,
+        token
       );
+
+      const mappedPixTarget = await p2pContract.getPixTarget(
+        deposit.args?.seller,
+        token
+      );
+
       let validDeposit: ValidDeposit | null = null;
 
-      if (mappedDeposit.valid) {
+      if (mappedBalance._hex) {
         validDeposit = {
+          token: token,
           blockNumber: deposit.blockNumber,
-          depositID: deposit.args?.depositID,
-          remaining: Number(formatEther(mappedDeposit.remaining)),
-          seller: mappedDeposit.seller,
-          pixKey: mappedDeposit.pixTarget,
+          remaining: Number(formatEther(mappedBalance._hex)),
+          seller: deposit.args?.seller,
+          pixKey: Number(mappedPixTarget._hex),
         };
       }
 

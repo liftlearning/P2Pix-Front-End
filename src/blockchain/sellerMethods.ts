@@ -33,6 +33,7 @@ const addDeposit = async (tokenQty: string, pixKey: string): Promise<any> => {
     getTokenAddress(),
     parseEther(tokenQty),
     pixKey,
+    true,
     ethers.utils.formatBytes32String("")
   );
 

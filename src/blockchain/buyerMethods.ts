@@ -9,7 +9,8 @@ import { BigNumber, ethers } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
 const addLock = async (
-  depositId: BigNumber,
+  seller: string,
+  token: string,
   amount: number
 ): Promise<string> => {
   const etherStore = useEtherStore();
@@ -17,7 +18,8 @@ const addLock = async (
   const p2pContract = getContract();
 
   const lock = await p2pContract.lock(
-    depositId, // BigNumber
+    seller,
+    token,
     etherStore.walletAddress, // String "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (Example)
     ethers.constants.AddressZero, // String "0x0000000000000000000000000000000000000000"
     0,
@@ -33,7 +35,7 @@ const addLock = async (
 };
 
 const releaseLock = async (
-  pixKey: string,
+  pixKey: number,
   amount: number,
   e2eId: string,
   lockId: string

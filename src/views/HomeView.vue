@@ -27,7 +27,7 @@ etherStore.setSellerView(false);
 // States
 const { loadingLock, walletAddress } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
-const pixTarget = ref<string>("");
+const pixTarget = ref<number>();
 const tokenAmount = ref<number>();
 const _lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
@@ -46,7 +46,7 @@ const confirmBuyClick = async (
     flowStep.value = Step.Buy;
     etherStore.setLoadingLock(true);
 
-    await addLock(selectedDeposit.depositID, tokenValue)
+    await addLock(selectedDeposit.seller, selectedDeposit.token, tokenValue)
       .then((lockID) => {
         _lockID.value = lockID;
       })
@@ -63,7 +63,7 @@ const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  if (_lockID.value && tokenAmount.value) {
+  if (_lockID.value && tokenAmount.value && pixTarget.value) {
     const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
@@ -96,7 +96,7 @@ onMounted(async () => {
   />
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
-      :pixTarget="pixTarget"
+      :pixTarget="String(pixTarget)"
       :tokenValue="tokenAmount"
       @pix-validated="releaseTransaction"
       v-if="!loadingLock"

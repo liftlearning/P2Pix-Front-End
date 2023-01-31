@@ -107,7 +107,12 @@ const enableOrDisableConfirmButton = (): void => {
 };
 
 watch(networkName, (): void => {
+  verifyLiquidity();
   enableOrDisableConfirmButton();
+});
+
+watch(walletAddress, (): void => {
+  verifyLiquidity();
 });
 </script>
 

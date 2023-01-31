@@ -63,8 +63,9 @@ const getValidDeposits = async (
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
   if (!contract) p2pContract = getContract(); // get metamask provider contract
+  const depositList: { [key: string]: ValidDeposit } = {};
 
-  const depositList = await Promise.all(
+  await Promise.all(
     eventsDeposits.map(async (deposit) => {
       // Get liquidity only for the selected token
       if (deposit.args?.token != token) return null;
@@ -91,11 +92,11 @@ const getValidDeposits = async (
         };
       }
 
-      return validDeposit;
+      if (validDeposit) depositList[deposit.args?.seller + token] = validDeposit;
     })
   );
 
-  return depositList.filter((deposit) => deposit) as ValidDeposit[];
+  return Object.values(depositList);
 };
 
 export { getValidDeposits, getNetworksLiquidity };

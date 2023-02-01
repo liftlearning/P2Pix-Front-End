@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import SearchComponent from "../components/SearchComponent.vue";
-import ValidationComponent from "../components/LoadingComponent.vue";
-import BuyConfirmedComponent from "@/components/BuyConfirmedComponent.vue";
+import SearchComponent from "@/components/SearchComponent.vue";
+import ValidationComponent from "@/components/LoadingComponent.vue";
+import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
 import { ref, onMounted } from "vue";
-
 import { useEtherStore } from "@/store/ether";
-import QrCodeComponent from "../components/QrCodeComponent.vue";
+import QrCodeComponent from "@/components/QrCodeComponent.vue";
 import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
-import { updateWalletStatus } from "@/blockchain/wallet";
+import {
+  updateWalletStatus,
+  listReleaseTransactionByWalletAddress,
+} from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import { listReleaseTransactionByWalletAddress } from "@/blockchain/wallet";
 import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 
@@ -118,5 +119,3 @@ onMounted(async () => {
     />
   </div>
 </template>
-
-<style scoped></style>

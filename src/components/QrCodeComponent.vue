@@ -45,11 +45,11 @@ const validatePix = async (): Promise<void> => {
     isCodeInputEmpty.value = true;
     return;
   }
-  var sellerPixKey = props.pixTarget;
-  var transactionValue = props.tokenValue;
+  const sellerPixKey = props.pixTarget;
+  const transactionValue = props.tokenValue;
 
   if (sellerPixKey && transactionValue) {
-    var body_req = {
+    const body_req = {
       e2e_id: e2eId.value,
       pix_key: sellerPixKey,
       pix_value: transactionValue,
@@ -73,7 +73,9 @@ const validatePix = async (): Promise<void> => {
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold lg:text-2xl text-xl sm:max-w-[30rem] max-w-[24rem]">
+      <span
+        class="text font-extrabold lg:text-2xl text-xl sm:max-w-[30rem] max-w-[24rem]"
+      >
         Utilize o QR Code ou copie o código para realizar o Pix
       </span>
       <span class="text font-medium lg:text-md text-sm max-w-[28rem]">
@@ -85,7 +87,7 @@ const validatePix = async (): Promise<void> => {
       <div
         class="flex-col items-center justify-center flex w-full bg-white sm:p-8 p-4 rounded-lg break-normal"
       >
-        <img :src="qrCode" class="sm:w-48 sm:h-48 w-40 h-40" />
+        <img alt="Qr code image" :src="qrCode" class="w-48 h-48" />
         <span class="text-center font-bold">Código pix</span>
         <div class="break-words w-4/5">
           <span class="text-center text-xs">
@@ -191,10 +193,6 @@ h2 {
   top: -20px;
   right: 50%;
   transform: translateX(50%);
-}
-
-.page {
-  @apply flex flex-col items-center justify-center w-full mt-16;
 }
 
 .text-container {

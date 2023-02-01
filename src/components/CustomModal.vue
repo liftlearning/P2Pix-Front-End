@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="modal-overlay">
+  <div class="modal-overlay backdrop-blur-sm sm:backdrop-blur-none">
     <div class="modal px-5 text-center">
       <p class="text-black tracking-tighter leading-tight my-6 mx-2 text-justify">
         <strong>ATENÇÃO!</strong>
@@ -30,7 +30,6 @@
   right: 0;
   display: flex;
   justify-content: center;
-  backdrop-filter: blur(5px);
 }
 
 .modal {

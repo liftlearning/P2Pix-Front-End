@@ -84,10 +84,13 @@ const cancelDeposit = async (depositId: BigNumber): Promise<any> => {
   return cancel;
 };
 
-const withdrawDeposit = async (depositId: BigNumber): Promise<any> => {
+const withdrawDeposit = async (
+  depositId: BigNumber,
+  amount: string
+): Promise<any> => {
   const contract = getContract();
 
-  const withdraw = await contract.withdraw(depositId, []);
+  const withdraw = await contract.withdraw(depositId, amount, []);
   await withdraw.wait();
 
   return withdraw;

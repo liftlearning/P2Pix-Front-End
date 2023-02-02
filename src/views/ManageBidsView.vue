@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch, onMounted } from "vue";
-import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 
@@ -24,16 +24,9 @@ onMounted(async () => {
   }
 });
 
-const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await cancelDeposit(depositID);
-  if (response) {
-    console.log("Depósito cancelado com sucesso.");
-    depositList.value.splice(index, 1);
-  }
-};
-
-const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await withdrawDeposit(depositID);
+const handleWithDrawDeposit = async (token: BigNumber, index: number) => {
+  const fixedAmount = "1"; // Need to ask user for amount
+  const response = await withdrawDeposit(token, fixedAmount);
   if (response) {
     console.log("Token retirado com sucesso.");
     depositList.value.splice(index, 1);
@@ -68,7 +61,6 @@ watch(networkName, async () => {
       <ListingComponent
         :wallet-transactions="depositList"
         :is-manage-mode="true"
-        @cancel-deposit="handleCancelDeposit"
         @withdraw-deposit="handleWithDrawDeposit"
       ></ListingComponent>
     </div>

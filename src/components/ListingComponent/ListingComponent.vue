@@ -20,7 +20,7 @@ const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
 const isValidDeposit = (
   deposit: Event | ValidDeposit
 ): deposit is ValidDeposit => {
-  return (deposit as ValidDeposit).depositID !== undefined;
+  return (deposit as ValidDeposit).token !== undefined;
 };
 
 const showInitialItems = (): void => {
@@ -72,7 +72,7 @@ watch(props, async (): Promise<void> => {
 });
 
 //emits
-const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
+const emit = defineEmits(["withdrawDeposit"]);
 
 // initial itemsToShow value
 showInitialItems();
@@ -83,6 +83,7 @@ showInitialItems();
     <div
       class="grid grid-cols-4 grid-flow-row w-full px-6"
       v-if="itemsToShow.length != 0"
+      v-bind:class="{ 'grid-cols-3': props.isManageMode }"
     >
       <span class="text-xs text-gray-50 font-medium justify-self-center"
         >Valor</span
@@ -90,15 +91,19 @@ showInitialItems();
       <span class="text-xs text-gray-50 font-medium justify-self-center"
         >Data</span
       >
-      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
-        props.isManageMode ? "Cancelar oferta" : "Tipo de transação"
-      }}</span>
+      <span
+        v-if="!props.isManageMode"
+        class="text-xs text-gray-50 font-medium justify-self-center"
+      >
+        "Tipo de transação"
+      </span>
       <span class="text-xs text-gray-50 font-medium justify-self-center">{{
         props.isManageMode ? "Retirar tokens" : "Checar transação"
       }}</span>
     </div>
     <div
       class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
+      v-bind:class="{ 'grid-cols-3': props.isManageMode }"
       v-for="(item, index) in itemsToShow"
       :key="item.blockNumber"
     >
@@ -129,18 +134,7 @@ showInitialItems();
       <div
         v-if="props.isManageMode"
         class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', (item as ValidDeposit).depositID, index)"
-      >
-        <span class="last-release-info">Cancelar</span>
-        <img alt="Cancel image" src="@/assets/cancel.svg" />
-      </div>
-
-      <div
-        v-if="props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="
-          emit('withdrawDeposit', (item as ValidDeposit).depositID, index)
-        "
+        @click="emit('withdrawDeposit', (item as ValidDeposit).token, index)"
       >
         <span class="last-release-info">Retirar</span>
         <img alt="Withdraw image" src="@/assets/withdraw.svg" />

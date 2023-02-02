@@ -92,7 +92,8 @@ const getValidDeposits = async (
         };
       }
 
-      if (validDeposit) depositList[deposit.args?.seller + token] = validDeposit;
+      if (validDeposit)
+        depositList[deposit.args?.seller + token] = validDeposit;
     })
   );
 

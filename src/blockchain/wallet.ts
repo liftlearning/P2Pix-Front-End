@@ -35,7 +35,7 @@ const updateWalletStatus = async (): Promise<void> => {
 const listValidDepositTransactionsByWalletAddress = async (
   walletAddress: string
 ): Promise<ValidDeposit[]> => {
-  const walletDeposits = await getValidDeposits();
+  const walletDeposits = await getValidDeposits(getTokenAddress());
 
   if (walletDeposits) {
     return walletDeposits

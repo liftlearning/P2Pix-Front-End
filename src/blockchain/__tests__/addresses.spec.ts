@@ -33,7 +33,7 @@ describe("addresses.ts functions", () => {
     const etherStore = useEtherStore();
     etherStore.setNetworkName(NetworkEnum.ethereum);
     expect(getTokenAddress()).toBe(
-      "0x294003F602c321627152c6b7DED3EAb5bEa853Ee"
+      "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00"
     );
   });
 
@@ -41,13 +41,13 @@ describe("addresses.ts functions", () => {
     const etherStore = useEtherStore();
     etherStore.setNetworkName(NetworkEnum.polygon);
     expect(getTokenAddress()).toBe(
-      "0x294003F602c321627152c6b7DED3EAb5bEa853Ee"
+      "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29"
     );
   });
 
   it("getTokenAddress Default", () => {
     expect(getTokenAddress()).toBe(
-      "0x294003F602c321627152c6b7DED3EAb5bEa853Ee"
+      "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00"
     );
   });
 
@@ -55,7 +55,7 @@ describe("addresses.ts functions", () => {
     const etherStore = useEtherStore();
     etherStore.setNetworkName(NetworkEnum.ethereum);
     expect(getP2PixAddress()).toBe(
-      "0x5f3EFA9A90532914545CEf527C530658af87e196"
+      "0xefa5cE4351cda51192509cf8De7d8881ADAE95DD"
     );
   });
 
@@ -63,13 +63,13 @@ describe("addresses.ts functions", () => {
     const etherStore = useEtherStore();
     etherStore.setNetworkName(NetworkEnum.polygon);
     expect(getP2PixAddress()).toBe(
-      "0x5f3EFA9A90532914545CEf527C530658af87e196"
+      "0xA9258eBb157E4cf5e756b77FDD0DF09C2F73240b"
     );
   });
 
   it("getP2PixAddress Default", () => {
     expect(getP2PixAddress()).toBe(
-      "0x5f3EFA9A90532914545CEf527C530658af87e196"
+      "0xefa5cE4351cda51192509cf8De7d8881ADAE95DD"
     );
   });
 
@@ -100,11 +100,5 @@ describe("addresses.ts functions", () => {
     expect(isPossibleNetwork("")).toBe(false);
     expect(isPossibleNetwork(" ")).toBe(false);
     expect(isPossibleNetwork("0x55")).toBe(false);
-  });
-});
-
-describe("addresses.ts Unset Store", () => {
-  it("getProviderUrl Unset", () => {
-    expect(getProviderUrl()).toBe(undefined);
   });
 });

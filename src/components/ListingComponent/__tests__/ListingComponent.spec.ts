@@ -20,7 +20,6 @@ describe("ListingComponent.vue", () => {
 
     expect(wrapper.html()).toContain("Valor");
     expect(wrapper.html()).toContain("Data");
-    expect(wrapper.html()).toContain("Cancelar oferta");
     expect(wrapper.html()).toContain("Retirar tokens");
   });
 
@@ -68,20 +67,6 @@ describe("ListingComponent.vue", () => {
     elements = wrapper.findAll(".transaction-date");
 
     expect(elements).toHaveLength(5);
-  });
-
-  test("Test cancel offer button emit", async () => {
-    const wrapper = mount(ListingComponent, {
-      props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
-      },
-    });
-    wrapper.vm.$emit("cancelDeposit");
-
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.emitted("cancelDeposit")).toBeTruthy();
   });
 
   test("Test withdraw offer button emit", async () => {

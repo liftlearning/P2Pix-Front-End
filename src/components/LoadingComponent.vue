@@ -10,7 +10,7 @@ const props = defineProps({
   <div class="page">
     <div class="text-container">
       <span
-        class="text font-bold sm:text-3xl text-2xl sm:max-w-[29rem] msx-w-[20rem]"
+        class="text font-bold sm:text-3xl text-2xl sm:max-w-[29rem] max-w-[20rem]"
       >
         {{ props.title ? props.title : "Confirme em sua carteira" }}
       </span>

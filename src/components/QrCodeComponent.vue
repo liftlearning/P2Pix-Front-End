@@ -3,7 +3,7 @@ import { pix } from "../utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "./CustomButton.vue";
-import AttentionModal from "./CustomModal.vue";
+import CustomModal from "./CustomModal.vue";
 import api from "../services/index";
 
 // props and store references
@@ -152,7 +152,10 @@ const validatePix = async (): Promise<void> => {
         @button-clicked="emit('pixValidated', e2eId)"
       />
     </div>
-    <AttentionModal v-show="showModal" @close-modal="showModal = false" />
+    <CustomModal
+      v-if="showModal"
+      @close-modal="showModal = false"
+    />
   </div>
 </template>
 

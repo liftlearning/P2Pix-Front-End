@@ -7,4 +7,5 @@ export type ValidDeposit = {
   seller: string;
   pixKey: string;
   pixTarget?: string;
+  open?: boolean;
 };

@@ -55,7 +55,7 @@ const getValidDeposits = async (
   const filterDeposits = p2pContract.filters.DepositAdded(null);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
-  p2pContract = getContract(); // get metamask provider contract
+  if (!contract) p2pContract = getContract(); // get metamask provider contract
 
   const depositList = await Promise.all(
     eventsDeposits.map(async (deposit) => {

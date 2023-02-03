@@ -2,7 +2,7 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { ref, watch, onMounted } from "vue";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import { listAllTransactionByWalletAddress } from "@/blockchain/wallet";
 import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
@@ -58,6 +58,6 @@ watch(networkName, async () => {
 }
 
 .header {
-  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex;
+  @apply text-3xl text-white leading-9 font-bold justify-center flex;
 }
 </style>

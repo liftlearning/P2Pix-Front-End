@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CustomButton from "@/components/CustomButton.vue";
-import ListingComponent from "@/components/ListingComponent.vue";
+import CustomButton from "@/components/CustomButton/CustomButton.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import type { Event } from "ethers";
 
 // props
@@ -31,7 +31,8 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         </div>
         <div class="my-5">
           <p class="text-sm">
-            <b>Não encontrou os tokens? </b><br/>Clique no botão abaixo para <br />
+            <b>Não encontrou os tokens? </b><br />Clique no botão abaixo para
+            <br />
             cadastrar o BRZ em sua carteira.
           </p>
         </div>
@@ -50,7 +51,7 @@ const emit = defineEmits(["makeAnotherTransaction"]);
     </div>
     <div class="text-container mt-16 lg-view">
       <span class="text font-extrabold text-3xl max-w-[50rem]"
-        >Histórico de compras
+        >Gerenciar transações
       </span>
     </div>
     <div class="w-full max-w-4xl lg-view">
@@ -60,7 +61,10 @@ const emit = defineEmits(["makeAnotherTransaction"]);
       >
       </ListingComponent>
     </div>
-    <RouterLink to="/transaction_history" class="mt-8 text-white text-2xl font-bold">
+    <RouterLink
+      to="/transaction_history"
+      class="mt-8 text-white text-2xl font-bold"
+    >
       Gerenciar Transações
     </RouterLink>
   </div>

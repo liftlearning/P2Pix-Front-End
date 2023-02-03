@@ -75,7 +75,7 @@ const listAllTransactionByWalletAddress = async (
 const listReleaseTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]> => {
-  const p2pContract = getContract();
+  const p2pContract = getContract(true);
 
   const filterReleasedLocks = p2pContract.filters.LockReleased([walletAddress]);
   const eventsReleasedLocks = await p2pContract.queryFilter(

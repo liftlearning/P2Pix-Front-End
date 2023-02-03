@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import ListingComponent from "@/components/ListingComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import type { BigNumber } from "ethers";
 import { ref, watch, onMounted } from "vue";
 import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
@@ -26,7 +26,7 @@ onMounted(async () => {
 
 const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
   const response = await cancelDeposit(depositID);
-  if (response == true) {
+  if (response) {
     console.log("Depósito cancelado com sucesso.");
     depositList.value.splice(index, 1);
   }
@@ -34,7 +34,7 @@ const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
 
 const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
   const response = await withdrawDeposit(depositID);
-  if (response == true) {
+  if (response) {
     console.log("Token retirado com sucesso.");
     depositList.value.splice(index, 1);
   }

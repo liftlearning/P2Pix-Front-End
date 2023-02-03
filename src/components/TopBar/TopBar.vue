@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "@/store/ether";
-import { ref } from "vue";
+import { ref, onBeforeUnmount, onMounted } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import { connectProvider, requestNetworkChange } from "@/blockchain/provider";
 import ethereumImage from "@/assets/ethereum.svg";
@@ -17,6 +18,8 @@ const menuHoverToggle = ref<boolean>(false);
 
 const currencyMenuOpenToggle = ref<boolean>(false);
 const currencyMenuHoverToggle = ref<boolean>(false);
+const walletAddressRef = ref<any>(null);
+const currencyRef = ref<any>(null);
 
 //Methods
 const connectMetaMask = async (): Promise<void> => {
@@ -58,6 +61,16 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
 
   return validImages[networkName];
 };
+
+onClickOutside(walletAddressRef, () => {
+  menuHoverToggle.value = false;
+  menuOpenToggle.value = false;
+});
+
+onClickOutside(currencyRef, () => {
+  currencyMenuOpenToggle.value = false;
+  currencyMenuHoverToggle.value = false;
+});
 </script>
 
 <template>
@@ -103,6 +116,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
       </RouterLink>
       <div class="flex flex-col" v-if="walletAddress">
         <div
+          ref="currencyRef"
           class="group top-bar-info cursor-pointer hover:bg-white h-10"
           @click="
             [
@@ -216,6 +230,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
       <div v-if="walletAddress" class="account-info">
         <div class="flex flex-col">
           <div
+            ref="walletAddressRef"
             class="top-bar-info cursor-pointer h-10"
             @click="
               [

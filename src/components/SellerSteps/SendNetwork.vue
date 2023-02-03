@@ -14,10 +14,10 @@ const props = defineProps({
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-5xl max-w-[50rem]"
+      <span class="text font-extrabold sm:text-5xl text-xl sm:max-w-[50rem] max-w-[20rem]"
         >Envie sua oferta para a rede
       </span>
-      <span class="text text-xl font-medium text-base max-w-[30rem]"
+      <span class="text text-xl font-normal sm:text-base text-xs sm:max-w-[30rem] max-w-[22rem]"
         >Após a confirmação sua oferta estará disponível para outros usuários.
         Caso deseje retirar a oferta, será necessário aguardar 24h para receber
         os tokens de volta.</span
@@ -63,18 +63,15 @@ p {
 }
 
 .text-container {
-  @apply flex flex-col items-center justify-center gap-4;
+  @apply flex flex-col items-center justify-center sm:gap-4 gap-2;
 }
 
 .text {
   @apply text-white text-center;
 }
-.blur-container-row {
-  @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
-}
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 sm:w-1/3;
 }
 
 .last-deposit-info {

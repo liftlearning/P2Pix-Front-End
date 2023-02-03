@@ -64,7 +64,7 @@ const handleButtonClick = async (
           <input
             type="number"
             v-model="offer"
-            class="border-none outline-none sm:text-lg text-sm text-gray-900 sm:w-fit w-3/4"
+            class="border-none outline-none text-gray-900 sm:w-fit w-3/4"
             v-bind:class="{
               'font-semibold': offer != undefined,
               'text-xl': offer != undefined,
@@ -81,7 +81,7 @@ const handleButtonClick = async (
               class="sm:w-fit w-4"
               src="@/assets/brz.svg"
             />
-            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz">
+            <span class="text-gray-900 w-fit" id="brz">
               BRZ
             </span>
           </div>
@@ -152,5 +152,9 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+input {
+  @apply sm:text-lg text-sm;
 }
 </style>

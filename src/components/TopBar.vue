@@ -61,7 +61,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
 </script>
 
 <template>
-  <header>
+  <header class="z-20">
     <RouterLink :to="'/'" class="default-button">
       <img
         alt="P2Pix logo"
@@ -155,7 +155,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
         <div
           v-show="currencyMenuOpenToggle"
-          class="mt-10 pl-3 absolute w-full text-gray-900"
+          class="mt-10 pl-3 absolute w-full text-gray-900 lg-view"
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10">
@@ -265,7 +265,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
           </div>
           <div
             v-show="menuOpenToggle"
-            class="mt-10 absolute w-full text-gray-900"
+            class="mt-10 absolute w-full text-gray-900 lg-view"
           >
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
@@ -296,6 +296,93 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
       </div>
     </div>
+    <div
+      v-show="menuOpenToggle"
+      class="mobile-menu fixed w-4/5 text-gray-900 sm-view"
+    >
+      <div class="pl-4 mt-2 h-full">
+        <div class="bg-white rounded-md z-10 h-full">
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink
+              :to="sellerView ? '/' : '/seller'"
+              class="redirect_button mt-2"
+            >
+              {{ sellerView ? "Quero comprar" : "Quero vender" }}
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink to="/transaction_history" class="redirect_button">
+              Histórico de transações
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink to="/manage_bids" class="redirect_button">
+              Gerenciar Ofertas
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="disconnectUser">
+            <RouterLink to="/" class="redirect_button">
+              Desconectar
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center pb-20">
+            <hr class="w-4/5" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-show="currencyMenuOpenToggle"
+      class="mobile-menu fixed w-4/5 text-gray-900 sm-view"
+    >
+      <div class="pl-4 mt-2 h-full">
+        <div class="bg-white rounded-md z-10 h-full">
+          <div
+            class="menu-button gap-2 sm:px-4 rounded-md cursor-pointer py-2"
+            @click="networkChange(NetworkEnum.ethereum)"
+          >
+            <img
+              alt="Ethereum image"
+              width="20"
+              height="20"
+              src="@/assets/ethereum.svg"
+            />
+            <span class="text-gray-900 py-4 text-end font-bold text-sm">
+              Ethereum
+            </span>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div
+            class="menu-button gap-2 sm:px-4 rounded-md cursor-pointer py-2"
+            @click="networkChange(NetworkEnum.polygon)"
+          >
+            <img
+              alt="Polygon image"
+              width="20"
+              height="20"
+              src="@/assets/polygon.svg"
+            />
+            <span class="text-gray-900 py-4 text-end font-bold text-sm">
+              Polygon
+            </span>
+          </div>
+          <div class="w-full flex justify-center pb-12">
+            <hr class="w-4/5" />
+          </div>
+        </div>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -321,11 +408,11 @@ header {
 }
 
 .redirect_button {
-  @apply py-4 text-gray-900 font-semibold text-xs w-full;
+  @apply py-5 text-gray-900 sm:font-semibold font-bold sm:text-xs text-sm w-full;
 }
 
 .menu-button {
-  @apply flex text-center justify-center hover:bg-gray-200;
+  @apply flex sm:text-center sm:justify-center hover:bg-gray-200 ml-8 sm:ml-0;
 }
 
 a:hover {
@@ -338,6 +425,12 @@ a:hover {
 
 .sm-view {
   display: none;
+}
+
+.mobile-menu {
+  margin-top: 1400px;
+  bottom: 0px;
+  height: auto;
 }
 
 @media screen and (max-width: 500px) {

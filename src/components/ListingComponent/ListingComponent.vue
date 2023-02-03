@@ -48,8 +48,8 @@ const getEventName = (event: string | undefined): string => {
 
   const possibleEventName: { [key: string]: string } = {
     DepositAdded: "Oferta",
-    LockAdded: "Compra",
-    LockReleased: "Reserva",
+    LockAdded: "Reserva",
+    LockReleased: "Compra",
   };
 
   return possibleEventName[event];

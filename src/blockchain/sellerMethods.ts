@@ -22,7 +22,6 @@ const approveTokens = async (tokenQty: string): Promise<any> => {
   );
 
   await apprv.wait();
-  console.log(apprv);
   return apprv;
 };
 

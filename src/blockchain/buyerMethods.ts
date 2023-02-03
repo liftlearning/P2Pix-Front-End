@@ -31,7 +31,7 @@ const addLock = async (
   const lock_rec = await lock.wait();
   const [t] = lock_rec.events;
 
-  return t.args.lockID;
+  return String(t.args.lockID);
 };
 
 const releaseLock = async (
@@ -45,7 +45,7 @@ const releaseLock = async (
   );
 
   const messageToSign = ethers.utils.solidityKeccak256(
-    ["string", "uint256", "bytes32"],
+    ["uint160", "uint256", "bytes32"],
     [
       pixKey,
       parseEther(String(amount)),
@@ -63,7 +63,7 @@ const releaseLock = async (
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
   const release = await p2pContract.release(
-    lockId,
+    BigNumber.from(lockId),
     ethers.constants.AddressZero,
     ethers.utils.formatBytes32String(e2eId),
     sig.r,

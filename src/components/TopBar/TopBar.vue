@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "@/store/ether";
-import { ref } from "vue";
+import { ref, onBeforeUnmount, onMounted } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import { connectProvider, requestNetworkChange } from "@/blockchain/provider";
 import ethereumImage from "@/assets/ethereum.svg";
@@ -17,6 +18,8 @@ const menuHoverToggle = ref<boolean>(false);
 
 const currencyMenuOpenToggle = ref<boolean>(false);
 const currencyMenuHoverToggle = ref<boolean>(false);
+const walletAddressRef = ref<any>(null);
+const currencyRef = ref<any>(null);
 
 //Methods
 const connectMetaMask = async (): Promise<void> => {
@@ -58,28 +61,63 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
 
   return validImages[networkName];
 };
+
+onClickOutside(walletAddressRef, () => {
+  menuHoverToggle.value = false;
+  menuOpenToggle.value = false;
+});
+
+onClickOutside(currencyRef, () => {
+  currencyMenuOpenToggle.value = false;
+  currencyMenuHoverToggle.value = false;
+});
 </script>
 
 <template>
-  <header>
+  <header class="z-20">
     <RouterLink :to="'/'" class="default-button">
       <img
         alt="P2Pix logo"
-        class="logo"
+        class="logo lg-view"
         src="@/assets/logo.svg"
         width="75"
         height="75"
       />
+      <img
+        alt="P2Pix logo"
+        class="logo sm-view w-10/12"
+        src="@/assets/logo2.svg"
+        width="40"
+        height="40"
+      />
     </RouterLink>
 
-    <div class="flex gap-4 items-center">
-      <RouterLink :to="'/faq'" class="default-button"> FAQ </RouterLink>
-      <RouterLink :to="sellerView ? '/' : '/seller'" class="default-button">
+    <div class="flex sm:gap-4 gap-2 items-center">
+      <RouterLink :to="'/faq'" class="default-button lg-view"> FAQ </RouterLink>
+      <RouterLink
+        :to="'/faq'"
+        v-if="!walletAddress"
+        class="default-button sm-view"
+      >
+        FAQ
+      </RouterLink>
+      <RouterLink
+        :to="sellerView ? '/' : '/seller'"
+        class="default-button sm:whitespace-normal whitespace-nowrap lg-view"
+      >
+        {{ sellerView ? "Quero comprar" : "Quero vender" }}
+      </RouterLink>
+      <RouterLink
+        :to="sellerView ? '/' : '/seller'"
+        v-if="!walletAddress"
+        class="default-button sm:whitespace-normal whitespace-nowrap sm-view"
+      >
         {{ sellerView ? "Quero comprar" : "Quero vender" }}
       </RouterLink>
       <div class="flex flex-col" v-if="walletAddress">
         <div
-          class="group top-bar-info cursor-pointer hover:bg-white"
+          ref="currencyRef"
+          class="group top-bar-info cursor-pointer hover:bg-white h-10"
           @click="
             [
               (currencyMenuOpenToggle = !currencyMenuOpenToggle),
@@ -101,7 +139,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
             :src="getNetworkImage(etherStore.networkName)"
           />
           <span
-            class="default-text group-hover:text-gray-900"
+            class="default-text group-hover:text-gray-900 lg-view"
             :style="{
               color: currencyMenuOpenToggle
                 ? '#000000'
@@ -131,7 +169,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
         <div
           v-show="currencyMenuOpenToggle"
-          class="mt-10 pl-3 absolute w-full text-gray-900"
+          class="mt-10 pl-3 absolute w-full text-gray-900 lg-view"
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10">
@@ -176,15 +214,24 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
       <button
         type="button"
         v-if="!walletAddress"
-        class="border-amber-500 border-2 rounded default-button"
+        class="border-amber-500 border-2 rounded default-button lg-view"
         @click="connectMetaMask()"
       >
         Conectar carteira
       </button>
+      <button
+        type="button"
+        v-if="!walletAddress"
+        class="border-amber-500 border-2 rounded default-button sm-view"
+        @click="connectMetaMask()"
+      >
+        Conectar
+      </button>
       <div v-if="walletAddress" class="account-info">
         <div class="flex flex-col">
           <div
-            class="top-bar-info cursor-pointer"
+            ref="walletAddressRef"
+            class="top-bar-info cursor-pointer h-10"
             @click="
               [
                 (menuOpenToggle = !menuOpenToggle),
@@ -203,7 +250,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
           >
             <img alt="Account image" src="@/assets/account.svg" />
             <span
-              class="default-text text-sm"
+              class="default-text"
               :style="{
                 color: menuOpenToggle
                   ? '#000000'
@@ -215,7 +262,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
               {{ formatWalletAddress() }}
             </span>
             <img
-              class="text-gray-900"
+              class="text-gray-900 lg-view"
               v-if="!menuHoverToggle && !menuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"
@@ -233,7 +280,7 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
           </div>
           <div
             v-show="menuOpenToggle"
-            class="mt-10 absolute w-full text-gray-900"
+            class="mt-10 absolute w-full text-gray-900 lg-view"
           >
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
@@ -264,6 +311,93 @@ const getNetworkImage = (networkName: NetworkEnum): string => {
         </div>
       </div>
     </div>
+    <div
+      v-show="menuOpenToggle"
+      class="mobile-menu fixed w-4/5 text-gray-900 sm-view"
+    >
+      <div class="pl-4 mt-2 h-full">
+        <div class="bg-white rounded-md z-10 h-full">
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink
+              :to="sellerView ? '/' : '/seller'"
+              class="redirect_button mt-2"
+            >
+              {{ sellerView ? "Quero comprar" : "Quero vender" }}
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink to="/transaction_history" class="redirect_button">
+              Histórico de transações
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="closeMenu()">
+            <RouterLink to="/manage_bids" class="redirect_button">
+              Gerenciar Ofertas
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div class="menu-button" @click="disconnectUser">
+            <RouterLink to="/" class="redirect_button">
+              Desconectar
+            </RouterLink>
+          </div>
+          <div class="w-full flex justify-center pb-20">
+            <hr class="w-4/5" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-show="currencyMenuOpenToggle"
+      class="mobile-menu fixed w-4/5 text-gray-900 sm-view"
+    >
+      <div class="pl-4 mt-2 h-full">
+        <div class="bg-white rounded-md z-10 h-full">
+          <div
+            class="menu-button gap-2 sm:px-4 rounded-md cursor-pointer py-2"
+            @click="networkChange(NetworkEnum.ethereum)"
+          >
+            <img
+              alt="Ethereum image"
+              width="20"
+              height="20"
+              src="@/assets/ethereum.svg"
+            />
+            <span class="text-gray-900 py-4 text-end font-bold text-sm">
+              Ethereum
+            </span>
+          </div>
+          <div class="w-full flex justify-center">
+            <hr class="w-4/5" />
+          </div>
+          <div
+            class="menu-button gap-2 sm:px-4 rounded-md cursor-pointer py-2"
+            @click="networkChange(NetworkEnum.polygon)"
+          >
+            <img
+              alt="Polygon image"
+              width="20"
+              height="20"
+              src="@/assets/polygon.svg"
+            />
+            <span class="text-gray-900 py-4 text-end font-bold text-sm">
+              Polygon
+            </span>
+          </div>
+          <div class="w-full flex justify-center pb-12">
+            <hr class="w-4/5" />
+          </div>
+        </div>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -273,7 +407,7 @@ header {
 }
 
 .default-button {
-  @apply px-4 py-2 rounded text-gray-50 font-semibold text-base hover:bg-transparent;
+  @apply sm:px-4 px-3 py-2 rounded text-gray-50 font-semibold sm:text-base text-xs hover:bg-transparent;
 }
 
 .account-info {
@@ -285,18 +419,42 @@ header {
 }
 
 .top-bar-info {
-  @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 rounded;
+  @apply flex justify-between gap-2 px-4 py-2 border-amber-500 border-2 sm:rounded rounded-lg items-center;
 }
 
 .redirect_button {
-  @apply py-4 text-gray-900 font-semibold text-xs w-full;
+  @apply py-5 text-gray-900 sm:font-semibold font-bold sm:text-xs text-sm w-full;
 }
 
 .menu-button {
-  @apply flex text-center justify-center hover:bg-gray-200;
+  @apply flex sm:text-center sm:justify-center hover:bg-gray-200 ml-8 sm:ml-0;
 }
 
 a:hover {
   @apply bg-gray-200 rounded;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+.mobile-menu {
+  margin-top: 1400px;
+  bottom: 0px;
+  height: auto;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

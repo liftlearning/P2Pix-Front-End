@@ -114,22 +114,25 @@ watch(networkName, (): void => {
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-5xl max-w-[29rem]"
-        >Adquira cripto com apenas um Pix</span
+      <span
+        class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] max-w-[20rem]"
       >
-      <span class="text font-medium text-base max-w-[28rem]"
+        Adquira cripto com apenas um Pix</span
+      >
+      <span class="text font-medium sm:text-base text-sm max-w-[28rem]"
         >Digite um valor, confira a oferta, conecte sua carteira e receba os
         tokens após realizar o Pix</span
       >
     </div>
     <div class="blur-container">
+      <div class="backdrop-blur -z-10 w-full h-full"></div>
       <div
-        class="flex flex-col w-full bg-white px-10 py-5 rounded-lg border-y-10"
+        class="flex flex-col w-full bg-white sm:px-10 px-6 py-5 rounded-lg border-y-10"
       >
-        <div class="flex justify-between w-full items-center">
+        <div class="flex justify-between sm:w-full items-center">
           <input
             type="number"
-            class="border-none outline-none text-lg text-gray-900 w-fit"
+            class="border-none outline-none text-lg text-gray-900 w-3/4"
             v-bind:class="{
               'font-semibold': tokenValue != undefined,
               'text-xl': tokenValue != undefined,
@@ -141,8 +144,12 @@ watch(networkName, (): void => {
           <div
             class="flex flex-row p-2 px-3 bg-gray-300 rounded-3xl min-w-fit gap-1"
           >
-            <img alt="Token image" class="w-fit" src="@/assets/brz.svg" />
-            <span class="text-gray-900 text-lg w-fit" id="brz">BRZ</span>
+            <img
+              alt="Token image"
+              class="sm:w-fit w-4"
+              src="@/assets/brz.svg"
+            />
+            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz">BRZ</span>
           </div>
         </div>
 
@@ -215,11 +222,11 @@ watch(networkName, (): void => {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
+  @apply flex flex-col justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 mt-10;
 }
 
 input[type="number"] {

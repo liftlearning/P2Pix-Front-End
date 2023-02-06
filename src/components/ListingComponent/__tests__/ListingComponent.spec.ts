@@ -10,6 +10,17 @@ describe("ListingComponent.vue", () => {
     setActivePinia(createPinia());
   });
 
+  test("Test Message when an empty array is received", () => {
+    const wrapper = mount(ListingComponent, {
+      props: {
+        walletTransactions: [],
+        isManageMode: true,
+      },
+    });
+
+    expect(wrapper.html()).toContain("Não há nenhuma transação anterior");
+  });
+
   test("Test Headers on List in Manage Mode", () => {
     const wrapper = mount(ListingComponent, {
       props: {

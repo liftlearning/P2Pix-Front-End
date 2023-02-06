@@ -13,6 +13,7 @@ export default defineConfig({
       provider: "c8",
       all: true,
       src: ["./src"],
+      exclude: ["model/**", "**/__tests__/**"],
       reporter: ["text", "lcov", "html"],
     },
   },

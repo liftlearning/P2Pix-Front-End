@@ -74,70 +74,64 @@ watch(props, async (): Promise<void> => {
 //emits
 const emit = defineEmits(["withdrawDeposit"]);
 
-// initial itemsToShow value
+// initial itemsToShow valueb
 showInitialItems();
 </script>
 
 <template>
   <div class="blur-container">
     <div
-      class="grid grid-cols-4 grid-flow-row w-full px-6"
-      v-if="itemsToShow.length != 0"
-      v-bind:class="{ 'grid-cols-3': props.isManageMode }"
-    >
-      <span class="text-xs text-gray-50 font-medium justify-self-center"
-        >Valor</span
-      >
-      <span class="text-xs text-gray-50 font-medium justify-self-center"
-        >Data</span
-      >
-      <span
-        v-if="!props.isManageMode"
-        class="text-xs text-gray-50 font-medium justify-self-center"
-      >
-        "Tipo de transação"
-      </span>
-      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
-        props.isManageMode ? "Retirar tokens" : "Checar transação"
-      }}</span>
-    </div>
-    <div
-      class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
-      v-bind:class="{ 'grid-cols-3': props.isManageMode }"
+      class="w-full bg-white p-6 rounded-lg"
       v-for="(item, index) in itemsToShow"
       :key="item.blockNumber"
     >
-      <span class="last-release-info">
-        {{
-          isValidDeposit(item)
-            ? item.remaining
-            : getAmountFormatted(item.args?.amount)
-        }}
-        BRZ
-      </span>
-
-      <span class="last-release-info transaction-date"> 20 out 2022 </span>
-
-      <span class="last-release-info" v-if="!props.isManageMode">
-        {{ getEventName((item as Event).event) }}
-      </span>
-
-      <div
-        v-if="!props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="openEtherscanUrl((item as Event)?.transactionHash)"
-      >
-        <span class="last-release-info">Etherscan</span>
-        <img alt="Redirect image" src="@/assets/redirect.svg" />
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-sm leading-5 font-medium text-gray-600">
+            {{ getEventName((item as Event).event) }}
+          </p>
+          <p class="text-xl leading-7 font-semibold text-gray-900">
+            {{
+              isValidDeposit(item)
+                ? item.remaining
+                : getAmountFormatted(item.args?.amount)
+            }}
+            BRZ
+          </p>
+          <p class="text-xs leading-4 font-medium text-gray-600">20/08/2022</p>
+        </div>
+        <div>
+          <div class="bg-emerald-300 rounded-lg text-center mb-2">
+            Finalizado
+          </div>
+          <div
+            v-if="!props.isManageMode"
+            class="flex gap-2 cursor-pointer items-center justify-self-center"
+            @click="openEtherscanUrl((item as Event)?.transactionHash)"
+          >
+            <span class="last-release-info">Etherscan</span>
+            <img alt="Redirect image" src="@/assets/redirect.svg" />
+          </div>
+        </div>
       </div>
+      <div class="pt-5" v-if="props.isManageMode">
+        <!-- <div class="py-2">
+          <p class="text-sm leading-5 font-medium">Valor do saque</p>
+          <p class="text-2xl leading-8 font-medium">0</p>
+        </div> -->
 
-      <div
-        v-if="props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('withdrawDeposit', (item as ValidDeposit).token, index)"
-      >
-        <span class="last-release-info">Retirar</span>
-        <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+        <hr class="pb-3" />
+        <div class="flex justify-between items-center">
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            @click="
+              emit('withdrawDeposit', (item as ValidDeposit).token, index)
+            "
+          >
+            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+            <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -180,7 +174,7 @@ p {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 .blur-container-row {
   @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;

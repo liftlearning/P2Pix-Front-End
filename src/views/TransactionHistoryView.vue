@@ -58,6 +58,6 @@ watch(networkName, async () => {
 }
 
 .header {
-  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex;
+  @apply text-3xl text-white leading-9 font-bold justify-center flex;
 }
 </style>

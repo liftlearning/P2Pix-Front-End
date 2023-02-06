@@ -96,7 +96,7 @@ const openItem = (index: number) => {
 
     <div class="flex justify-between w-10/12 mt-20">
       <div>
-        <h1 class="text-3xl text-gray-800 font-bold">Sumário</h1>
+        <h1 class="text-3xl text-white font-bold">Sumário</h1>
         <h3
           :class="index == selectedSection ? 'selected-sumario' : 'sumario'"
           v-for="(f, index) in faq"
@@ -125,10 +125,10 @@ const openItem = (index: number) => {
               class="mr-3"
               v-if="item.isOpen"
             />
-            <h4>{{ item.title }}</h4>
+            <h4 class="text-white">{{ item.title }}</h4>
           </div>
           <div
-            style="padding-top: 24px"
+            style="padding-top: 24px; color: white"
             v-if="item.isOpen"
             v-html="item.content"
           ></div>
@@ -159,12 +159,8 @@ const openItem = (index: number) => {
   margin: 24px 0;
 }
 
-p,
-h2,
-h3,
-h4 {
-  @apply text-gray-800 text-xl;
-  color: #1f2937;
+h3 {
+  @apply text-white;
 }
 
 h2,
@@ -177,7 +173,7 @@ h4 {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 .blur-container-row {
   @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;

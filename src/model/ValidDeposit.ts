@@ -4,4 +4,5 @@ export type ValidDeposit = {
   remaining: number;
   seller: string;
   pixKey: number;
+  open?: boolean;
 };

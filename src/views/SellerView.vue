@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
 import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
-import ValidationComponent from "../components/LoadingComponent.vue";
+import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import { approveTokens, addDeposit } from "../blockchain/sellerMethods";
 
 import { ref } from "vue";
@@ -57,7 +57,7 @@ const sendNetwork = async () => {
 <template>
   <div v-if="flowStep == Step.Sell">
     <WantSellComponent v-if="!loading" @approve-tokens="approveOffer" />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"
     />
@@ -69,7 +69,7 @@ const sendNetwork = async () => {
       v-if="!loading"
       @send-network="sendNetwork"
     />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"
     />

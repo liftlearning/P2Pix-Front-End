@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SearchComponent from "@/components/SearchComponent.vue";
-import ValidationComponent from "@/components/LoadingComponent.vue";
+import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
 import { ref, onMounted } from "vue";
 import { useEtherStore } from "@/store/ether";
@@ -101,7 +101,7 @@ onMounted(async () => {
       @pix-validated="releaseTransaction"
       v-if="!loadingLock"
     />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loadingLock"
       :message="'A transação está sendo enviada para a rede'"
     />
@@ -113,7 +113,7 @@ onMounted(async () => {
       :tokenAmount="tokenAmount"
       @make-another-transaction="flowStep = Step.Search"
     />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loadingRelease"
       :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"
     />

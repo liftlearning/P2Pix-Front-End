@@ -5,7 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["jest", "node"],
+    "resolveJsonModule": true
   },
 
   "references": [

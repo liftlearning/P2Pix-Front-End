@@ -1,6 +1,10 @@
 name: CI script
 
-on: push 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
  
 jobs:
   lint:
@@ -13,29 +17,48 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: 🏗 Install dependencies
-        run: npm ci
+        run: yarn
 
       - name: 📦 Lint with eslint
-        run: npm run lint
+        run: yarn lint
 
   build:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID_STAGING }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3
   
-      - name: 📦 Build docker image
-        run: |
-          docker build -t p2pix:$GITHUB_SHA .
-          docker save -o image_$GITHUB_SHA p2pix:$GITHUB_SHA
+      - name: 🏗 Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: 📦 Put docker image in cache
-        uses: actions/cache@v3
+      - name: 🏗 Pull staging app from vercel environment
+        run: vercel pull --yes --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+
+      - name: 📦 Build staging app artifacts
+        run: vercel build --token=${{ secrets.VERCEL_AUTH_TOKEN }}
+
+  test-coverage:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
         with:
-          key: p2pix
-          path: image_${{ github.sha }}
+          fetch-depth: 0 
 
-  # test job
+      - name: 🏗 Install dependencies
+        run: yarn
+
+      - name: 📦 Test and coverage
+        run: yarn coverage
+
+      - name: 📦 SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

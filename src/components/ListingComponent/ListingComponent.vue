@@ -16,11 +16,17 @@ const etherStore = useEtherStore();
 
 const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
 
+const getExplorer = (): string => {
+  return etherStore.networkName == NetworkEnum.ethereum
+    ? "Etherscan"
+    : "Polygonscan";
+};
+
 // Methods
 const isValidDeposit = (
   deposit: Event | ValidDeposit
 ): deposit is ValidDeposit => {
-  return (deposit as ValidDeposit).depositID !== undefined;
+  return (deposit as ValidDeposit).token !== undefined;
 };
 
 const showInitialItems = (): void => {
@@ -48,8 +54,8 @@ const getEventName = (event: string | undefined): string => {
 
   const possibleEventName: { [key: string]: string } = {
     DepositAdded: "Oferta",
-    LockAdded: "Compra",
-    LockReleased: "Reserva",
+    LockAdded: "Reserva",
+    LockReleased: "Compra",
   };
 
   return possibleEventName[event];
@@ -72,7 +78,7 @@ watch(props, async (): Promise<void> => {
 });
 
 //emits
-const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
+const emit = defineEmits(["withdrawDeposit"]);
 
 // initial itemsToShow valueb
 showInitialItems();
@@ -109,7 +115,7 @@ showInitialItems();
             class="flex gap-2 cursor-pointer items-center justify-self-center"
             @click="openEtherscanUrl((item as Event)?.transactionHash)"
           >
-            <span class="last-release-info">Etherscan</span>
+            <span class="last-release-info">{{ getExplorer() }}</span>
             <img alt="Redirect image" src="@/assets/redirect.svg" />
           </div>
         </div>
@@ -123,18 +129,9 @@ showInitialItems();
         <hr class="pb-3" />
         <div class="flex justify-between items-center">
           <div
-            class="flex gap-2 cursor-pointer items-center justify-self-center"
-            @click="
-              emit('cancelDeposit', (item as ValidDeposit).depositID, index)
-            "
-          >
-            <span class="last-release-info">Cancelar</span>
-          </div>
-
-          <div
             class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="
-              emit('withdrawDeposit', (item as ValidDeposit).depositID, index)
+              emit('withdrawDeposit', (item as ValidDeposit).token, index)
             "
           >
             <img alt="Withdraw image" src="@/assets/withdraw.svg" />

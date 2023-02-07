@@ -22,7 +22,6 @@ const approveTokens = async (tokenQty: string): Promise<any> => {
   );
 
   await apprv.wait();
-  console.log(apprv);
   return apprv;
 };
 
@@ -33,6 +32,7 @@ const addDeposit = async (tokenQty: string, pixKey: string): Promise<any> => {
     getTokenAddress(),
     parseEther(tokenQty),
     pixKey,
+    true,
     ethers.utils.formatBytes32String("")
   );
 

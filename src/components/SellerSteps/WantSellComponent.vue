@@ -3,6 +3,7 @@ import { ref } from "vue";
 import CustomButton from "../CustomButton/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { decimalCount } from "@/utils/decimalCount";
+import { pixFormatValidation, postProcessKey } from "@/utils/pixKeyFormat";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { connectProvider } from "@/blockchain/provider";
@@ -17,6 +18,7 @@ const pixKey = ref<string>("");
 const enableSelectButton = ref<boolean>(false);
 const hasLiquidity = ref<boolean>(true);
 const validDecimals = ref<boolean>(true);
+const validPixFormat = ref<boolean>(true);
 
 // Emits
 const emit = defineEmits(["approveTokens"]);
@@ -35,10 +37,26 @@ const handleInputEvent = (event: any): void => {
   validDecimals.value = true;
 };
 
+const handlePixKeyInputEvent = (event: any): void => {
+  const { value } = event.target;
+
+  pixKey.value = value;
+
+  if (pixFormatValidation(pixKey.value)) {
+    validPixFormat.value = true;
+    enableSelectButton.value = true;
+    return;
+  }
+
+  enableSelectButton.value = false;
+  validPixFormat.value = false;
+};
+
 const handleButtonClick = async (
   offer: string,
   pixKey: string
 ): Promise<void> => {
+  console.log(postProcessKey(pixKey));
   if (walletAddress.value) emit("approveTokens", { offer, pixKey });
   else await connectProvider();
 };
@@ -47,10 +65,12 @@ const handleButtonClick = async (
 <template>
   <div class="page w-full">
     <div class="text-container">
-      <span class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] max-w-[20rem]"
+      <span
+        class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] max-w-[20rem]"
         >Venda cripto e receba em Pix</span
       >
-      <span class="text font-medium sm:text-base text-xs sm:max-w-[28rem] max-w-[30rem] sm:tracking-normal tracking-wide"
+      <span
+        class="text font-medium sm:text-base text-xs sm:max-w-[28rem] max-w-[30rem] sm:tracking-normal tracking-wide"
         >Digite sua oferta, informe a chave Pix, selecione a rede, aprove o
         envio da transação e confirme sua oferta.</span
       >
@@ -81,9 +101,7 @@ const handleButtonClick = async (
               class="sm:w-fit w-4"
               src="@/assets/brz.svg"
             />
-            <span class="text-gray-900 w-fit" id="brz">
-              BRZ
-            </span>
+            <span class="text-gray-900 w-fit" id="brz"> BRZ </span>
           </div>
         </div>
 
@@ -103,15 +121,22 @@ const handleButtonClick = async (
       >
         <div class="flex justify-between w-full items-center">
           <input
+            @input="debounce(handlePixKeyInputEvent, 500)($event)"
             type="text"
             v-model="pixKey"
             class="border-none outline-none sm:text-lg text-sm text-gray-900 w-fit"
             placeholder="Digite a chave Pix"
           />
         </div>
+        <div class="flex pt-2 justify-center" v-if="!validPixFormat">
+          <span class="text-red-500 font-normal text-sm"
+            >Por favor utilize telefone, CPF ou CNPJ</span
+          >
+        </div>
       </div>
       <CustomButton
         :text="walletAddress ? 'Aprovar tokens' : 'Conectar Carteira'"
+        :isDisabled="!validDecimals || !validPixFormat"
         @buttonClicked="handleButtonClick(offer, pixKey)"
       />
     </div>

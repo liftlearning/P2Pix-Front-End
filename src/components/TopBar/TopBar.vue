@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useEtherStore } from "@/store/ether";
-import { ref, onBeforeUnmount, onMounted } from "vue";
+import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import { connectProvider, requestNetworkChange } from "@/blockchain/provider";

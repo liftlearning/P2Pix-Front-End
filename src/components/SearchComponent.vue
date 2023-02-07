@@ -107,7 +107,12 @@ const enableOrDisableConfirmButton = (): void => {
 };
 
 watch(networkName, (): void => {
+  verifyLiquidity();
   enableOrDisableConfirmButton();
+});
+
+watch(walletAddress, (): void => {
+  verifyLiquidity();
 });
 </script>
 
@@ -149,7 +154,9 @@ watch(networkName, (): void => {
               class="sm:w-fit w-4"
               src="@/assets/brz.svg"
             />
-            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz">BRZ</span>
+            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz"
+              >BRZ</span
+            >
           </div>
         </div>
 

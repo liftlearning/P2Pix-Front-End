@@ -5,8 +5,8 @@ const getTokenAddress = (): string => {
   const etherStore = useEtherStore();
 
   const possibleTokenAddresses: { [key: string]: string } = {
-    Ethereum: "0x294003F602c321627152c6b7DED3EAb5bEa853Ee",
-    Polygon: "0x294003F602c321627152c6b7DED3EAb5bEa853Ee",
+    Ethereum: "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
+    Polygon: "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29",
   };
 
   return possibleTokenAddresses[etherStore.networkName];
@@ -16,8 +16,8 @@ const getP2PixAddress = (): string => {
   const etherStore = useEtherStore();
 
   const possibleP2PixAddresses: { [key: string]: string } = {
-    Ethereum: "0x5f3EFA9A90532914545CEf527C530658af87e196",
-    Polygon: "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    Ethereum: "0xefa5cE4351cda51192509cf8De7d8881ADAE95DD",
+    Polygon: "0xA9258eBb157E4cf5e756b77FDD0DF09C2F73240b",
   };
 
   return possibleP2PixAddresses[etherStore.networkName];

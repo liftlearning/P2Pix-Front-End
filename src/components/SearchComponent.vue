@@ -154,7 +154,9 @@ watch(walletAddress, (): void => {
               class="sm:w-fit w-4"
               src="@/assets/brz.svg"
             />
-            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz">BRZ</span>
+            <span class="text-gray-900 sm:text-lg text-md w-fit" id="brz"
+              >BRZ</span
+            >
           </div>
         </div>
 

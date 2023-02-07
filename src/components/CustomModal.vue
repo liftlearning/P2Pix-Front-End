@@ -1,10 +1,13 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div class="modal-overlay inset-0 fixed justify-center backdrop-blur-sm sm:backdrop-blur-none">
+  <div
+    class="modal-overlay inset-0 fixed justify-center backdrop-blur-sm sm:backdrop-blur-none"
+  >
     <div class="modal px-5 text-center">
-      <p class="text-black tracking-tighter leading-tight my-6 mx-2 text-justify">
+      <p
+        class="text-black tracking-tighter leading-tight my-6 mx-2 text-justify"
+      >
         <strong>ATENÇÃO!</strong>
         A transação só será processada após inserir o código de autenticação.
         Caso contrário não conseguiremos comprovar o seu depósito e não será
@@ -21,7 +24,6 @@
 </template>
 
 <style scoped>
-
 .modal-overlay {
   display: flex !important;
 }
@@ -62,5 +64,4 @@ button {
   font-size: 14px;
   border-radius: 10px;
 }
-
 </style>

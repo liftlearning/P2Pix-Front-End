@@ -51,7 +51,7 @@ const listValidDepositTransactionsByWalletAddress = async (
 const listAllTransactionByWalletAddress = async (
   walletAddress: string
 ): Promise<Event[]> => {
-  const p2pContract = getContract();
+  const p2pContract = getContract(true);
 
   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);

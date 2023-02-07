@@ -65,10 +65,12 @@ const handleButtonClick = async (
 <template>
   <div class="page w-full">
     <div class="text-container">
-      <span class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] max-w-[20rem]"
+      <span
+        class="text font-extrabold sm:text-5xl text-3xl sm:max-w-[29rem] max-w-[20rem]"
         >Venda cripto e receba em Pix</span
       >
-      <span class="text font-medium sm:text-base text-xs sm:max-w-[28rem] max-w-[30rem] sm:tracking-normal tracking-wide"
+      <span
+        class="text font-medium sm:text-base text-xs sm:max-w-[28rem] max-w-[30rem] sm:tracking-normal tracking-wide"
         >Digite sua oferta, informe a chave Pix, selecione a rede, aprove o
         envio da transação e confirme sua oferta.</span
       >
@@ -99,9 +101,7 @@ const handleButtonClick = async (
               class="sm:w-fit w-4"
               src="@/assets/brz.svg"
             />
-            <span class="text-gray-900 w-fit" id="brz">
-              BRZ
-            </span>
+            <span class="text-gray-900 w-fit" id="brz"> BRZ </span>
           </div>
         </div>
 

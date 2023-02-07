@@ -16,6 +16,12 @@ const etherStore = useEtherStore();
 
 const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
 
+const getExplorer = (): string => {
+  return etherStore.networkName == NetworkEnum.ethereum
+    ? "Etherscan"
+    : "Polygonscan";
+};
+
 // Methods
 const isValidDeposit = (
   deposit: Event | ValidDeposit
@@ -109,7 +115,7 @@ showInitialItems();
             class="flex gap-2 cursor-pointer items-center justify-self-center"
             @click="openEtherscanUrl((item as Event)?.transactionHash)"
           >
-            <span class="last-release-info">Etherscan</span>
+            <span class="last-release-info">{{ getExplorer() }}</span>
             <img alt="Redirect image" src="@/assets/redirect.svg" />
           </div>
         </div>

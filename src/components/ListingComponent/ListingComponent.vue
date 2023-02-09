@@ -86,9 +86,36 @@ showInitialItems();
 
 <template>
   <div class="blur-container">
+    <div class="w-full bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-sm leading-5 font-medium text-gray-600">
+            Saldo disponível
+          </p>
+          <p class="text-xl leading-7 font-semibold text-gray-900">0 BRZ</p>
+          <p class="text-xs leading-4 font-medium text-gray-600"></p>
+        </div>
+      </div>
+      <div class="pt-5" v-if="props.isManageMode">
+        <div class="py-2">
+          <p class="text-sm leading-5 font-medium">Valor do saque</p>
+          <p class="text-2xl leading-8 font-medium">0</p>
+        </div>
+
+        <hr class="pb-3" />
+        <div class="flex justify-end items-center">
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+          >
+            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+            <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div
       class="w-full bg-white p-6 rounded-lg"
-      v-for="(item, index) in itemsToShow"
+      v-for="item in itemsToShow"
       :key="item.blockNumber"
     >
       <div class="flex justify-between items-center">
@@ -104,10 +131,10 @@ showInitialItems();
             }}
             BRZ
           </p>
-          <p class="text-xs leading-4 font-medium text-gray-600">20/08/2022</p>
+          <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
         <div>
-          <div class="bg-emerald-300 rounded-lg text-center mb-2">
+          <div class="bg-emerald-300 rounded-lg text-center mb-2 p-1">
             Finalizado
           </div>
           <div
@@ -120,11 +147,11 @@ showInitialItems();
           </div>
         </div>
       </div>
-      <div class="pt-5" v-if="props.isManageMode">
-        <!-- <div class="py-2">
+      <!-- <div class="pt-5" v-if="props.isManageMode">
+        <div class="py-2">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
           <p class="text-2xl leading-8 font-medium">0</p>
-        </div> -->
+        </div>
 
         <hr class="pb-3" />
         <div class="flex justify-between items-center">
@@ -138,7 +165,7 @@ showInitialItems();
             <span class="last-release-info">Sacar</span>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div
       class="flex flex-col justify-center items-center w-full mt-2 gap-2"

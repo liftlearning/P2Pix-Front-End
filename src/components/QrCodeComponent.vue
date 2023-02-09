@@ -154,7 +154,11 @@ const validatePix = async (): Promise<void> => {
         @button-clicked="emit('pixValidated', e2eId)"
       />
     </div>
-    <CustomModal v-if="showModal" @close-modal="showModal = false" />
+    <CustomModal
+      v-if="showModal"
+      @close-modal="showModal = false"
+      :isRedirectModal="false"
+    />
   </div>
 </template>
 

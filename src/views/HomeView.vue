@@ -5,6 +5,7 @@ import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirm
 import { ref, onMounted } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
+import CustomModal from "@/components/CustomModal.vue";
 import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import {
@@ -31,6 +32,7 @@ const pixTarget = ref<number>();
 const tokenAmount = ref<number>();
 const _lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
+const showModal = ref<boolean>(true);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 
 const confirmBuyClick = async (
@@ -93,6 +95,12 @@ onMounted(async () => {
   <SearchComponent
     v-if="flowStep == Step.Search"
     @token-buy="confirmBuyClick"
+  />
+  <CustomModal
+    v-if="flowStep == Step.Search && showModal"
+    :isRedirectModal="true"
+    @close-modal="showModal = false"
+    @go-to-lock="flowStep = Step.Buy"
   />
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent

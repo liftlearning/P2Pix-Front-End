@@ -1,8 +1,25 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const props = defineProps({
+  isRedirectModal: Boolean,
+});
+
+const modalColor = ref<string>("white");
+const modalHeight = ref<string>("250px");
+const pFontSize = ref<string>("16px");
+
+if (props.isRedirectModal) {
+  modalColor.value = "rgba(251, 191, 36, 1)";
+  modalHeight.value = "150px";
+  pFontSize.value = "20px";
+}
+</script>
 
 <template>
   <div
     class="modal-overlay inset-0 fixed justify-center backdrop-blur-sm sm:backdrop-blur-none"
+    v-if="!isRedirectModal"
   >
     <div class="modal px-5 text-center">
       <p
@@ -21,6 +38,32 @@
       </button>
     </div>
   </div>
+  <div
+    class="modal-overlay inset-0 fixed justify-center backdrop-blur-sm"
+    v-if="isRedirectModal"
+  >
+    <div class="modal px-5 text-center">
+      <p
+        class="text-black text-lg tracking-tighter leading-tight my-6 mx-2 text-justify font-semibold"
+      >
+        Retomar a última compra?
+      </p>
+      <div class="flex justify-around items-center px-2">
+        <button
+          @click="$emit('close-modal')"
+          class="border-2 border-solid border-white-400 mt-2 font-semibold"
+        >
+          Não
+        </button>
+        <button
+          @click="$emit('go-to-lock')"
+          class="border-2 border-solid border-white-400 mt-2 font-semibold"
+        >
+          Sim
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -29,8 +72,8 @@
 }
 
 .modal {
-  background-color: white;
-  height: 250px;
+  background-color: v-bind(modalColor);
+  height: v-bind(modalHeight);
   width: 300px;
   margin-top: 50%;
   border-radius: 10px;
@@ -54,7 +97,7 @@ h6 {
 }
 
 p {
-  font-size: 16px;
+  font-size: v-bind(pFontSize);
 }
 
 button {

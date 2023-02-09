@@ -99,7 +99,7 @@ showInitialItems();
       <div class="pt-5" v-if="props.isManageMode">
         <div class="py-2">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
-          <p class="text-2xl leading-8 font-medium">0</p>
+          <input type="number" name="" id="" placeholder="0" class="text-2xl" />
         </div>
 
         <hr class="pb-3" />

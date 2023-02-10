@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { pix } from "../utils/QrCodePix";
+import { pix } from "@/utils/QrCodePix";
 import { ref } from "vue";
 import { debounce } from "@/utils/debounce";
-import CustomButton from "./CustomButton/CustomButton.vue";
-import CustomModal from "./CustomModal.vue";
-import api from "../services/index";
+import CustomButton from "@/components/CustomButton/CustomButton.vue";
+import CustomModal from "@/components//CustomModal/CustomModal.vue";
+import api from "@/services/index";
 
 // props and store references
 const props = defineProps({

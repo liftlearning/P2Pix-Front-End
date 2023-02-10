@@ -2,16 +2,15 @@
 import SearchComponent from "@/components/SearchComponent.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
-import CustomModal from "@/components/CustomModal.vue";
+import CustomModal from "@/components/CustomModal/CustomModal.vue";
 import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import {
   updateWalletStatus,
   listReleaseTransactionByWalletAddress,
-  checkUnreleasedLocks,
 } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { Event } from "ethers";
@@ -27,7 +26,7 @@ const etherStore = useEtherStore();
 etherStore.setSellerView(false);
 
 // States
-const { loadingLock, walletAddress, networkName } = storeToRefs(etherStore);
+const { loadingLock, walletAddress } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<number>();
 const tokenAmount = ref<number>();
@@ -87,18 +86,18 @@ const releaseTransaction = async (e2eId: string) => {
   }
 };
 
-const checkForUnreleasedLocks = async () => {
-  const walletLocks = await checkUnreleasedLocks(walletAddress.value);
-  if (walletLocks) {
-    lockID.value = walletLocks.lockID;
-    tokenAmount.value = walletLocks.pix.value;
-    pixTarget.value = Number(walletLocks.pix.pixKey);
-    showModal.value = true;
-  } else {
-    flowStep.value = Step.Search;
-    showModal.value = false;
-  }
-};
+// const checkForUnreleasedLocks = async () => {
+//   const walletLocks = await checkUnreleasedLocks(walletAddress.value);
+//   if (walletLocks) {
+//     lockID.value = walletLocks.lockID;
+//     tokenAmount.value = walletLocks.pix.value;
+//     pixTarget.value = Number(walletLocks.pix.pixKey);
+//     showModal.value = true;
+//   } else {
+//     flowStep.value = Step.Search;
+//     showModal.value = false;
+//   }
+// };
 
 // if (walletAddress) {
 //   await checkForUnreleasedLocks();

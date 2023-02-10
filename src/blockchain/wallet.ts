@@ -9,6 +9,8 @@ import { ethers, type Event } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { UnreleasedLock } from "@/model/UnreleasedLock";
+import type { Pix } from "@/model/Pix";
 
 const updateWalletStatus = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -97,9 +99,54 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
+const listLockTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<Event[]> => {
+  const p2pContract = getContract(true);
+
+  const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
+  const eventsReleasedLocks = await p2pContract.queryFilter(
+    filterAddedLocks
+  );
+
+  return eventsReleasedLocks.sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
+};
+
+const checkUnreleasedLocks = async (
+  walletAddress: string
+): Promise<UnreleasedLock | undefined> => {
+  const p2pContract = getContract();
+  const pixData: Pix = {
+    pixKey: "",
+  };
+
+  const addedLocks = await listLockTransactionByWalletAddress(walletAddress);
+  const lockStatus = await p2pContract.getLocksStatus(addedLocks.map((lock) => lock.args?.lockID))
+  const unreleasedLockId = lockStatus.find((lock: any) => lock.status)
+
+  if (unreleasedLockId){
+    const lock = await p2pContract.mapLocks(unreleasedLockId);
+
+    const pixTarget = lock.pixTarget;
+    const amount = formatEther(lock?.amount);
+    pixData.pixKey = pixTarget;
+    pixData.value = Number(amount);
+
+    return {
+      lockID: unreleasedLockId,
+      pix: pixData,
+    };
+  }
+
+  return;
+};
+
 export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
+  checkUnreleasedLocks
 };

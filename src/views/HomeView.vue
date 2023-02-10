@@ -2,7 +2,7 @@
 import SearchComponent from "@/components/SearchComponent.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
 import CustomModal from "@/components/CustomModal.vue";
@@ -11,6 +11,7 @@ import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import {
   updateWalletStatus,
   listReleaseTransactionByWalletAddress,
+  checkUnreleasedLocks,
 } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { Event } from "ethers";
@@ -26,13 +27,13 @@ const etherStore = useEtherStore();
 etherStore.setSellerView(false);
 
 // States
-const { loadingLock, walletAddress } = storeToRefs(etherStore);
+const { loadingLock, walletAddress, networkName} = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<number>();
 const tokenAmount = ref<number>();
-const _lockID = ref<string>("");
+const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
-const showModal = ref<boolean>(true);
+const showModal = ref<boolean>(false);
 const lastWalletReleaseTransactions = ref<Event[]>([]);
 
 const confirmBuyClick = async (
@@ -49,8 +50,8 @@ const confirmBuyClick = async (
     etherStore.setLoadingLock(true);
 
     await addLock(selectedDeposit.seller, selectedDeposit.token, tokenValue)
-      .then((lockID) => {
-        _lockID.value = lockID;
+      .then((_lockID) => {
+        lockID.value = _lockID;
       })
       .catch((err) => {
         console.log(err);
@@ -65,12 +66,12 @@ const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
   loadingRelease.value = true;
 
-  if (_lockID.value && tokenAmount.value && pixTarget.value) {
+  if (lockID.value && tokenAmount.value && pixTarget.value) {
     const release = await releaseLock(
       pixTarget.value,
       tokenAmount.value,
       e2eId,
-      _lockID.value
+      lockID.value
     );
     release.wait();
 
@@ -85,6 +86,31 @@ const releaseTransaction = async (e2eId: string) => {
     loadingRelease.value = false;
   }
 };
+
+const checkForUnreleasedLocks = async () => {
+  const walletLocks = await checkUnreleasedLocks(walletAddress.value);
+  if (walletLocks) {
+    lockID.value = walletLocks.lockID;
+    tokenAmount.value = walletLocks.pix.value;
+    pixTarget.value = Number(walletLocks.pix.pixKey);
+    showModal.value = true;
+  } else {
+    flowStep.value = Step.Search;
+    showModal.value = false;
+  }
+}
+
+if (walletAddress){
+  await checkForUnreleasedLocks();
+}
+
+watch(walletAddress, async () => {
+  await checkForUnreleasedLocks();
+});
+
+watch(networkName, async () => {
+  await checkForUnreleasedLocks();
+});
 
 onMounted(async () => {
   await getNetworksLiquidity();

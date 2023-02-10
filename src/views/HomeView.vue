@@ -27,7 +27,7 @@ const etherStore = useEtherStore();
 etherStore.setSellerView(false);
 
 // States
-const { loadingLock, walletAddress, networkName} = storeToRefs(etherStore);
+const { loadingLock, walletAddress, networkName } = storeToRefs(etherStore);
 const flowStep = ref<Step>(Step.Search);
 const pixTarget = ref<number>();
 const tokenAmount = ref<number>();
@@ -98,19 +98,19 @@ const checkForUnreleasedLocks = async () => {
     flowStep.value = Step.Search;
     showModal.value = false;
   }
-}
+};
 
-if (walletAddress){
-  await checkForUnreleasedLocks();
-}
+// if (walletAddress) {
+//   await checkForUnreleasedLocks();
+// }
 
-watch(walletAddress, async () => {
-  await checkForUnreleasedLocks();
-});
+// watch(walletAddress, async () => {
+//   await checkForUnreleasedLocks();
+// });
 
-watch(networkName, async () => {
-  await checkForUnreleasedLocks();
-});
+// watch(networkName, async () => {
+//   await checkForUnreleasedLocks();
+// });
 
 onMounted(async () => {
   await getNetworksLiquidity();

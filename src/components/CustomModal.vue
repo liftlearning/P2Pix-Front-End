@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const props = defineProps({
   isRedirectModal: Boolean,
@@ -69,13 +69,16 @@ if (props.isRedirectModal) {
 <style scoped>
 .modal-overlay {
   display: flex !important;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
 }
 
 .modal {
   background-color: v-bind(modalColor);
   height: v-bind(modalHeight);
   width: 300px;
-  margin-top: 50%;
   border-radius: 10px;
 }
 .close {

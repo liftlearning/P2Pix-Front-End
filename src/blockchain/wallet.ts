@@ -105,9 +105,7 @@ const listLockTransactionByWalletAddress = async (
   const p2pContract = getContract(true);
 
   const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
-  const eventsReleasedLocks = await p2pContract.queryFilter(
-    filterAddedLocks
-  );
+  const eventsReleasedLocks = await p2pContract.queryFilter(filterAddedLocks);
 
   return eventsReleasedLocks.sort((a, b) => {
     return b.blockNumber - a.blockNumber;
@@ -123,10 +121,12 @@ const checkUnreleasedLocks = async (
   };
 
   const addedLocks = await listLockTransactionByWalletAddress(walletAddress);
-  const lockStatus = await p2pContract.getLocksStatus(addedLocks.map((lock) => lock.args?.lockID))
-  const unreleasedLockId = lockStatus.find((lock: any) => lock.status)
+  const lockStatus = await p2pContract.getLocksStatus(
+    addedLocks.map((lock) => lock.args?.lockID)
+  );
+  const unreleasedLockId = lockStatus.find((lock: any) => lock.status);
 
-  if (unreleasedLockId){
+  if (unreleasedLockId) {
     const lock = await p2pContract.mapLocks(unreleasedLockId);
 
     const pixTarget = lock.pixTarget;
@@ -148,5 +148,5 @@ export {
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
-  checkUnreleasedLocks
+  checkUnreleasedLocks,
 };

@@ -2,44 +2,68 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
-import type { BigNumber } from "ethers";
 import { ref, watch, onMounted } from "vue";
-import { withdrawDeposit } from "@/blockchain/buyerMethods";
-import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
+import {
+  listValidDepositTransactionsByWalletAddress,
+  listAllTransactionByWalletAddress,
+} from "@/blockchain/wallet";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { Event } from "ethers";
 
 const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
 const depositList = ref<ValidDeposit[]>([]);
+const transactionsList = ref<(Event | ValidDeposit)[]>([]);
+
+const updateRemaining = async () => {
+  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+    walletAddress.value
+  );
+  depositList.value = walletDeposits;
+
+  const allUserTransactions = await listAllTransactionByWalletAddress(
+    walletAddress.value
+  );
+  transactionsList.value = allUserTransactions;
+};
 
 onMounted(async () => {
   if (walletAddress.value) {
     const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
+    console.log(walletDeposits);
+
+    const allUserTransactions = await listAllTransactionByWalletAddress(
+      walletAddress.value
+    );
+    console.log(allUserTransactions);
+
     if (walletDeposits) {
       depositList.value = walletDeposits;
+    }
+    if (allUserTransactions) {
+      transactionsList.value = allUserTransactions;
     }
   }
 });
 
-const handleWithDrawDeposit = async (token: BigNumber, index: number) => {
-  const fixedAmount = "1"; // Need to ask user for amount
-  const response = await withdrawDeposit(token, fixedAmount);
-  if (response) {
-    console.log("Token retirado com sucesso.");
-    depositList.value.splice(index, 1);
-  }
-};
-
-watch(walletAddress, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
+watch(walletAddress, async (newValue) => {
+  await listValidDepositTransactionsByWalletAddress(newValue)
     .then((res) => {
       if (res) depositList.value = res;
     })
     .catch(() => {
       depositList.value = [];
+    });
+
+  await listAllTransactionByWalletAddress(newValue)
+    .then((res) => {
+      if (res) transactionsList.value = res;
+    })
+    .catch(() => {
+      transactionsList.value = [];
     });
 });
 
@@ -51,17 +75,26 @@ watch(networkName, async () => {
     .catch(() => {
       depositList.value = [];
     });
+
+  await listAllTransactionByWalletAddress(walletAddress.value)
+    .then((res) => {
+      if (res) transactionsList.value = res;
+    })
+    .catch(() => {
+      transactionsList.value = [];
+    });
 });
 </script>
 
 <template>
   <div class="page">
-    <div class="header">Gerenciar ofertas</div>
+    <div class="header">Gerenciar Ofertas</div>
     <div class="w-full max-w-4xl">
       <ListingComponent
-        :wallet-transactions="depositList"
+        :deposit-list="depositList"
+        :wallet-transactions="transactionsList"
         :is-manage-mode="true"
-        @withdraw-deposit="handleWithDrawDeposit"
+        @deposit-withdrawn="updateRemaining"
       ></ListingComponent>
     </div>
   </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import { useEtherStore } from "@/store/ether";
@@ -8,13 +9,36 @@ import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
+  depositList: (Event | ValidDeposit)[];
   walletTransactions: (Event | ValidDeposit)[];
   isManageMode: boolean;
 }>();
 
+const emit = defineEmits(["depositWithdrawn"]);
+
 const etherStore = useEtherStore();
 
 const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
+const withdrawAmount = ref<string>("");
+
+const callWithdraw = async () => {
+  if (withdrawAmount.value) {
+    const withdraw = await withdrawDeposit(withdrawAmount.value);
+    if (withdraw) {
+      console.log(withdraw);
+      alert("Saque realizado!");
+      emit("depositWithdrawn");
+    }
+  }
+};
+
+const getRemaining = (): number => {
+  if (props.depositList instanceof Array) {
+    const deposit = props.depositList[0] as ValidDeposit;
+    return deposit ? deposit.remaining : 0;
+  }
+  return 0;
+};
 
 const getExplorer = (): string => {
   return etherStore.networkName == NetworkEnum.ethereum
@@ -56,6 +80,7 @@ const getEventName = (event: string | undefined): string => {
     DepositAdded: "Oferta",
     LockAdded: "Reserva",
     LockReleased: "Compra",
+    DepositWithdrawn: "Retirada",
   };
 
   return possibleEventName[event];
@@ -77,9 +102,6 @@ watch(props, async (): Promise<void> => {
         : props.walletTransactions;
 });
 
-//emits
-const emit = defineEmits(["withdrawDeposit"]);
-
 // initial itemsToShow valueb
 showInitialItems();
 </script>
@@ -92,20 +114,30 @@ showInitialItems();
           <p class="text-sm leading-5 font-medium text-gray-600">
             Saldo disponível
           </p>
-          <p class="text-xl leading-7 font-semibold text-gray-900">0 BRZ</p>
+          <p class="text-xl leading-7 font-semibold text-gray-900">
+            {{ getRemaining() }} BRZ
+          </p>
           <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
       </div>
       <div class="pt-5" v-if="props.isManageMode">
         <div class="py-2">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
-          <input type="number" name="" id="" placeholder="0" class="text-2xl" />
+          <input
+            type="number"
+            name=""
+            id=""
+            placeholder="0"
+            class="text-2xl"
+            v-model="withdrawAmount"
+          />
         </div>
 
         <hr class="pb-3" />
         <div class="flex justify-end items-center">
           <div
             class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            @click="callWithdraw"
           >
             <img alt="Withdraw image" src="@/assets/withdraw.svg" />
             <span class="last-release-info">Sacar</span>
@@ -138,7 +170,7 @@ showInitialItems();
             Finalizado
           </div>
           <div
-            v-if="!props.isManageMode"
+            v-if="props.isManageMode"
             class="flex gap-2 cursor-pointer items-center justify-self-center"
             @click="openEtherscanUrl((item as Event)?.transactionHash)"
           >
@@ -183,7 +215,7 @@ showInitialItems();
       </button>
       <span class="text-gray-300">
         ({{ itemsToShow.length }} de {{ props.walletTransactions.length }}
-        {{ isManageMode ? "ofertas" : "transações" }})
+        transações )
       </span>
     </div>
 

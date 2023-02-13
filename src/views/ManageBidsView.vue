@@ -14,7 +14,7 @@ const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
 const depositList = ref<ValidDeposit[]>([]);
-const transactionsList = ref<(Event | ValidDeposit)[]>([]);
+const transactionsList = ref<Event[]>([]);
 
 const updateRemaining = async () => {
   const walletDeposits = await listValidDepositTransactionsByWalletAddress(
@@ -33,12 +33,10 @@ onMounted(async () => {
     const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
-    console.log(walletDeposits);
 
     const allUserTransactions = await listAllTransactionByWalletAddress(
       walletAddress.value
     );
-    console.log(allUserTransactions);
 
     if (walletDeposits) {
       depositList.value = walletDeposits;
@@ -93,7 +91,6 @@ watch(networkName, async () => {
       <ListingComponent
         :deposit-list="depositList"
         :wallet-transactions="transactionsList"
-        :is-manage-mode="true"
         @deposit-withdrawn="updateRemaining"
       ></ListingComponent>
     </div>

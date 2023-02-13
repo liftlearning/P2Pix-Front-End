@@ -9,16 +9,15 @@ import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
-  depositList: (Event | ValidDeposit)[];
-  walletTransactions: (Event | ValidDeposit)[];
-  isManageMode: boolean;
+  depositList: ValidDeposit[];
+  walletTransactions: Event[];
 }>();
 
 const emit = defineEmits(["depositWithdrawn"]);
 
 const etherStore = useEtherStore();
 
-const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
+const itemsToShow = ref<Event[]>([]);
 const withdrawAmount = ref<string>("");
 
 const callWithdraw = async () => {
@@ -34,7 +33,7 @@ const callWithdraw = async () => {
 
 const getRemaining = (): number => {
   if (props.depositList instanceof Array) {
-    const deposit = props.depositList[0] as ValidDeposit;
+    const deposit = props.depositList[0];
     return deposit ? deposit.remaining : 0;
   }
   return 0;
@@ -44,13 +43,6 @@ const getExplorer = (): string => {
   return etherStore.networkName == NetworkEnum.ethereum
     ? "Etherscan"
     : "Polygonscan";
-};
-
-// Methods
-const isValidDeposit = (
-  deposit: Event | ValidDeposit
-): deposit is ValidDeposit => {
-  return (deposit as ValidDeposit).token !== undefined;
 };
 
 const showInitialItems = (): void => {
@@ -120,7 +112,7 @@ showInitialItems();
           <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
       </div>
-      <div class="pt-5" v-if="props.isManageMode">
+      <div class="pt-5">
         <div class="py-2">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
           <input
@@ -153,14 +145,10 @@ showInitialItems();
       <div class="item-container">
         <div>
           <p class="text-sm leading-5 font-medium text-gray-600">
-            {{ getEventName((item as Event).event) }}
+            {{ getEventName(item.event) }}
           </p>
           <p class="text-xl leading-7 font-semibold text-gray-900">
-            {{
-              isValidDeposit(item)
-                ? item.remaining
-                : getAmountFormatted(item.args?.amount)
-            }}
+            {{ getAmountFormatted(item.args?.amount) }}
             BRZ
           </p>
           <p class="text-xs leading-4 font-medium text-gray-600"></p>
@@ -170,34 +158,14 @@ showInitialItems();
             Finalizado
           </div>
           <div
-            v-if="props.isManageMode"
             class="flex gap-2 cursor-pointer items-center justify-self-center"
-            @click="openEtherscanUrl((item as Event)?.transactionHash)"
+            @click="openEtherscanUrl(item?.transactionHash)"
           >
             <span class="last-release-info">{{ getExplorer() }}</span>
             <img alt="Redirect image" src="@/assets/redirect.svg" />
           </div>
         </div>
       </div>
-      <!-- <div class="pt-5" v-if="props.isManageMode">
-        <div class="py-2">
-          <p class="text-sm leading-5 font-medium">Valor do saque</p>
-          <p class="text-2xl leading-8 font-medium">0</p>
-        </div>
-
-        <hr class="pb-3" />
-        <div class="flex justify-between items-center">
-          <div
-            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
-            @click="
-              emit('withdrawDeposit', (item as ValidDeposit).token, index)
-            "
-          >
-            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
-            <span class="last-release-info">Sacar</span>
-          </div>
-        </div>
-      </div> -->
     </div>
     <div
       class="flex flex-col justify-center items-center w-full mt-2 gap-2"

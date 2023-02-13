@@ -150,7 +150,7 @@ showInitialItems();
       v-for="item in itemsToShow"
       :key="item.blockNumber"
     >
-      <div class="flex justify-between items-center">
+      <div class="item-container">
         <div>
           <p class="text-sm leading-5 font-medium text-gray-600">
             {{ getEventName((item as Event).event) }}
@@ -236,6 +236,10 @@ p {
 
 .text-container {
   @apply flex flex-col items-center justify-center gap-4;
+}
+
+.item-container {
+  @apply flex justify-between items-center;
 }
 
 .text {

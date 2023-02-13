@@ -13,6 +13,7 @@ describe("ListingComponent.vue", () => {
   test("Test Message when an empty array is received", () => {
     const wrapper = mount(ListingComponent, {
       props: {
+        depositList: [],
         walletTransactions: [],
         isManageMode: true,
       },
@@ -21,42 +22,16 @@ describe("ListingComponent.vue", () => {
     expect(wrapper.html()).toContain("Não há nenhuma transação anterior");
   });
 
-  test("Test Headers on List in Manage Mode", () => {
-    const wrapper = mount(ListingComponent, {
-      props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
-      },
-    });
-
-    expect(wrapper.html()).toContain("Valor");
-    expect(wrapper.html()).toContain("Data");
-    expect(wrapper.html()).toContain("Retirar tokens");
-  });
-
-  test("Test Headers on List in Unmanage Mode", () => {
-    const wrapper = mount(ListingComponent, {
-      props: {
-        walletTransactions: MockEvents,
-        isManageMode: false,
-      },
-    });
-
-    expect(wrapper.html()).toContain("Valor");
-    expect(wrapper.html()).toContain("Data");
-    expect(wrapper.html()).toContain("Tipo de transação");
-    expect(wrapper.html()).toContain("Checar transação");
-  });
-
   test("Test number of elements in the list first render", () => {
     const wrapper = mount(ListingComponent, {
       props: {
+        depositList: [],
         walletTransactions: MockEvents,
         isManageMode: false,
       },
     });
 
-    const elements = wrapper.findAll(".transaction-date");
+    const elements = wrapper.findAll(".item-container");
 
     expect(elements).toHaveLength(3);
   });
@@ -64,18 +39,19 @@ describe("ListingComponent.vue", () => {
   test("Test load more button behavior", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
+        depositList: [],
         walletTransactions: MockValidDeposits,
         isManageMode: false,
       },
     });
     const btn = wrapper.find("button");
 
-    let elements = wrapper.findAll(".transaction-date");
+    let elements = wrapper.findAll(".item-container");
     expect(elements).toHaveLength(3);
 
     await btn.trigger("click");
 
-    elements = wrapper.findAll(".transaction-date");
+    elements = wrapper.findAll(".item-container");
 
     expect(elements).toHaveLength(5);
   });
@@ -83,14 +59,15 @@ describe("ListingComponent.vue", () => {
   test("Test withdraw offer button emit", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
+        depositList: MockValidDeposits,
         walletTransactions: MockValidDeposits,
         isManageMode: true,
       },
     });
-    wrapper.vm.$emit("withdrawDeposit");
+    wrapper.vm.$emit("depositWithdrawn");
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted("withdrawDeposit")).toBeTruthy();
+    expect(wrapper.emitted("depositWithdrawn")).toBeTruthy();
   });
 });

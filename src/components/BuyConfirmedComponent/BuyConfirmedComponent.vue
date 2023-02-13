@@ -56,6 +56,7 @@ const emit = defineEmits(["makeAnotherTransaction"]);
     </div>
     <div class="w-full max-w-4xl lg-view">
       <ListingComponent
+        :deposit-list="[]"
         :walletTransactions="lastWalletReleaseTransactions"
         :isManageMode="false"
       >

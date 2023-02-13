@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { pix } from "@/utils/QrCodePix";
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { debounce } from "@/utils/debounce";
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
 import CustomModal from "@/components//CustomModal/CustomModal.vue";
@@ -12,11 +12,12 @@ const props = defineProps({
   tokenValue: Number,
 });
 
+const windowSize = ref<number>(window.innerWidth);
 const qrCode = ref<string>("");
 const qrCodePayload = ref<string>("");
 const isPixValid = ref<boolean>(false);
 const isCodeInputEmpty = ref<boolean>(true);
-const showModal = ref<boolean>(true);
+const showWarnModal = ref<boolean>(true);
 const e2eId = ref<string>("");
 
 // Emits
@@ -68,6 +69,19 @@ const validatePix = async (): Promise<void> => {
     isPixValid.value = false;
   }
 };
+
+onMounted(() => {
+  window.addEventListener(
+    "resize",
+    () => (windowSize.value = window.innerWidth)
+  );
+});
+onUnmounted(() => {
+  window.removeEventListener(
+    "resize",
+    () => (windowSize.value = window.innerWidth)
+  );
+});
 </script>
 
 <template>
@@ -155,8 +169,8 @@ const validatePix = async (): Promise<void> => {
       />
     </div>
     <CustomModal
-      v-if="showModal"
-      @close-modal="showModal = false"
+      v-if="showWarnModal && windowSize < 500"
+      @close-modal="showWarnModal = false"
       :isRedirectModal="false"
     />
   </div>

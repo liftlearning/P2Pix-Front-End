@@ -14,8 +14,7 @@ describe("ListingComponent.vue", () => {
     const wrapper = mount(ListingComponent, {
       props: {
         depositList: [],
-        walletTransactions: [],
-        isManageMode: true,
+        walletTransactions: []
       },
     });
 
@@ -27,7 +26,6 @@ describe("ListingComponent.vue", () => {
       props: {
         depositList: [],
         walletTransactions: MockEvents,
-        isManageMode: false,
       },
     });
 
@@ -39,9 +37,8 @@ describe("ListingComponent.vue", () => {
   test("Test load more button behavior", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        depositList: [],
-        walletTransactions: MockValidDeposits,
-        isManageMode: false,
+        depositList: MockValidDeposits,
+        walletTransactions: [],
       },
     });
     const btn = wrapper.find("button");
@@ -60,8 +57,7 @@ describe("ListingComponent.vue", () => {
     const wrapper = mount(ListingComponent, {
       props: {
         depositList: MockValidDeposits,
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
+        walletTransactions: MockEvents,
       },
     });
     wrapper.vm.$emit("depositWithdrawn");

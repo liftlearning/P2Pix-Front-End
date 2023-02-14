@@ -33,7 +33,9 @@ const callWithdraw = async () => {
 
 const getRemaining = (): number => {
   if (props.depositList instanceof Array) {
-    const deposit = props.depositList[0];
+    // Here we are getting only the first element of the list because
+    // in this release only the BRL token is being used.
+    const deposit = props.depositList[0]; 
     return deposit ? deposit.remaining : 0;
   }
   return 0;

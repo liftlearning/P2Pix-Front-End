@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import { useEtherStore } from "@/store/ether";
@@ -8,25 +9,42 @@ import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
-  walletTransactions: (Event | ValidDeposit)[];
-  isManageMode: boolean;
+  validDeposits: ValidDeposit[];
+  walletTransactions: Event[];
 }>();
+
+const emit = defineEmits(["depositWithdrawn"]);
 
 const etherStore = useEtherStore();
 
-const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
+const itemsToShow = ref<Event[]>([]);
+const withdrawAmount = ref<string>("");
+
+const callWithdraw = async () => {
+  if (withdrawAmount.value) {
+    const withdraw = await withdrawDeposit(withdrawAmount.value);
+    if (withdraw) {
+      console.log(withdraw);
+      alert("Saque realizado!");
+      emit("depositWithdrawn");
+    }
+  }
+};
+
+const getRemaining = (): number => {
+  if (props.validDeposits instanceof Array) {
+    // Here we are getting only the first element of the list because
+    // in this release only the BRL token is being used.
+    const deposit = props.validDeposits[0];
+    return deposit ? deposit.remaining : 0;
+  }
+  return 0;
+};
 
 const getExplorer = (): string => {
   return etherStore.networkName == NetworkEnum.ethereum
     ? "Etherscan"
     : "Polygonscan";
-};
-
-// Methods
-const isValidDeposit = (
-  deposit: Event | ValidDeposit
-): deposit is ValidDeposit => {
-  return (deposit as ValidDeposit).token !== undefined;
 };
 
 const showInitialItems = (): void => {
@@ -56,6 +74,7 @@ const getEventName = (event: string | undefined): string => {
     DepositAdded: "Oferta",
     LockAdded: "Reserva",
     LockReleased: "Compra",
+    DepositWithdrawn: "Retirada",
   };
 
   return possibleEventName[event];
@@ -77,65 +96,74 @@ watch(props, async (): Promise<void> => {
         : props.walletTransactions;
 });
 
-//emits
-const emit = defineEmits(["withdrawDeposit"]);
-
 // initial itemsToShow valueb
 showInitialItems();
 </script>
 
 <template>
   <div class="blur-container">
-    <div
-      class="w-full bg-white p-6 rounded-lg"
-      v-for="(item, index) in itemsToShow"
-      :key="item.blockNumber"
-    >
+    <div class="w-full bg-white p-6 rounded-lg">
       <div class="flex justify-between items-center">
         <div>
           <p class="text-sm leading-5 font-medium text-gray-600">
-            {{ getEventName((item as Event).event) }}
+            Saldo disponível
           </p>
           <p class="text-xl leading-7 font-semibold text-gray-900">
-            {{
-              isValidDeposit(item)
-                ? item.remaining
-                : getAmountFormatted(item.args?.amount)
-            }}
-            BRZ
+            {{ getRemaining() }} BRZ
           </p>
-          <p class="text-xs leading-4 font-medium text-gray-600">20/08/2022</p>
-        </div>
-        <div>
-          <div class="bg-emerald-300 rounded-lg text-center mb-2">
-            Finalizado
-          </div>
-          <div
-            v-if="!props.isManageMode"
-            class="flex gap-2 cursor-pointer items-center justify-self-center"
-            @click="openEtherscanUrl((item as Event)?.transactionHash)"
-          >
-            <span class="last-release-info">{{ getExplorer() }}</span>
-            <img alt="Redirect image" src="@/assets/redirect.svg" />
-          </div>
+          <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
       </div>
-      <div class="pt-5" v-if="props.isManageMode">
-        <!-- <div class="py-2">
+      <div class="pt-5">
+        <div class="py-2 w-100">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
-          <p class="text-2xl leading-8 font-medium">0</p>
-        </div> -->
-
+          <input
+            type="number"
+            name=""
+            id=""
+            placeholder="0"
+            class="text-2xl text-gray-900 w-full outline-none"
+            v-model="withdrawAmount"
+          />
+        </div>
         <hr class="pb-3" />
-        <div class="flex justify-between items-center">
+        <div class="flex justify-end items-center">
           <div
             class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
-            @click="
-              emit('withdrawDeposit', (item as ValidDeposit).token, index)
-            "
+            @click="callWithdraw"
           >
             <img alt="Withdraw image" src="@/assets/withdraw.svg" />
             <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="w-full bg-white p-6 rounded-lg"
+      v-for="item in itemsToShow"
+      :key="item.blockNumber"
+    >
+      <div class="item-container">
+        <div>
+          <p class="text-sm leading-5 font-medium text-gray-600">
+            {{ getEventName(item.event) }}
+          </p>
+          <p class="text-xl leading-7 font-semibold text-gray-900">
+            {{ getAmountFormatted(item.args?.amount) }}
+            BRZ
+          </p>
+          <p class="text-xs leading-4 font-medium text-gray-600"></p>
+        </div>
+        <div>
+          <div class="bg-emerald-300 rounded-lg text-center mb-2 p-1">
+            Finalizado
+          </div>
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center"
+            @click="openEtherscanUrl(item?.transactionHash)"
+          >
+            <span class="last-release-info">{{ getExplorer() }}</span>
+            <img alt="Redirect image" src="@/assets/redirect.svg" />
           </div>
         </div>
       </div>
@@ -156,7 +184,7 @@ showInitialItems();
       </button>
       <span class="text-gray-300">
         ({{ itemsToShow.length }} de {{ props.walletTransactions.length }}
-        {{ isManageMode ? "ofertas" : "transações" }})
+        transações )
       </span>
     </div>
 
@@ -177,6 +205,10 @@ p {
 
 .text-container {
   @apply flex flex-col items-center justify-center gap-4;
+}
+
+.item-container {
+  @apply flex justify-between items-center;
 }
 
 .text {

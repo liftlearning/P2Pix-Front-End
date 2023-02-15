@@ -1,7 +1,7 @@
 import { useEtherStore } from "@/store/ether";
 
 import { getContract, getProvider } from "./provider";
-import { getP2PixAddress } from "./addresses";
+import { getP2PixAddress, getTokenAddress } from "./addresses";
 
 import p2pix from "../utils/smart_contract_files/P2PIX.json";
 
@@ -84,15 +84,18 @@ const cancelDeposit = async (depositId: BigNumber): Promise<any> => {
   return cancel;
 };
 
-const withdrawDeposit = async (
-  depositId: BigNumber,
-  amount: string
-): Promise<any> => {
+const withdrawDeposit = async (amount: string): Promise<any> => {
   const contract = getContract();
 
-  const withdraw = await contract.withdraw(depositId, amount, []);
-  await withdraw.wait();
+  const withdraw = await contract.withdraw(
+    getTokenAddress(),
+    parseEther(String(amount)),
+    []
+  );
+  const with_rec = await withdraw.wait();
+  const [t] = with_rec.events;
 
+  console.log(t.args);
   return withdraw;
 };
 

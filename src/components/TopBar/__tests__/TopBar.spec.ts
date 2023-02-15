@@ -30,6 +30,6 @@ describe("TopBar.vue", () => {
   it("should render the P2Pix logo correctly", () => {
     const wrapper = shallowMount(TopBar);
     const img = wrapper.findAll(".logo");
-    expect(img.length).toBe(1);
+    expect(img.length).toBe(2);
   });
 });

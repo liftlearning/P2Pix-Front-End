@@ -64,11 +64,21 @@ const listAllTransactionByWalletAddress = async (
     filterReleasedLocks
   );
 
-  return [...eventsDeposits, ...eventsAddedLocks, ...eventsReleasedLocks].sort(
-    (a, b) => {
-      return b.blockNumber - a.blockNumber;
-    }
+  const filterWithdrawnDeposits = p2pContract.filters.DepositWithdrawn([
+    walletAddress,
+  ]);
+  const eventsWithdrawnDeposits = await p2pContract.queryFilter(
+    filterWithdrawnDeposits
   );
+
+  return [
+    ...eventsDeposits,
+    ...eventsAddedLocks,
+    ...eventsReleasedLocks,
+    ...eventsWithdrawnDeposits,
+  ].sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
 };
 
 // get wallet's release transactions

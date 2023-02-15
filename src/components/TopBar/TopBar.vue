@@ -285,14 +285,6 @@ onClickOutside(currencyRef, () => {
             <div class="pl-4 mt-2">
               <div class="bg-white rounded-md z-10">
                 <div class="menu-button" @click="closeMenu()">
-                  <RouterLink to="/transaction_history" class="redirect_button">
-                    Histórico de transações
-                  </RouterLink>
-                </div>
-                <div class="w-full flex justify-center">
-                  <hr class="w-4/5" />
-                </div>
-                <div class="menu-button" @click="closeMenu()">
                   <RouterLink to="/manage_bids" class="redirect_button">
                     Gerenciar Ofertas
                   </RouterLink>
@@ -323,14 +315,6 @@ onClickOutside(currencyRef, () => {
               class="redirect_button mt-2"
             >
               {{ sellerView ? "Quero comprar" : "Quero vender" }}
-            </RouterLink>
-          </div>
-          <div class="w-full flex justify-center">
-            <hr class="w-4/5" />
-          </div>
-          <div class="menu-button" @click="closeMenu()">
-            <RouterLink to="/transaction_history" class="redirect_button">
-              Histórico de transações
             </RouterLink>
           </div>
           <div class="w-full flex justify-center">

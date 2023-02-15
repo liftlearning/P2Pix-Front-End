@@ -56,8 +56,9 @@ const handleButtonClick = async (
   offer: string,
   pixKey: string
 ): Promise<void> => {
-  console.log(postProcessKey(pixKey));
-  if (walletAddress.value) emit("approveTokens", { offer, pixKey });
+  const postProcessedPixKey = postProcessKey(pixKey);
+  if (walletAddress.value)
+    emit("approveTokens", { offer, postProcessedPixKey });
   else await connectProvider();
 };
 </script>

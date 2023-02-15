@@ -20,12 +20,12 @@ const getNetworksLiquidity = async (): Promise<void> => {
   ); // mumbai provider
 
   const p2pContractGoerli = new ethers.Contract(
-    "0xefa5cE4351cda51192509cf8De7d8881ADAE95DD",
+    "0x2414817FF64A114d91eCFA16a834d3fCf69103d4",
     p2pix.abi,
     goerliProvider
   );
   const p2pContractMumbai = new ethers.Contract(
-    "0xA9258eBb157E4cf5e756b77FDD0DF09C2F73240b",
+    "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
     p2pix.abi,
     mumbaiProvider
   );

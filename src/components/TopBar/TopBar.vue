@@ -333,8 +333,34 @@ onClickOutside(currencyRef, () => {
               Desconectar
             </RouterLink>
           </div>
-          <div class="w-full flex justify-center pb-20">
+          <div class="w-full flex justify-center">
             <hr class="w-4/5" />
+          </div>
+          <div class="menu-button pb-10">
+            <div class="redirect_button flex">
+              <img
+                alt="Twitter"
+                width="20"
+                height="20"
+                src="@/assets/twitterIcon.svg"
+                class="mr-6"
+                onclick="location.href = 'https://www.twitter.com/doiim';"
+              />
+              <img
+                alt="Discord"
+                width="20"
+                height="20"
+                src="@/assets/discordIcon.svg"
+                class="mr-6"
+              />
+              <img
+                alt="Github"
+                width="20"
+                height="20"
+                src="@/assets/githubIcon.svg"
+                onclick="location.href = 'https://github.com/doiim';"
+              />
+            </div>
           </div>
         </div>
       </div>

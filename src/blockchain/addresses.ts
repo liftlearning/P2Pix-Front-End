@@ -1,7 +1,7 @@
 import { useEtherStore } from "@/store/ether";
 import { NetworkEnum } from "@/model/NetworkEnum";
 
-const getTokenAddress = (): string => {
+const getTokenAddress = (network?: NetworkEnum): string => {
   const etherStore = useEtherStore();
 
   const possibleTokenAddresses: { [key: string]: string } = {
@@ -9,10 +9,10 @@ const getTokenAddress = (): string => {
     Polygon: "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29",
   };
 
-  return possibleTokenAddresses[etherStore.networkName];
+  return possibleTokenAddresses[network ? network : etherStore.networkName];
 };
 
-const getP2PixAddress = (): string => {
+const getP2PixAddress = (network?: NetworkEnum): string => {
   const etherStore = useEtherStore();
 
   const possibleP2PixAddresses: { [key: string]: string } = {
@@ -20,7 +20,7 @@ const getP2PixAddress = (): string => {
     Polygon: "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
   };
 
-  return possibleP2PixAddresses[etherStore.networkName];
+  return possibleP2PixAddresses[network ? network : etherStore.networkName];
 };
 
 const getProviderUrl = (): string => {

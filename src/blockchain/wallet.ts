@@ -3,12 +3,14 @@ import { useEtherStore } from "@/store/ether";
 import { getContract, getProvider } from "./provider";
 import { getTokenAddress, possibleChains } from "./addresses";
 
-import mockToken from "../utils/smart_contract_files/MockToken.json";
+import mockToken from "@/utils/smart_contract_files/MockToken.json";
 
 import { ethers, type Event } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { UnreleasedLock } from "@/model/UnreleasedLock";
+import type { Pix } from "@/model/Pix";
 
 const updateWalletStatus = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -97,9 +99,55 @@ const listReleaseTransactionByWalletAddress = async (
   });
 };
 
+const listLockTransactionByWalletAddress = async (
+  walletAddress: string
+): Promise<Event[]> => {
+  const p2pContract = getContract(true);
+
+  const filterAddedLocks = p2pContract.filters.LockAdded([walletAddress]);
+  const eventsReleasedLocks = await p2pContract.queryFilter(filterAddedLocks);
+
+  return eventsReleasedLocks.sort((a, b) => {
+    return b.blockNumber - a.blockNumber;
+  });
+};
+
+const checkUnreleasedLock = async (
+  walletAddress: string
+): Promise<UnreleasedLock | undefined> => {
+  const p2pContract = getContract();
+  const pixData: Pix = {
+    pixKey: "",
+  };
+
+  const addedLocks = await listLockTransactionByWalletAddress(walletAddress);
+  const lockStatus = await p2pContract.getLocksStatus(
+    addedLocks.map((lock) => lock.args?.lockID)
+  );
+  const unreleasedLockId = lockStatus[1].findIndex(
+    (lockStatus: number) => lockStatus == 1
+  );
+
+  if (unreleasedLockId != -1) {
+    const _lockID = lockStatus[0][unreleasedLockId];
+    const lock = await p2pContract.mapLocks(_lockID);
+
+    const pixTarget = lock.pixTarget;
+    const amount = formatEther(lock?.amount);
+    pixData.pixKey = String(Number(pixTarget));
+    pixData.value = Number(amount);
+
+    return {
+      lockID: _lockID,
+      pix: pixData,
+    };
+  }
+};
+
 export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
+  checkUnreleasedLock,
 };

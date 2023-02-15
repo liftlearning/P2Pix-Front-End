@@ -1,10 +1,12 @@
 import { useEtherStore } from "@/store/ether";
 import { Contract, ethers } from "ethers";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
 import { getContract } from "./provider";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import { getP2PixAddress, getTokenAddress } from "./addresses";
+import { NetworkEnum } from "@/model/NetworkEnum";
 
 const getNetworksLiquidity = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -20,23 +22,23 @@ const getNetworksLiquidity = async (): Promise<void> => {
   ); // mumbai provider
 
   const p2pContractGoerli = new ethers.Contract(
-    "0x2414817FF64A114d91eCFA16a834d3fCf69103d4",
+    getP2PixAddress(NetworkEnum.ethereum),
     p2pix.abi,
     goerliProvider
   );
   const p2pContractMumbai = new ethers.Contract(
-    "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
+    getP2PixAddress(NetworkEnum.polygon),
     p2pix.abi,
     mumbaiProvider
   );
 
   const depositListGoerli = await getValidDeposits(
-    "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
+    getTokenAddress(NetworkEnum.ethereum),
     p2pContractGoerli
   );
 
   const depositListMumbai = await getValidDeposits(
-    "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29",
+    getTokenAddress(NetworkEnum.polygon),
     p2pContractMumbai
   );
 

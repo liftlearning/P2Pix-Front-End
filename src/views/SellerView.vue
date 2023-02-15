@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
-import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
+import WantSellComponent from "@/components/SellerSteps/WantSellComponent.vue";
+import SendNetwork from "@/components/SellerSteps/SendNetwork.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
-import { approveTokens, addDeposit } from "../blockchain/sellerMethods";
+import { approveTokens, addDeposit } from "@/blockchain/sellerMethods";
 
 import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
@@ -23,7 +23,10 @@ const offerValue = ref<string>("");
 const pixKeyBuyer = ref<string>("");
 
 // Verificar tipagem
-const approveOffer = async (args: { offer: string; postProcessedPixKey: string }) => {
+const approveOffer = async (args: {
+  offer: string;
+  postProcessedPixKey: string;
+}) => {
   loading.value = true;
   try {
     offerValue.value = args.offer;

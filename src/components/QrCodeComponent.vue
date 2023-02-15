@@ -169,7 +169,7 @@ onUnmounted(() => {
       />
     </div>
     <CustomModal
-      v-if="showWarnModal && windowSize < 500"
+      v-if="showWarnModal && windowSize <= 500"
       @close-modal="showWarnModal = false"
       :isRedirectModal="false"
     />

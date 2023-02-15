@@ -23,7 +23,10 @@ const offerValue = ref<string>("");
 const pixKeyBuyer = ref<string>("");
 
 // Verificar tipagem
-const approveOffer = async (args: { offer: string; postProcessedPixKey: string }) => {
+const approveOffer = async (args: {
+  offer: string;
+  postProcessedPixKey: string;
+}) => {
   loading.value = true;
   try {
     offerValue.value = args.offer;

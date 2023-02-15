@@ -112,7 +112,7 @@ const listLockTransactionByWalletAddress = async (
   });
 };
 
-const checkUnreleasedLocks = async (
+const checkUnreleasedLock = async (
   walletAddress: string
 ): Promise<UnreleasedLock | undefined> => {
   const p2pContract = getContract();
@@ -124,18 +124,22 @@ const checkUnreleasedLocks = async (
   const lockStatus = await p2pContract.getLocksStatus(
     addedLocks.map((lock) => lock.args?.lockID)
   );
-  const unreleasedLockId = lockStatus.find((lock: any) => lock.status);
+  const unreleasedLockId = lockStatus[1].findIndex(
+    (lockStatus: number) => lockStatus == 1
+  );
 
-  if (unreleasedLockId) {
-    const lock = await p2pContract.mapLocks(unreleasedLockId);
+  console.log(lockStatus);
+  if (unreleasedLockId != -1) {
+    const _lockID = lockStatus[0][unreleasedLockId];
+    const lock = await p2pContract.mapLocks(_lockID);
 
     const pixTarget = lock.pixTarget;
     const amount = formatEther(lock?.amount);
-    pixData.pixKey = pixTarget;
+    pixData.pixKey = String(Number(pixTarget));
     pixData.value = Number(amount);
 
     return {
-      lockID: unreleasedLockId,
+      lockID: _lockID,
       pix: pixData,
     };
   }
@@ -148,5 +152,5 @@ export {
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
-  checkUnreleasedLocks,
+  checkUnreleasedLock,
 };

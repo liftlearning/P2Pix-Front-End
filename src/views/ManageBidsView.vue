@@ -89,7 +89,7 @@ watch(networkName, async () => {
     <div class="header">Gerenciar Ofertas</div>
     <div class="w-full max-w-4xl">
       <ListingComponent
-        :deposit-list="depositList"
+        :valid-deposits="depositList"
         :wallet-transactions="transactionsList"
         @deposit-withdrawn="updateRemaining"
       ></ListingComponent>

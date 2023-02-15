@@ -13,8 +13,8 @@ describe("ListingComponent.vue", () => {
   test("Test Message when an empty array is received", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        depositList: [],
-        walletTransactions: []
+        validDeposits: [],
+        walletTransactions: [],
       },
     });
 
@@ -24,7 +24,7 @@ describe("ListingComponent.vue", () => {
   test("Test number of elements in the list first render", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        depositList: [],
+        validDeposits: [],
         walletTransactions: MockEvents,
       },
     });
@@ -37,8 +37,8 @@ describe("ListingComponent.vue", () => {
   test("Test load more button behavior", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        depositList: MockValidDeposits,
-        walletTransactions: [],
+        validDeposits: MockValidDeposits,
+        walletTransactions: MockEvents,
       },
     });
     const btn = wrapper.find("button");
@@ -50,13 +50,13 @@ describe("ListingComponent.vue", () => {
 
     elements = wrapper.findAll(".item-container");
 
-    expect(elements).toHaveLength(5);
+    expect(elements).toHaveLength(4);
   });
 
   test("Test withdraw offer button emit", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        depositList: MockValidDeposits,
+        validDeposits: MockValidDeposits,
         walletTransactions: MockEvents,
       },
     });

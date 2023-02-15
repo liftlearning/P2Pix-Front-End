@@ -9,7 +9,7 @@ import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
-  depositList: ValidDeposit[];
+  validDeposits: ValidDeposit[];
   walletTransactions: Event[];
 }>();
 
@@ -32,10 +32,10 @@ const callWithdraw = async () => {
 };
 
 const getRemaining = (): number => {
-  if (props.depositList instanceof Array) {
+  if (props.validDeposits instanceof Array) {
     // Here we are getting only the first element of the list because
     // in this release only the BRL token is being used.
-    const deposit = props.depositList[0]; 
+    const deposit = props.validDeposits[0];
     return deposit ? deposit.remaining : 0;
   }
   return 0;
@@ -115,18 +115,17 @@ showInitialItems();
         </div>
       </div>
       <div class="pt-5">
-        <div class="py-2">
+        <div class="py-2 w-100">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
           <input
             type="number"
             name=""
             id=""
             placeholder="0"
-            class="text-2xl"
+            class="text-2xl text-gray-900 w-full outline-none"
             v-model="withdrawAmount"
           />
         </div>
-
         <hr class="pb-3" />
         <div class="flex justify-end items-center">
           <div

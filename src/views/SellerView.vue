@@ -26,10 +26,8 @@ const pixKeyBuyer = ref<string>("");
 const approveOffer = async (args: { offer: string; postProcessedPixKey: string }) => {
   loading.value = true;
   try {
-    console.log(args)
     offerValue.value = args.offer;
     pixKeyBuyer.value = args.postProcessedPixKey;
-    console.log(pixKeyBuyer, pixKeyBuyer.value)
     await approveTokens(args.offer);
     flowStep.value = Step.Network;
     loading.value = false;
@@ -43,9 +41,7 @@ const approveOffer = async (args: { offer: string; postProcessedPixKey: string }
 const sendNetwork = async () => {
   loading.value = true;
   try {
-    console.log(offerValue.value, pixKeyBuyer.value)
     if (offerValue.value && pixKeyBuyer.value) {
-      console.log("entrou no if")
       await addDeposit(String(offerValue.value), pixKeyBuyer.value);
       flowStep.value = Step.Sell;
       loading.value = false;

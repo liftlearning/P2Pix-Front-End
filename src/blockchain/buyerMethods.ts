@@ -3,7 +3,7 @@ import { useEtherStore } from "@/store/ether";
 import { getContract, getProvider } from "./provider";
 import { getP2PixAddress, getTokenAddress } from "./addresses";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 
 import { BigNumber, ethers } from "ethers";
 import { parseEther } from "ethers/lib/utils";

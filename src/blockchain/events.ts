@@ -1,7 +1,7 @@
 import { useEtherStore } from "@/store/ether";
 import { Contract, ethers } from "ethers";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
 import { getContract } from "./provider";
 import type { ValidDeposit } from "@/model/ValidDeposit";

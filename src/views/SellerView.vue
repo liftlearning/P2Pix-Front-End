@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
-import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
+import WantSellComponent from "@/components/SellerSteps/WantSellComponent.vue";
+import SendNetwork from "@/components/SellerSteps/SendNetwork.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
-import { approveTokens, addDeposit } from "../blockchain/sellerMethods";
+import { approveTokens, addDeposit } from "@/blockchain/sellerMethods";
 
 import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";

@@ -3,7 +3,7 @@ import { useEtherStore } from "@/store/ether";
 import { getContract, getProvider } from "./provider";
 import { getTokenAddress, possibleChains } from "./addresses";
 
-import mockToken from "../utils/smart_contract_files/MockToken.json";
+import mockToken from "@/utils/smart_contract_files/MockToken.json";
 
 import { ethers, type Event } from "ethers";
 import { formatEther } from "ethers/lib/utils";
@@ -128,7 +128,6 @@ const checkUnreleasedLock = async (
     (lockStatus: number) => lockStatus == 1
   );
 
-  console.log(lockStatus);
   if (unreleasedLockId != -1) {
     const _lockID = lockStatus[0][unreleasedLockId];
     const lock = await p2pContract.mapLocks(_lockID);
@@ -143,8 +142,6 @@ const checkUnreleasedLock = async (
       pix: pixData,
     };
   }
-
-  return;
 };
 
 export {

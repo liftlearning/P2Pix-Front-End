@@ -47,7 +47,8 @@ const updateRemaining = async () => {
   transactionsList.value = allUserTransactions;
 };
 
-onMounted(async () => {
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
   if (walletAddress.value) {
     const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
@@ -64,42 +65,19 @@ onMounted(async () => {
       transactionsList.value = allUserTransactions;
     }
   }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+onMounted(async () => {
+  await getWalletTransactions();
 });
 
-watch(walletAddress, async (newValue) => {
-  await listValidDepositTransactionsByWalletAddress(newValue)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
-
-  await listAllTransactionByWalletAddress(newValue)
-    .then((res) => {
-      if (res) transactionsList.value = res;
-    })
-    .catch(() => {
-      transactionsList.value = [];
-    });
+watch(walletAddress, async () => {
+  await getWalletTransactions();
 });
 
 watch(networkName, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
-
-  await listAllTransactionByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) transactionsList.value = res;
-    })
-    .catch(() => {
-      transactionsList.value = [];
-    });
+  await getWalletTransactions();
 });
 </script>
 

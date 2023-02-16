@@ -10,7 +10,6 @@ import { NetworkEnum } from "@/model/NetworkEnum";
 
 const getNetworksLiquidity = async (): Promise<void> => {
   const etherStore = useEtherStore();
-  console.log("Loading events");
 
   const goerliProvider = new ethers.providers.JsonRpcProvider(
     import.meta.env.VITE_GOERLI_API_URL,
@@ -43,10 +42,8 @@ const getNetworksLiquidity = async (): Promise<void> => {
   );
 
   etherStore.setDepositsValidListGoerli(depositListGoerli);
-  console.log(depositListGoerli);
 
   etherStore.setDepositsValidListMumbai(depositListMumbai);
-  console.log(depositListMumbai);
 };
 
 const getValidDeposits = async (

@@ -2,6 +2,7 @@
 import SearchComponent from "@/components/SearchComponent.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
+import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import { ref, onMounted, watch } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
@@ -10,12 +11,13 @@ import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import {
   updateWalletStatus,
-  listReleaseTransactionByWalletAddress,
+  listAllTransactionByWalletAddress,
   checkUnreleasedLock,
+  listValidDepositTransactionsByWalletAddress,
 } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
-import type { Event } from "ethers";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
 
 enum Step {
   Search,
@@ -34,7 +36,8 @@ const tokenAmount = ref<number>();
 const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
-const lastWalletReleaseTransactions = ref<Event[]>([]);
+const lastWalletTransactions = ref<WalletTransaction[]>([]);
+const depositList = ref<ValidDeposit[]>([]);
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -75,12 +78,17 @@ const releaseTransaction = async (e2eId: string) => {
     );
     release.wait();
 
-    await listReleaseTransactionByWalletAddress(
+    await listAllTransactionByWalletAddress(
       walletAddress.value.toLowerCase()
     ).then((releaseTransactions) => {
       if (releaseTransactions)
-        lastWalletReleaseTransactions.value = releaseTransactions;
+        lastWalletTransactions.value = releaseTransactions;
     });
+
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+    depositList.value = walletDeposits;
 
     await updateWalletStatus();
     loadingRelease.value = false;
@@ -89,7 +97,6 @@ const releaseTransaction = async (e2eId: string) => {
 
 const checkForUnreleasedLocks = async (): Promise<void> => {
   const walletLocks = await checkUnreleasedLock(walletAddress.value);
-  console.log(walletLocks);
   if (walletLocks) {
     lockID.value = walletLocks.lockID;
     tokenAmount.value = walletLocks.pix.value;
@@ -144,10 +151,14 @@ onMounted(async () => {
   <div v-if="flowStep == Step.List">
     <BuyConfirmedComponent
       v-if="!loadingRelease"
-      :last-wallet-release-transactions="lastWalletReleaseTransactions"
       :tokenAmount="tokenAmount"
       @make-another-transaction="flowStep = Step.Search"
     />
+    <ListingComponent
+      v-if="!loadingRelease"
+      :valid-deposits="depositList"
+      :wallet-transactions="lastWalletTransactions"
+    ></ListingComponent>
     <LoadingComponent
       v-if="loadingRelease"
       :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"

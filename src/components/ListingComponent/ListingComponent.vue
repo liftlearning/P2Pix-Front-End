@@ -2,22 +2,21 @@
 import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
 import { useEtherStore } from "@/store/ether";
-import { formatEther } from "@ethersproject/units";
-import type { BigNumber, Event } from "ethers";
 import { ref, watch } from "vue";
 
 // props
 const props = defineProps<{
   validDeposits: ValidDeposit[];
-  walletTransactions: Event[];
+  walletTransactions: WalletTransaction[];
 }>();
 
 const emit = defineEmits(["depositWithdrawn"]);
 
 const etherStore = useEtherStore();
 
-const itemsToShow = ref<Event[]>([]);
+const itemsToShow = ref<WalletTransaction[]>([]);
 const withdrawAmount = ref<string>("");
 const withdrawButtonOpacity = ref<number>(0.6);
 const withdrawButtonCursor = ref<string>("not-allowed");
@@ -91,11 +90,6 @@ const getEventName = (event: string | undefined): string => {
   };
 
   return possibleEventName[event];
-};
-
-const getAmountFormatted = (amount?: BigNumber): string => {
-  if (!amount) return "";
-  return formatEther(amount);
 };
 
 // watch props changes
@@ -180,18 +174,36 @@ showInitialItems();
             {{ getEventName(item.event) }}
           </p>
           <p class="text-xl leading-7 font-semibold text-gray-900">
-            {{ getAmountFormatted(item.args?.amount) }}
+            {{ item.amount }}
             BRZ
           </p>
           <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
         <div>
-          <div class="bg-emerald-300 rounded-lg text-center mb-2 p-1">
+          <div
+            class="bg-amber-300 rounded-lg text-center mb-2 p-1"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
+          >
+            Ativo
+          </div>
+          <div
+            class="bg-[#94A3B8] rounded-lg text-center mb-2 p-1"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 2"
+          >
+            Expirado
+          </div>
+          <div
+            class="bg-emerald-300 rounded-lg text-center mb-2 p-1"
+            v-if="
+              (getEventName(item.event) == 'Reserva' && item.lockStatus == 3) ||
+              getEventName(item.event) != 'Reserva'
+            "
+          >
             Finalizado
           </div>
           <div
             class="flex gap-2 cursor-pointer items-center justify-self-center"
-            @click="openEtherscanUrl(item?.transactionHash)"
+            @click="openEtherscanUrl(item.transactionHash)"
           >
             <span class="last-release-info">{{ getExplorer() }}</span>
             <img alt="Redirect image" src="@/assets/redirect.svg" />

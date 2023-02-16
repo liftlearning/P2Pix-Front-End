@@ -5,10 +5,12 @@ import { getTokenAddress, possibleChains } from "./addresses";
 
 import mockToken from "@/utils/smart_contract_files/MockToken.json";
 
-import { ethers, type Event } from "ethers";
+import { ethers, type Event, type BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { getValidDeposits } from "./events";
+
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
 import type { UnreleasedLock } from "@/model/UnreleasedLock";
 import type { Pix } from "@/model/Pix";
 
@@ -50,9 +52,45 @@ const listValidDepositTransactionsByWalletAddress = async (
   return [];
 };
 
+const getLockStatus = async (id: [BigNumber]): Promise<number> => {
+  const p2pContract = getContract();
+  const res = await p2pContract.getLocksStatus([id]);
+
+  return res[1][0];
+};
+
+const filterLockStatus = async (
+  transactions: Event[]
+): Promise<WalletTransaction[]> => {
+  const txs = [];
+
+  for (const transaction of transactions) {
+    const tx: WalletTransaction = {
+      token: transaction.args?.token ? transaction.args?.token : "",
+      blockNumber: transaction.blockNumber ? transaction.blockNumber : -1,
+      amount: transaction.args?.amount
+        ? Number(formatEther(transaction.args?.amount))
+        : -1,
+      seller: transaction.args?.seller ? transaction.args?.seller : "",
+      buyer: transaction.args?.buyer ? transaction.args?.buyer : "",
+      event: transaction.event ? transaction.event : "",
+      lockStatus:
+        transaction.event == "LockAdded"
+          ? await getLockStatus(transaction.args?.lockID)
+          : -1,
+      transactionHash: transaction.transactionHash
+        ? transaction.transactionHash
+        : "",
+    };
+    txs.push(tx);
+  }
+
+  return txs;
+};
+
 const listAllTransactionByWalletAddress = async (
   walletAddress: string
-): Promise<Event[]> => {
+): Promise<WalletTransaction[]> => {
   const p2pContract = getContract(true);
 
   const filterDeposits = p2pContract.filters.DepositAdded([walletAddress]);
@@ -73,14 +111,18 @@ const listAllTransactionByWalletAddress = async (
     filterWithdrawnDeposits
   );
 
-  return [
-    ...eventsDeposits,
-    ...eventsAddedLocks,
-    ...eventsReleasedLocks,
-    ...eventsWithdrawnDeposits,
-  ].sort((a, b) => {
-    return b.blockNumber - a.blockNumber;
-  });
+  const lockStatusFiltered = await filterLockStatus(
+    [
+      ...eventsDeposits,
+      ...eventsAddedLocks,
+      ...eventsReleasedLocks,
+      ...eventsWithdrawnDeposits,
+    ].sort((a, b) => {
+      return b.blockNumber - a.blockNumber;
+    })
+  );
+
+  return lockStatusFiltered;
 };
 
 // get wallet's release transactions

@@ -16,8 +16,10 @@ const { walletAddress, sellerView } = storeToRefs(etherStore);
 const menuOpenToggle = ref<boolean>(false);
 const menuHoverToggle = ref<boolean>(false);
 
+const infoMenuOpenToggle = ref<boolean>(false);
 const currencyMenuOpenToggle = ref<boolean>(false);
 const currencyMenuHoverToggle = ref<boolean>(false);
+const infoMenuRef = ref<any>(null);
 const walletAddressRef = ref<any>(null);
 const currencyRef = ref<any>(null);
 
@@ -71,6 +73,10 @@ onClickOutside(currencyRef, () => {
   currencyMenuOpenToggle.value = false;
   currencyMenuHoverToggle.value = false;
 });
+
+onClickOutside(infoMenuRef, () => {
+  infoMenuOpenToggle.value = false;
+});
 </script>
 
 <template>
@@ -93,7 +99,91 @@ onClickOutside(currencyRef, () => {
     </RouterLink>
 
     <div class="flex sm:gap-4 gap-2 items-center">
-      <RouterLink :to="'/faq'" class="default-button lg-view"> FAQ </RouterLink>
+      <div class="flex flex-col">
+        <div
+          v-show="infoMenuOpenToggle"
+          class="mt-10 absolute w-full text-gray-900 lg-view"
+        >
+          <div class="mt-2">
+            <div class="bg-white rounded-md z-10 -left-32 w-52">
+              <div
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+              >
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm">
+                  Documentação
+                </span>
+              </div>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+              <RouterLink
+                :to="'/faq'"
+                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
+              >
+                <span class="text-gray-900 py-4 text-end font-semibold text-sm whitespace-nowrap">
+                  Perguntas frequentes
+                </span>
+              </RouterLink>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+              <div
+                class="sm:text-center sm:justify-center ml-8 sm:ml-0 gap-2 px-4 rounded-md cursor-pointer float-right"
+              >
+                <div class="redirect_button flex mr-4">
+                  <img
+                    alt="Twitter"
+                    width="20"
+                    height="20"
+                    src="@/assets/twitterIcon.svg"
+                    class="mr-6"
+                    onclick="location.href = 'https://www.twitter.com/doiim';"
+                  />
+                  <img
+                    alt="Discord"
+                    width="20"
+                    height="20"
+                    src="@/assets/discordIcon.svg"
+                    class="mr-6"
+                  />
+                  <img
+                    alt="Github"
+                    width="20"
+                    height="20"
+                    src="@/assets/githubIcon.svg"
+                    onclick="location.href = 'https://github.com/doiim';"
+                  />
+                </div>
+              </div>
+              <div class="w-full flex justify-center">
+                <hr class="w-4/5" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+            ref="infoMenuRef"
+            class="default-button lg-view cursor-pointer"
+            @click="
+              [
+                (infoMenuOpenToggle = !infoMenuOpenToggle),
+                (menuOpenToggle = false),
+                (currencyMenuOpenToggle = false),
+              ]
+            "
+        >
+          <h1
+            class="text-gray-50 font-semibold sm:text-base"
+            :style="{
+              'border-bottom': infoMenuOpenToggle
+                ? '2px solid white'
+                : 'transparent',
+            }"
+          >
+            Menu
+          </h1>
+        </div>
+      </div>
       <RouterLink
         :to="'/faq'"
         v-if="!walletAddress"
@@ -122,6 +212,7 @@ onClickOutside(currencyRef, () => {
             [
               (currencyMenuOpenToggle = !currencyMenuOpenToggle),
               (menuOpenToggle = false),
+              (infoMenuOpenToggle = false),
             ]
           "
           @mouseover="currencyMenuHoverToggle = true"
@@ -236,6 +327,7 @@ onClickOutside(currencyRef, () => {
               [
                 (menuOpenToggle = !menuOpenToggle),
                 (currencyMenuOpenToggle = false),
+                (infoMenuOpenToggle = false),
               ]
             "
             @mouseover="menuHoverToggle = true"

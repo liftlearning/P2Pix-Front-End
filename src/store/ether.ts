@@ -14,6 +14,7 @@ export const useEtherStore = defineStore("ether", {
     // Depósitos válidos para compra MUMBAI
     depositsValidListMumbai: [] as ValidDeposit[],
     loadingWalletTransactions: false,
+    loadingNetworkLiquidity: false,
   }),
   actions: {
     setWalletAddress(walletAddress: string) {
@@ -39,6 +40,9 @@ export const useEtherStore = defineStore("ether", {
     },
     setLoadingWalletTransactions(isLoadingWalletTransactions: boolean) {
       this.loadingWalletTransactions = isLoadingWalletTransactions;
+    },
+    setLoadingNetworkLiquidity(isLoadingNetworkLiquidity: boolean) {
+      this.loadingNetworkLiquidity = isLoadingNetworkLiquidity;
     },
   },
   // Alterar para integrar com mumbai

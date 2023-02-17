@@ -31,6 +31,7 @@ const getNetworksLiquidity = async (): Promise<void> => {
     mumbaiProvider
   );
 
+  etherStore.setLoadingNetworkLiquidity(true);
   const depositListGoerli = await getValidDeposits(
     getTokenAddress(NetworkEnum.ethereum),
     p2pContractGoerli
@@ -42,8 +43,8 @@ const getNetworksLiquidity = async (): Promise<void> => {
   );
 
   etherStore.setDepositsValidListGoerli(depositListGoerli);
-
   etherStore.setDepositsValidListMumbai(depositListMumbai);
+  etherStore.setLoadingNetworkLiquidity(false);
 };
 
 const getValidDeposits = async (

@@ -106,9 +106,7 @@ onClickOutside(infoMenuRef, () => {
         >
           <div class="mt-2">
             <div class="bg-white rounded-md z-10 -left-32 w-52">
-              <div
-                class="menu-button gap-2 px-4 rounded-md cursor-pointer"
-              >
+              <div class="menu-button gap-2 px-4 rounded-md cursor-pointer">
                 <span class="text-gray-900 py-4 text-end font-semibold text-sm">
                   Documentação
                 </span>
@@ -128,29 +126,34 @@ onClickOutside(infoMenuRef, () => {
                 <hr class="w-4/5" />
               </div>
               <div
-                class="sm:text-center sm:justify-center ml-8 sm:ml-0 gap-2 px-4 rounded-md cursor-pointer float-right"
+                class="sm:text-center sm:justify-center ml-8 sm:ml-0 gap-2 px-4 rounded-md float-right"
               >
                 <div class="redirect_button flex mr-4">
-                  <img
-                    alt="Twitter"
-                    width="20"
-                    height="20"
-                    src="@/assets/twitterIcon.svg"
-                    class="mr-6"
-                    onclick="location.href = 'https://www.twitter.com/doiim';"
-                  />
-                  <img
-                    alt="Discord"
-                    width="20"
-                    height="20"
-                    src="@/assets/discordIcon.svg"
-                    class="mr-6"
-                  />
+                  <div class="mr-6">
+                    <img
+                      alt="Twitter"
+                      width="20"
+                      height="20"
+                      src="@/assets/twitterIcon.svg"
+                      class="cursor-pointer"
+                      onclick="location.href = 'https://www.twitter.com/doiim';"
+                    />
+                  </div>
+                  <div class="mr-6">
+                    <img
+                      alt="Discord"
+                      width="20"
+                      height="20"
+                      src="@/assets/discordIcon.svg"
+                      class="cursor-pointer"
+                    />
+                  </div>
                   <img
                     alt="Github"
                     width="20"
                     height="20"
                     src="@/assets/githubIcon.svg"
+                    class="cursor-pointer"
                     onclick="location.href = 'https://github.com/doiim';"
                   />
                 </div>
@@ -162,15 +165,15 @@ onClickOutside(infoMenuRef, () => {
           </div>
         </div>
         <div
-            ref="infoMenuRef"
-            class="default-button lg-view cursor-pointer"
-            @click="
-              [
-                (infoMenuOpenToggle = !infoMenuOpenToggle),
-                (menuOpenToggle = false),
-                (currencyMenuOpenToggle = false),
-              ]
-            "
+          ref="infoMenuRef"
+          class="default-button lg-view cursor-pointer"
+          @click="
+            [
+              (infoMenuOpenToggle = !infoMenuOpenToggle),
+              (menuOpenToggle = false),
+              (currencyMenuOpenToggle = false),
+            ]
+          "
         >
           <h1
             class="text-gray-50 font-semibold sm:text-base"

@@ -19,6 +19,8 @@ const etherStore = useEtherStore();
 
 const itemsToShow = ref<Event[]>([]);
 const withdrawAmount = ref<string>("");
+const withdrawButtonOpacity = ref<number>(0.6);
+const withdrawButtonCursor = ref<string>("not-allowed");
 const isCollapsibleOpen = ref<boolean>(false);
 
 const callWithdraw = async () => {
@@ -31,6 +33,16 @@ const callWithdraw = async () => {
     }
   }
 };
+
+watch(withdrawAmount, (): void => {
+  if (!withdrawAmount.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
 
 const getRemaining = (): number => {
   if (props.validDeposits instanceof Array) {
@@ -148,7 +160,7 @@ showInitialItems();
             Cancelar
           </h1>
           <div
-            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >
             <img alt="Withdraw image" src="@/assets/withdraw.svg" />
@@ -247,6 +259,11 @@ p {
 
 .last-release-info {
   @apply font-medium text-base text-gray-900 justify-self-center;
+}
+
+.withdraw-button {
+  opacity: v-bind(withdrawButtonOpacity);
+  cursor: v-bind(withdrawButtonCursor);
 }
 
 input[type="number"] {

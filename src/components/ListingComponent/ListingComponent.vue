@@ -190,19 +190,19 @@ showInitialItems();
         </div>
         <div>
           <div
-            class="bg-amber-300 rounded-lg text-center mb-2 p-1"
+            class="bg-amber-300 status-text"
             v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
           >
             Ativo
           </div>
           <div
-            class="bg-[#94A3B8] rounded-lg text-center mb-2 p-1"
+            class="bg-[#94A3B8] status-text"
             v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 2"
           >
             Expirado
           </div>
           <div
-            class="bg-emerald-300 rounded-lg text-center mb-2 p-1"
+            class="bg-emerald-300 status-text"
             v-if="
               (getEventName(item.event) == 'Reserva' && item.lockStatus == 3) ||
               getEventName(item.event) != 'Reserva'
@@ -263,6 +263,9 @@ p {
   @apply flex justify-between items-center;
 }
 
+.status-text {
+  @apply text-base font-medium text-gray-900 rounded-lg text-center mb-2 p-1;
+}
 .text {
   @apply text-white text-center;
 }

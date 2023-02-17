@@ -197,7 +197,7 @@ watch(walletAddress, (): void => {
           <SpinnerComponent
             width="4"
             height="4"
-            color="blue-600"
+            fillColor="white"
           ></SpinnerComponent>
         </div>
         <div

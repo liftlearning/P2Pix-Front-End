@@ -112,7 +112,7 @@ showInitialItems();
 
 <template>
   <div class="blur-container" v-if="loadingWalletTransactions">
-    <SpinnerComponent width="8" height="8" color="white"></SpinnerComponent>
+    <SpinnerComponent width="8" height="8" fillColor="white"></SpinnerComponent>
   </div>
   <div class="blur-container" v-if="!loadingWalletTransactions">
     <div

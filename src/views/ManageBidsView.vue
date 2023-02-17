@@ -23,15 +23,20 @@ const transactionsList = ref<WalletTransaction[]>([]);
 const callWithdraw = async (amount: string) => {
   if (amount) {
     loadingWithdraw.value = true;
-    const withdraw = await withdrawDeposit(amount);
+    let withdraw;
+    try {
+      withdraw = await withdrawDeposit(amount);
+    } catch {
+      loadingWithdraw.value = false;
+    }
+
     if (withdraw) {
       console.log("Saque realizado!");
       await getWalletTransactions();
-      loadingWithdraw.value = false;
     } else {
       console.log("Não foi possível realizar o saque!");
-      loadingWithdraw.value = false;
     }
+    loadingWithdraw.value = false;
   }
 };
 

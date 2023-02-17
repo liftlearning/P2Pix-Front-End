@@ -25,26 +25,14 @@ const callWithdraw = async (amount: string) => {
     loadingWithdraw.value = true;
     const withdraw = await withdrawDeposit(amount);
     if (withdraw) {
-      alert("Saque realizado!");
-      await updateRemaining();
+      console.log("Saque realizado!");
+      await getWalletTransactions();
       loadingWithdraw.value = false;
     } else {
-      alert("Não foi possível realizar o saque!");
+      console.log("Não foi possível realizar o saque!");
       loadingWithdraw.value = false;
     }
   }
-};
-
-const updateRemaining = async () => {
-  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-    walletAddress.value
-  );
-  depositList.value = walletDeposits;
-
-  const allUserTransactions = await listAllTransactionByWalletAddress(
-    walletAddress.value
-  );
-  transactionsList.value = allUserTransactions;
 };
 
 const getWalletTransactions = async () => {

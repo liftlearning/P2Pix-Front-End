@@ -21,6 +21,6 @@ const emit = defineEmits(["buttonClicked"]);
 
 <style scoped>
 .button {
-  @apply rounded-lg w-full text-base font-semibold text-gray-900 py-4 bg-amber-400;
+  @apply rounded-lg w-full text-base font-semibold text-gray-900 p-4 bg-amber-400;
 }
 </style>

@@ -8,7 +8,11 @@ import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
 import CustomModal from "@/components/CustomModal/CustomModal.vue";
 import { storeToRefs } from "pinia";
-import { addLock, releaseLock } from "@/blockchain/buyerMethods";
+import {
+  addLock,
+  releaseLock,
+  withdrawDeposit,
+} from "@/blockchain/buyerMethods";
 import {
   updateWalletStatus,
   listAllTransactionByWalletAddress,
@@ -78,20 +82,45 @@ const releaseTransaction = async (e2eId: string) => {
     );
     release.wait();
 
-    await listAllTransactionByWalletAddress(
-      walletAddress.value.toLowerCase()
-    ).then((releaseTransactions) => {
-      if (releaseTransactions)
-        lastWalletTransactions.value = releaseTransactions;
-    });
-
-    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
-    depositList.value = walletDeposits;
+    await getWalletTransactions();
 
     await updateWalletStatus();
     loadingRelease.value = false;
+  }
+};
+
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
+  if (walletAddress.value) {
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+
+    const allUserTransactions = await listAllTransactionByWalletAddress(
+      walletAddress.value
+    );
+
+    if (walletDeposits) {
+      depositList.value = walletDeposits;
+    }
+    if (allUserTransactions) {
+      lastWalletTransactions.value = allUserTransactions;
+    }
+  }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+const callWithdraw = async (amount: string) => {
+  if (amount) {
+    etherStore.setLoadingWalletTransactions(true);
+    const withdraw = await withdrawDeposit(amount);
+    if (withdraw) {
+      console.log("Saque realizado!");
+      await getWalletTransactions();
+    } else {
+      console.log("Não foi possível realizar o saque!");
+    }
+    etherStore.setLoadingWalletTransactions(false);
   }
 };
 
@@ -149,16 +178,22 @@ onMounted(async () => {
     />
   </div>
   <div v-if="flowStep == Step.List">
-    <BuyConfirmedComponent
-      v-if="!loadingRelease"
-      :tokenAmount="tokenAmount"
-      @make-another-transaction="flowStep = Step.Search"
-    />
-    <ListingComponent
-      v-if="!loadingRelease"
-      :valid-deposits="depositList"
-      :wallet-transactions="lastWalletTransactions"
-    ></ListingComponent>
+    <div class="flex flex-col gap-10" v-if="!loadingRelease">
+      <BuyConfirmedComponent
+        :tokenAmount="tokenAmount"
+        @make-another-transaction="flowStep = Step.Search"
+      />
+      <div
+        class="text-3xl text-white leading-9 font-bold justify-center flex mt-4"
+      >
+        Gerenciar transações
+      </div>
+      <ListingComponent
+        :valid-deposits="depositList"
+        :wallet-transactions="lastWalletTransactions"
+        @deposit-withdrawn="callWithdraw"
+      ></ListingComponent>
+    </div>
     <LoadingComponent
       v-if="loadingRelease"
       :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"

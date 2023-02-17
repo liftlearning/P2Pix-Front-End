@@ -19,6 +19,9 @@ const etherStore = useEtherStore();
 
 const itemsToShow = ref<Event[]>([]);
 const withdrawAmount = ref<string>("");
+const withdrawButtonOpacity = ref<number>(0.6);
+const withdrawButtonCursor = ref<string>("not-allowed");
+const isCollapsibleOpen = ref<boolean>(false);
 
 const callWithdraw = async () => {
   if (withdrawAmount.value) {
@@ -30,6 +33,16 @@ const callWithdraw = async () => {
     }
   }
 };
+
+watch(withdrawAmount, (): void => {
+  if (!withdrawAmount.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
 
 const getRemaining = (): number => {
   if (props.validDeposits instanceof Array) {
@@ -115,7 +128,16 @@ showInitialItems();
         </div>
       </div>
       <div class="pt-5">
-        <div class="py-2 w-100">
+        <div v-show="!isCollapsibleOpen" class="flex justify-end items-center">
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            @click="[(isCollapsibleOpen = true)]"
+          >
+            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+            <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
+        <div v-show="isCollapsibleOpen" class="py-2 w-100">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
           <input
             type="number"
@@ -126,10 +148,19 @@ showInitialItems();
             v-model="withdrawAmount"
           />
         </div>
-        <hr class="pb-3" />
-        <div class="flex justify-end items-center">
+        <hr v-show="isCollapsibleOpen" class="pb-3" />
+        <div
+          v-show="isCollapsibleOpen"
+          class="flex justify-between items-center"
+        >
+          <h1
+            @click="[(isCollapsibleOpen = false)]"
+            class="text-black font-medium cursor-pointer"
+          >
+            Cancelar
+          </h1>
           <div
-            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >
             <img alt="Withdraw image" src="@/assets/withdraw.svg" />
@@ -228,6 +259,11 @@ p {
 
 .last-release-info {
   @apply font-medium text-base text-gray-900 justify-self-center;
+}
+
+.withdraw-button {
+  opacity: v-bind(withdrawButtonOpacity);
+  cursor: v-bind(withdrawButtonCursor);
 }
 
 input[type="number"] {

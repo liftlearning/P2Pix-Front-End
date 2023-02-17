@@ -357,7 +357,7 @@ onClickOutside(infoMenuRef, () => {
               {{ formatWalletAddress() }}
             </span>
             <img
-              class="text-gray-900 lg-view"
+              class="text-gray-900"
               v-if="!menuHoverToggle && !menuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"

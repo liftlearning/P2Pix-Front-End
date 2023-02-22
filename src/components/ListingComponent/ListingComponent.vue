@@ -7,6 +7,8 @@ import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import SpinnerComponent from "../SpinnerComponent.vue";
+import { decimalCount } from "@/utils/decimalCount";
+import { debounce } from "@/utils/debounce";
 
 const etherStore = useEtherStore();
 
@@ -19,11 +21,35 @@ const props = defineProps<{
 const emit = defineEmits(["depositWithdrawn"]);
 
 const { loadingWalletTransactions } = storeToRefs(etherStore);
+const remaining = ref<number>(0.0);
 const itemsToShow = ref<WalletTransaction[]>([]);
 const withdrawAmount = ref<string>("");
 const withdrawButtonOpacity = ref<number>(0.6);
 const withdrawButtonCursor = ref<string>("not-allowed");
 const isCollapsibleOpen = ref<boolean>(false);
+const validDecimals = ref<boolean>(true);
+const validWithdrawAmount = ref<boolean>(true);
+const enableConfirmButton = ref<boolean>(false);
+
+// Debounce methods
+const handleInputEvent = (event: any): void => {
+  const { value } = event.target;
+
+  if (decimalCount(String(value)) > 2) {
+    validDecimals.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validDecimals.value = true;
+
+  if (value > remaining.value) {
+    validWithdrawAmount.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validWithdrawAmount.value = true;
+  enableConfirmButton.value = true;
+};
 
 const callWithdraw = async () => {
   if (withdrawAmount.value) {
@@ -51,6 +77,7 @@ const getRemaining = (): number => {
     // Here we are getting only the first element of the list because
     // in this release only the BRL token is being used.
     const deposit = props.validDeposits[0];
+    remaining.value = deposit ? deposit.remaining : 0;
     return deposit ? deposit.remaining : 0;
   }
   return 0;
@@ -146,10 +173,21 @@ showInitialItems();
             type="number"
             name=""
             id=""
+            @input="debounce(handleInputEvent, 500)($event)"
             placeholder="0"
             class="text-2xl text-gray-900 w-full outline-none"
             v-model="withdrawAmount"
           />
+        </div>
+        <div class="flex justify-center" v-if="!validDecimals">
+          <span class="text-red-500 font-normal text-sm"
+            >Por favor utilize no máximo 2 casas decimais</span
+          >
+        </div>
+        <div class="flex justify-center" v-else-if="!validWithdrawAmount">
+          <span class="text-red-500 font-normal text-sm"
+            >Saldo insuficiente</span
+          >
         </div>
         <hr v-show="isCollapsibleOpen" class="pb-3" />
         <div
@@ -162,7 +200,9 @@ showInitialItems();
           >
             Cancelar
           </h1>
+
           <div
+            v-if="enableConfirmButton"
             class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >

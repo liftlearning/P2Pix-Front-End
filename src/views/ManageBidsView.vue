@@ -12,6 +12,8 @@ import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { WalletTransaction } from "@/model/WalletTransaction";
 
+import router from "@/router/index";
+
 const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
@@ -62,6 +64,9 @@ const getWalletTransactions = async () => {
 };
 
 onMounted(async () => {
+  if (!walletAddress.value) {
+    router.push({ name: "home" });
+  }
   await getWalletTransactions();
 });
 

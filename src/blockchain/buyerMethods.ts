@@ -92,10 +92,8 @@ const withdrawDeposit = async (amount: string): Promise<any> => {
     parseEther(String(amount)),
     []
   );
-  const with_rec = await withdraw.wait();
-  const [t] = with_rec.events;
+  await withdraw.wait();
 
-  console.log(t.args);
   return withdraw;
 };
 

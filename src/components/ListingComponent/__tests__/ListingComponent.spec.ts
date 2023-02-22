@@ -3,11 +3,13 @@ import ListingComponent from "@/components/ListingComponent/ListingComponent.vue
 import { createPinia, setActivePinia } from "pinia";
 import { expect } from "vitest";
 import { MockValidDeposits } from "@/model/mock/ValidDepositMock";
-import { MockEvents } from "@/model/mock/EventMock";
+import { MockWalletTransactions } from "@/model/mock/WalletTransactionMock";
+import { useEtherStore } from "@/store/ether";
 
 describe("ListingComponent.vue", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    useEtherStore().setLoadingWalletTransactions(false);
   });
 
   test("Test Message when an empty array is received", () => {
@@ -25,7 +27,7 @@ describe("ListingComponent.vue", () => {
     const wrapper = mount(ListingComponent, {
       props: {
         validDeposits: [],
-        walletTransactions: MockEvents,
+        walletTransactions: MockWalletTransactions,
       },
     });
 
@@ -38,7 +40,7 @@ describe("ListingComponent.vue", () => {
     const wrapper = mount(ListingComponent, {
       props: {
         validDeposits: MockValidDeposits,
-        walletTransactions: MockEvents,
+        walletTransactions: MockWalletTransactions,
       },
     });
     const btn = wrapper.find("button");
@@ -50,14 +52,14 @@ describe("ListingComponent.vue", () => {
 
     elements = wrapper.findAll(".item-container");
 
-    expect(elements).toHaveLength(4);
+    expect(elements).toHaveLength(5);
   });
 
   test("Test withdraw offer button emit", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
         validDeposits: MockValidDeposits,
-        walletTransactions: MockEvents,
+        walletTransactions: MockWalletTransactions,
       },
     });
     wrapper.vm.$emit("depositWithdrawn");

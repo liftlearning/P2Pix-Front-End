@@ -2,26 +2,54 @@
 import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
 import { useEtherStore } from "@/store/ether";
-import { formatEther } from "@ethersproject/units";
-import type { BigNumber, Event } from "ethers";
+import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
+import SpinnerComponent from "../SpinnerComponent.vue";
+import { decimalCount } from "@/utils/decimalCount";
+import { debounce } from "@/utils/debounce";
+
+const etherStore = useEtherStore();
 
 // props
 const props = defineProps<{
   validDeposits: ValidDeposit[];
-  walletTransactions: Event[];
+  walletTransactions: WalletTransaction[];
 }>();
 
 const emit = defineEmits(["depositWithdrawn"]);
 
-const etherStore = useEtherStore();
-
-const itemsToShow = ref<Event[]>([]);
+const { loadingWalletTransactions } = storeToRefs(etherStore);
+const remaining = ref<number>(0.0);
+const itemsToShow = ref<WalletTransaction[]>([]);
 const withdrawAmount = ref<string>("");
 const withdrawButtonOpacity = ref<number>(0.6);
 const withdrawButtonCursor = ref<string>("not-allowed");
 const isCollapsibleOpen = ref<boolean>(false);
+const validDecimals = ref<boolean>(true);
+const validWithdrawAmount = ref<boolean>(true);
+const enableConfirmButton = ref<boolean>(false);
+
+// Debounce methods
+const handleInputEvent = (event: any): void => {
+  const { value } = event.target;
+
+  if (decimalCount(String(value)) > 2) {
+    validDecimals.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validDecimals.value = true;
+
+  if (value > remaining.value) {
+    validWithdrawAmount.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validWithdrawAmount.value = true;
+  enableConfirmButton.value = true;
+};
 
 const callWithdraw = async () => {
   if (withdrawAmount.value) {
@@ -49,6 +77,7 @@ const getRemaining = (): number => {
     // Here we are getting only the first element of the list because
     // in this release only the BRL token is being used.
     const deposit = props.validDeposits[0];
+    remaining.value = deposit ? deposit.remaining : 0;
     return deposit ? deposit.remaining : 0;
   }
   return 0;
@@ -93,11 +122,6 @@ const getEventName = (event: string | undefined): string => {
   return possibleEventName[event];
 };
 
-const getAmountFormatted = (amount?: BigNumber): string => {
-  if (!amount) return "";
-  return formatEther(amount);
-};
-
 // watch props changes
 watch(props, async (): Promise<void> => {
   const itemsToShowQty = itemsToShow.value.length;
@@ -114,8 +138,14 @@ showInitialItems();
 </script>
 
 <template>
-  <div class="blur-container">
-    <div class="w-full bg-white p-6 rounded-lg">
+  <div class="blur-container" v-if="loadingWalletTransactions">
+    <SpinnerComponent width="8" height="8" fillColor="white"></SpinnerComponent>
+  </div>
+  <div class="blur-container" v-if="!loadingWalletTransactions">
+    <div
+      class="w-full bg-white p-6 rounded-lg"
+      v-if="props.validDeposits.length > 0"
+    >
       <div class="flex justify-between items-center">
         <div>
           <p class="text-sm leading-5 font-medium text-gray-600">
@@ -143,10 +173,21 @@ showInitialItems();
             type="number"
             name=""
             id=""
+            @input="debounce(handleInputEvent, 500)($event)"
             placeholder="0"
             class="text-2xl text-gray-900 w-full outline-none"
             v-model="withdrawAmount"
           />
+        </div>
+        <div class="flex justify-center" v-if="!validDecimals">
+          <span class="text-red-500 font-normal text-sm"
+            >Por favor utilize no máximo 2 casas decimais</span
+          >
+        </div>
+        <div class="flex justify-center" v-else-if="!validWithdrawAmount">
+          <span class="text-red-500 font-normal text-sm"
+            >Saldo insuficiente</span
+          >
         </div>
         <hr v-show="isCollapsibleOpen" class="pb-3" />
         <div
@@ -159,7 +200,9 @@ showInitialItems();
           >
             Cancelar
           </h1>
+
           <div
+            v-if="enableConfirmButton"
             class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >
@@ -180,18 +223,36 @@ showInitialItems();
             {{ getEventName(item.event) }}
           </p>
           <p class="text-xl leading-7 font-semibold text-gray-900">
-            {{ getAmountFormatted(item.args?.amount) }}
+            {{ item.amount }}
             BRZ
           </p>
           <p class="text-xs leading-4 font-medium text-gray-600"></p>
         </div>
         <div>
-          <div class="bg-emerald-300 rounded-lg text-center mb-2 p-1">
+          <div
+            class="bg-amber-300 status-text"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
+          >
+            Ativo
+          </div>
+          <div
+            class="bg-[#94A3B8] status-text"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 2"
+          >
+            Expirado
+          </div>
+          <div
+            class="bg-emerald-300 status-text"
+            v-if="
+              (getEventName(item.event) == 'Reserva' && item.lockStatus == 3) ||
+              getEventName(item.event) != 'Reserva'
+            "
+          >
             Finalizado
           </div>
           <div
             class="flex gap-2 cursor-pointer items-center justify-self-center"
-            @click="openEtherscanUrl(item?.transactionHash)"
+            @click="openEtherscanUrl(item.transactionHash)"
           >
             <span class="last-release-info">{{ getExplorer() }}</span>
             <img alt="Redirect image" src="@/assets/redirect.svg" />
@@ -242,6 +303,9 @@ p {
   @apply flex justify-between items-center;
 }
 
+.status-text {
+  @apply text-base font-medium text-gray-900 rounded-lg text-center mb-2 p-1;
+}
 .text {
   @apply text-white text-center;
 }

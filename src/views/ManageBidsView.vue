@@ -2,33 +2,48 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
+import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import { ref, watch, onMounted } from "vue";
 import {
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
 } from "@/blockchain/wallet";
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import type { ValidDeposit } from "@/model/ValidDeposit";
-import type { Event } from "ethers";
+import type { WalletTransaction } from "@/model/WalletTransaction";
+
+import router from "@/router/index";
 
 const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
+const loadingWithdraw = ref<boolean>(false);
+
 const depositList = ref<ValidDeposit[]>([]);
-const transactionsList = ref<Event[]>([]);
+const transactionsList = ref<WalletTransaction[]>([]);
 
-const updateRemaining = async () => {
-  const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-    walletAddress.value
-  );
-  depositList.value = walletDeposits;
+const callWithdraw = async (amount: string) => {
+  if (amount) {
+    loadingWithdraw.value = true;
+    let withdraw;
+    try {
+      withdraw = await withdrawDeposit(amount);
+    } catch {
+      loadingWithdraw.value = false;
+    }
 
-  const allUserTransactions = await listAllTransactionByWalletAddress(
-    walletAddress.value
-  );
-  transactionsList.value = allUserTransactions;
+    if (withdraw) {
+      console.log("Saque realizado!");
+      await getWalletTransactions();
+    } else {
+      console.log("Não foi possível realizar o saque!");
+    }
+    loadingWithdraw.value = false;
+  }
 };
 
-onMounted(async () => {
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
   if (walletAddress.value) {
     const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
@@ -45,54 +60,44 @@ onMounted(async () => {
       transactionsList.value = allUserTransactions;
     }
   }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+onMounted(async () => {
+  if (!walletAddress.value) {
+    router.push({ name: "home" });
+  }
+  await getWalletTransactions();
 });
 
-watch(walletAddress, async (newValue) => {
-  await listValidDepositTransactionsByWalletAddress(newValue)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
-
-  await listAllTransactionByWalletAddress(newValue)
-    .then((res) => {
-      if (res) transactionsList.value = res;
-    })
-    .catch(() => {
-      transactionsList.value = [];
-    });
+watch(walletAddress, async () => {
+  await getWalletTransactions();
 });
 
 watch(networkName, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
-
-  await listAllTransactionByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) transactionsList.value = res;
-    })
-    .catch(() => {
-      transactionsList.value = [];
-    });
+  await getWalletTransactions();
 });
 </script>
 
 <template>
   <div class="page">
-    <div class="header">Gerenciar Ofertas</div>
+    <div class="header" v-if="!loadingWithdraw && !walletAddress">
+      Por Favor Conecte Sua Carteira
+    </div>
+    <div class="header" v-if="!loadingWithdraw && walletAddress">
+      Gerenciar Ofertas
+    </div>
     <div class="w-full max-w-4xl">
       <ListingComponent
+        v-if="!loadingWithdraw && walletAddress"
         :valid-deposits="depositList"
         :wallet-transactions="transactionsList"
-        @deposit-withdrawn="updateRemaining"
+        @deposit-withdrawn="callWithdraw"
       ></ListingComponent>
+      <LoadingComponent
+        v-if="loadingWithdraw"
+        :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"
+      />
     </div>
   </div>
 </template>

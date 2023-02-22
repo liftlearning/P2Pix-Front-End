@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
-import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
-import type { Event } from "ethers";
 
 // props
 const props = defineProps<{
-  lastWalletReleaseTransactions: Event[];
   tokenAmount: number | undefined;
 }>();
 
@@ -49,25 +46,6 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         Fazer nova transação
       </button>
     </div>
-    <div class="text-container mt-16 lg-view">
-      <span class="text font-extrabold text-3xl max-w-[50rem]"
-        >Gerenciar transações
-      </span>
-    </div>
-    <div class="w-full max-w-4xl lg-view">
-      <ListingComponent
-        :valid-deposits="[]"
-        :walletTransactions="lastWalletReleaseTransactions"
-        :isManageMode="false"
-      >
-      </ListingComponent>
-    </div>
-    <RouterLink
-      to="/transaction_history"
-      class="mt-8 text-white text-2xl font-bold"
-    >
-      Gerenciar Transações
-    </RouterLink>
   </div>
 </template>
 

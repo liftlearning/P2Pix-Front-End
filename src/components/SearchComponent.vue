@@ -9,6 +9,7 @@ import { verifyNetworkLiquidity } from "@/utils/networkLiquidity";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import { decimalCount } from "@/utils/decimalCount";
+import SpinnerComponent from "./SpinnerComponent.vue";
 
 // Store reference
 const etherStore = useEtherStore();
@@ -18,6 +19,7 @@ const {
   networkName,
   depositsValidListGoerli,
   depositsValidListMumbai,
+  loadingNetworkLiquidity,
 } = storeToRefs(etherStore);
 
 // Reactive state
@@ -160,8 +162,11 @@ watch(walletAddress, (): void => {
           </div>
         </div>
 
-        <div class="custom-divide py-2"></div>
-        <div class="flex justify-between pt-2" v-if="hasLiquidity">
+        <div class="custom-divide py-2 mb-2"></div>
+        <div
+          class="flex justify-between"
+          v-if="hasLiquidity && !loadingNetworkLiquidity"
+        >
           <p class="text-gray-500 font-normal text-sm w-auto">
             ~ R$ {{ tokenValue.toFixed(2) }}
           </p>
@@ -182,12 +187,31 @@ watch(walletAddress, (): void => {
             />
           </div>
         </div>
-        <div class="flex pt-2 justify-center" v-if="!validDecimals">
+        <div
+          class="flex justify-center items-center"
+          v-if="loadingNetworkLiquidity"
+        >
+          <span class="text-gray-900 font-normal text-sm mr-2"
+            >Carregando liquidez das redes.</span
+          >
+          <SpinnerComponent
+            width="4"
+            height="4"
+            fillColor="white"
+          ></SpinnerComponent>
+        </div>
+        <div
+          class="flex justify-center"
+          v-if="!validDecimals && !loadingNetworkLiquidity"
+        >
           <span class="text-red-500 font-normal text-sm"
             >Por favor utilize no máximo 2 casas decimais</span
           >
         </div>
-        <div class="flex pt-2 justify-center" v-else-if="!hasLiquidity">
+        <div
+          class="flex justify-center"
+          v-else-if="!hasLiquidity && !loadingNetworkLiquidity"
+        >
           <span class="text-red-500 font-normal text-sm"
             >Atualmente não há liquidez nas redes para sua demanda</span
           >

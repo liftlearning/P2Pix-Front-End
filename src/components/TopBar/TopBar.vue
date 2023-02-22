@@ -118,7 +118,9 @@ onClickOutside(infoMenuRef, () => {
                 :to="'/faq'"
                 class="menu-button gap-2 px-4 rounded-md cursor-pointer"
               >
-                <span class="text-gray-900 py-4 text-end font-semibold text-sm whitespace-nowrap">
+                <span
+                  class="text-gray-900 py-4 text-end font-semibold text-sm whitespace-nowrap"
+                >
                   Perguntas frequentes
                 </span>
               </RouterLink>
@@ -357,7 +359,7 @@ onClickOutside(infoMenuRef, () => {
               {{ formatWalletAddress() }}
             </span>
             <img
-              class="text-gray-900 lg-view"
+              class="text-gray-900"
               v-if="!menuHoverToggle && !menuOpenToggle"
               alt="Chevron Down"
               src="@/assets/chevronDown.svg"

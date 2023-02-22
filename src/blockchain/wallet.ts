@@ -62,28 +62,29 @@ const getLockStatus = async (id: [BigNumber]): Promise<number> => {
 const filterLockStatus = async (
   transactions: Event[]
 ): Promise<WalletTransaction[]> => {
-  const txs = [];
-
-  for (const transaction of transactions) {
-    const tx: WalletTransaction = {
-      token: transaction.args?.token ? transaction.args?.token : "",
-      blockNumber: transaction.blockNumber ? transaction.blockNumber : -1,
-      amount: transaction.args?.amount
-        ? Number(formatEther(transaction.args?.amount))
-        : -1,
-      seller: transaction.args?.seller ? transaction.args?.seller : "",
-      buyer: transaction.args?.buyer ? transaction.args?.buyer : "",
-      event: transaction.event ? transaction.event : "",
-      lockStatus:
-        transaction.event == "LockAdded"
-          ? await getLockStatus(transaction.args?.lockID)
+  const txs = await Promise.all(
+    transactions.map(async (transaction) => {
+      const tx: WalletTransaction = {
+        token: transaction.args?.token ? transaction.args?.token : "",
+        blockNumber: transaction.blockNumber ? transaction.blockNumber : -1,
+        amount: transaction.args?.amount
+          ? Number(formatEther(transaction.args?.amount))
           : -1,
-      transactionHash: transaction.transactionHash
-        ? transaction.transactionHash
-        : "",
-    };
-    txs.push(tx);
-  }
+        seller: transaction.args?.seller ? transaction.args?.seller : "",
+        buyer: transaction.args?.buyer ? transaction.args?.buyer : "",
+        event: transaction.event ? transaction.event : "",
+        lockStatus:
+          transaction.event == "LockAdded"
+            ? await getLockStatus(transaction.args?.lockID)
+            : -1,
+        transactionHash: transaction.transactionHash
+          ? transaction.transactionHash
+          : "",
+      };
+
+      return tx;
+    })
+  );
 
   return txs;
 };

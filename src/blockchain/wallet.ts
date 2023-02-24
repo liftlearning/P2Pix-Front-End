@@ -155,6 +155,22 @@ const listLockTransactionByWalletAddress = async (
   });
 };
 
+const listLockTransactionBySellerAddress = async (
+  sellerAddress: string
+): Promise<Event[]> => {
+  const p2pContract = getContract(true);
+
+  const filterAddedLocks = p2pContract.filters.LockAdded();
+  const eventsReleasedLocks = await p2pContract.queryFilter(filterAddedLocks);
+
+  return eventsReleasedLocks.filter((lock) =>
+    lock.args?.seller
+      .toHexString()
+      .substring(3)
+      .includes(sellerAddress.substring(2).toLowerCase())
+  );
+};
+
 const checkUnreleasedLock = async (
   walletAddress: string
 ): Promise<UnreleasedLock | undefined> => {
@@ -187,10 +203,37 @@ const checkUnreleasedLock = async (
   }
 };
 
+const getActiveLockAmount = async (walletAddress: string): Promise<Number> => {
+  const p2pContract = getContract();
+  const lockSeller = await listLockTransactionBySellerAddress(walletAddress);
+
+  const lockStatus = await p2pContract.getLocksStatus(
+    lockSeller.map((lock) => lock.args?.lockID)
+  );
+
+  const activeLockAmount = await lockStatus[1].reduce(
+    async (sumValue: Promise<number>, currentStatus: number, index: number) => {
+      const currValue = await sumValue;
+      let valueToSum = 0;
+
+      if (currentStatus == 1) {
+        const lock = await p2pContract.mapLocks(lockStatus[0][index]);
+        valueToSum = Number(formatEther(lock?.amount));
+      }
+
+      return currValue + valueToSum;
+    },
+    Promise.resolve(0)
+  );
+
+  return activeLockAmount;
+};
+
 export {
   updateWalletStatus,
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
   listReleaseTransactionByWalletAddress,
   checkUnreleasedLock,
+  getActiveLockAmount,
 };

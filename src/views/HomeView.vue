@@ -18,6 +18,7 @@ import {
   listAllTransactionByWalletAddress,
   checkUnreleasedLock,
   listValidDepositTransactionsByWalletAddress,
+  getActiveLockAmount,
 } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
@@ -42,6 +43,7 @@ const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
 const lastWalletTransactions = ref<WalletTransaction[]>([]);
 const depositList = ref<ValidDeposit[]>([]);
+const activeLockAmount = ref<Number>(0);
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -99,6 +101,8 @@ const getWalletTransactions = async () => {
     const allUserTransactions = await listAllTransactionByWalletAddress(
       walletAddress.value
     );
+
+    activeLockAmount.value = await getActiveLockAmount(walletAddress.value);
 
     if (walletDeposits) {
       depositList.value = walletDeposits;
@@ -191,6 +195,7 @@ onMounted(async () => {
       <ListingComponent
         :valid-deposits="depositList"
         :wallet-transactions="lastWalletTransactions"
+        :active-lock-amount="activeLockAmount"
         @deposit-withdrawn="callWithdraw"
       ></ListingComponent>
     </div>

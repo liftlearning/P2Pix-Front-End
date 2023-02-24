@@ -17,6 +17,7 @@ describe("ListingComponent.vue", () => {
       props: {
         validDeposits: [],
         walletTransactions: [],
+        activeLockAmount: 0,
       },
     });
 
@@ -28,6 +29,7 @@ describe("ListingComponent.vue", () => {
       props: {
         validDeposits: [],
         walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
 
@@ -41,6 +43,7 @@ describe("ListingComponent.vue", () => {
       props: {
         validDeposits: MockValidDeposits,
         walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
     const btn = wrapper.find("button");
@@ -60,6 +63,7 @@ describe("ListingComponent.vue", () => {
       props: {
         validDeposits: MockValidDeposits,
         walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
     wrapper.vm.$emit("depositWithdrawn");
@@ -67,5 +71,17 @@ describe("ListingComponent.vue", () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted("depositWithdrawn")).toBeTruthy();
+  });
+
+  test("Test should render lock info when active lock amount is greater than 0", () => {
+    const wrapper = mount(ListingComponent, {
+      props: {
+        validDeposits: MockValidDeposits,
+        walletTransactions: [],
+        activeLockAmount: 50,
+      },
+    });
+
+    expect(wrapper.html()).toContain("com 50 BRZ em lock");
   });
 });

@@ -16,6 +16,7 @@ const etherStore = useEtherStore();
 const props = defineProps<{
   validDeposits: ValidDeposit[];
   walletTransactions: WalletTransaction[];
+  activeLockAmount: Number;
 }>();
 
 const emit = defineEmits(["depositWithdrawn"]);
@@ -139,7 +140,7 @@ showInitialItems();
 
 <template>
   <div class="blur-container" v-if="loadingWalletTransactions">
-    <SpinnerComponent width="8" height="8" fillColor="white"></SpinnerComponent>
+    <SpinnerComponent width="8" height="8"></SpinnerComponent>
   </div>
   <div class="blur-container" v-if="!loadingWalletTransactions">
     <div
@@ -154,7 +155,12 @@ showInitialItems();
           <p class="text-xl leading-7 font-semibold text-gray-900">
             {{ getRemaining() }} BRZ
           </p>
-          <p class="text-xs leading-4 font-medium text-gray-600"></p>
+          <div class="flex gap-2">
+            <span class="text-xs leading-4 font-normal text-gray-400">{{
+              activeLockAmount != 0 ? `com ${activeLockAmount} BRZ em lock` : ""
+            }}</span>
+            <img alt="info image" src="@/assets/info.svg" />
+          </div>
         </div>
       </div>
       <div class="pt-5">

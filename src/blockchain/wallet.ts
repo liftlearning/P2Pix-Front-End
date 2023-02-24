@@ -203,7 +203,7 @@ const checkUnreleasedLock = async (
   }
 };
 
-const getActiveLockAmount = async (walletAddress: string): Promise<Number> => {
+const getActiveLockAmount = async (walletAddress: string): Promise<number> => {
   const p2pContract = getContract();
   const lockSeller = await listLockTransactionBySellerAddress(walletAddress);
 

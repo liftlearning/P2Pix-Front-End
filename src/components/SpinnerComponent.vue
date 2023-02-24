@@ -3,7 +3,6 @@
 const props = defineProps({
   width: String,
   height: String,
-  fillColor: String,
   show: Boolean,
 });
 

@@ -22,7 +22,7 @@ const loadingWithdraw = ref<boolean>(false);
 
 const depositList = ref<ValidDeposit[]>([]);
 const transactionsList = ref<WalletTransaction[]>([]);
-const activeLockAmount = ref<Number>(0);
+const activeLockAmount = ref<number>(0);
 
 const callWithdraw = async (amount: string) => {
   if (amount) {

@@ -16,7 +16,7 @@ const etherStore = useEtherStore();
 const props = defineProps<{
   validDeposits: ValidDeposit[];
   walletTransactions: WalletTransaction[];
-  activeLockAmount: Number;
+  activeLockAmount: number;
 }>();
 
 const emit = defineEmits(["depositWithdrawn"]);
@@ -155,9 +155,9 @@ showInitialItems();
           <p class="text-xl leading-7 font-semibold text-gray-900">
             {{ getRemaining() }} BRZ
           </p>
-          <div class="flex gap-2">
+          <div class="flex gap-2" v-if="activeLockAmount != 0">
             <span class="text-xs leading-4 font-normal text-gray-400">{{
-              activeLockAmount != 0 ? `com ${activeLockAmount} BRZ em lock` : ""
+              `com ${activeLockAmount} BRZ em lock`
             }}</span>
             <img alt="info image" src="@/assets/info.svg" />
           </div>
@@ -286,7 +286,7 @@ showInitialItems();
       </span>
     </div>
 
-    <span class="font-bold text-gray-900" v-if="itemsToShow.length == 0">
+    <span class="font-bold text-gray-300" v-if="itemsToShow.length == 0">
       Não há nenhuma transação anterior
     </span>
   </div>

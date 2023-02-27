@@ -11,6 +11,7 @@ import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus, checkUnreleasedLock } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import router from "@/router";
 
 enum Step {
   Search,
@@ -67,7 +68,7 @@ const releaseTransaction = async (e2eId: string) => {
       e2eId,
       lockID.value
     );
-    release.wait();
+    await release.wait();
 
     await updateWalletStatus();
     loadingRelease.value = false;
@@ -87,10 +88,6 @@ const checkForUnreleasedLocks = async (): Promise<void> => {
   }
 };
 
-if (walletAddress.value) {
-  await checkForUnreleasedLocks();
-}
-
 watch(walletAddress, async () => {
   await checkForUnreleasedLocks();
 });
@@ -101,6 +98,7 @@ watch(networkName, async () => {
 
 onMounted(async () => {
   await getNetworksLiquidity();
+  if (walletAddress.value) await checkForUnreleasedLocks();
 });
 </script>
 

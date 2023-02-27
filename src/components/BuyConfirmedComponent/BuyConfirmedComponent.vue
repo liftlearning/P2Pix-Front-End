@@ -10,7 +10,7 @@ import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { WalletTransaction } from "@/model/WalletTransaction";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import ListingComponent from "../ListingComponent/ListingComponent.vue";
 
 // props
@@ -65,15 +65,16 @@ const callWithdraw = async (amount: string) => {
   }
 };
 
-await getWalletTransactions();
-
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);
 
 // observer
 watch(props, async (): Promise<void> => {
-  console.log(props);
   if (props.isCurrentStep) await getWalletTransactions();
+});
+
+onMounted(async () => {
+  await getWalletTransactions();
 });
 </script>
 

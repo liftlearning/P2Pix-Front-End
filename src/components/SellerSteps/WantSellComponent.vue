@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import CustomButton from "../CustomButton/CustomButton.vue";
-import CustomAlert from "../CustomAlert/CustomAlert.vue";
 import { debounce } from "@/utils/debounce";
 import { decimalCount } from "@/utils/decimalCount";
 import { pixFormatValidation, postProcessKey } from "@/utils/pixKeyFormat";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import { connectProvider } from "@/blockchain/provider";
-
-const props = defineProps<{
-  showAlert: boolean;
-}>();
 
 // Reactive state
 const etherStore = useEtherStore();
@@ -24,7 +19,6 @@ const enableSelectButton = ref<boolean>(false);
 const hasLiquidity = ref<boolean>(true);
 const validDecimals = ref<boolean>(true);
 const validPixFormat = ref<boolean>(true);
-const showAlert = ref<boolean>(true);
 
 // Emits
 const emit = defineEmits(["approveTokens"]);
@@ -147,11 +141,6 @@ const handleButtonClick = async (
         @buttonClicked="handleButtonClick(offer, pixKey)"
       />
     </div>
-    <CustomAlert
-      v-if="props.showAlert"
-      :type="'sell'"
-      @close-alert="showAlert = false"
-    />
   </div>
 </template>
 

@@ -7,12 +7,14 @@ import { ref, watch, onMounted } from "vue";
 import {
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
+checkUnreleasedLock,
 } from "@/blockchain/wallet";
 import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { WalletTransaction } from "@/model/WalletTransaction";
 
 import router from "@/router/index";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 
 const etherStore = useEtherStore();
 
@@ -21,6 +23,7 @@ const loadingWithdraw = ref<boolean>(false);
 
 const depositList = ref<ValidDeposit[]>([]);
 const transactionsList = ref<WalletTransaction[]>([]);
+const showAlert = ref<boolean>(false);
 
 const callWithdraw = async (amount: string) => {
   if (amount) {
@@ -63,11 +66,25 @@ const getWalletTransactions = async () => {
   etherStore.setLoadingWalletTransactions(false);
 };
 
+const checkForUnreleasedLocks = async (): Promise<void> => {
+  const walletLocks = await checkUnreleasedLock(walletAddress.value);
+  if (walletLocks) {
+    showAlert.value = true;
+  } else {
+    showAlert.value = false;
+  }
+};
+
+const goToLock = () => {
+  router.push({ name: "home" });
+};
+
 onMounted(async () => {
   if (!walletAddress.value) {
     router.push({ name: "home" });
   }
   await getWalletTransactions();
+  await checkForUnreleasedLocks();
 });
 
 watch(walletAddress, async () => {
@@ -80,6 +97,12 @@ watch(networkName, async () => {
 </script>
 
 <template>
+  <CustomAlert
+    v-if="showAlert"
+    :type="'redirect'"
+    @close-alert="showAlert = false"
+    @go-to-lock="goToLock()"
+  />
   <div class="page">
     <div class="header" v-if="!loadingWithdraw && !walletAddress">
       Por Favor Conecte Sua Carteira

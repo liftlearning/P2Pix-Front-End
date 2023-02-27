@@ -22,6 +22,7 @@ import {
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { WalletTransaction } from "@/model/WalletTransaction";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 
 enum Step {
   Search,
@@ -42,6 +43,7 @@ const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
 const lastWalletTransactions = ref<WalletTransaction[]>([]);
 const depositList = ref<ValidDeposit[]>([]);
+const showBuyAlert = ref<boolean>(false);
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -71,6 +73,7 @@ const confirmBuyClick = async (
 
 const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
+  showBuyAlert.value = true;
   loadingRelease.value = true;
 
   if (lockID.value && tokenAmount.value && pixTarget.value) {
@@ -159,11 +162,18 @@ onMounted(async () => {
     v-if="flowStep == Step.Search"
     @token-buy="confirmBuyClick"
   />
-  <CustomModal
+  <CustomAlert
     v-if="flowStep == Step.Search && showModal"
-    :isRedirectModal="true"
-    @close-modal="showModal = false"
+    :type="'redirect'"
+    @close-alert="showModal = false"
     @go-to-lock="flowStep = Step.Buy"
+  />
+  <CustomAlert
+    v-if="
+      flowStep == Step.List && showBuyAlert && !loadingLock && !loadingRelease
+    "
+    :type="'buy'"
+    @close-alert="showBuyAlert = false"
   />
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent

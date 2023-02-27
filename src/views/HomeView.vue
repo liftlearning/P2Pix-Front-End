@@ -2,26 +2,16 @@
 import SearchComponent from "@/components/SearchComponent.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
 import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirmedComponent.vue";
-import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import { ref, onMounted, watch } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
 import CustomModal from "@/components/CustomModal/CustomModal.vue";
 import { storeToRefs } from "pinia";
-import {
-  addLock,
-  releaseLock,
-  withdrawDeposit,
-} from "@/blockchain/buyerMethods";
-import {
-  updateWalletStatus,
-  listAllTransactionByWalletAddress,
-  checkUnreleasedLock,
-  listValidDepositTransactionsByWalletAddress,
-} from "@/blockchain/wallet";
+import { addLock, releaseLock } from "@/blockchain/buyerMethods";
+import { updateWalletStatus, checkUnreleasedLock } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
-import type { WalletTransaction } from "@/model/WalletTransaction";
+import router from "@/router";
 
 enum Step {
   Search,
@@ -40,8 +30,6 @@ const tokenAmount = ref<number>();
 const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
-const lastWalletTransactions = ref<WalletTransaction[]>([]);
-const depositList = ref<ValidDeposit[]>([]);
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -80,47 +68,10 @@ const releaseTransaction = async (e2eId: string) => {
       e2eId,
       lockID.value
     );
-    release.wait();
-
-    await getWalletTransactions();
+    await release.wait();
 
     await updateWalletStatus();
     loadingRelease.value = false;
-  }
-};
-
-const getWalletTransactions = async () => {
-  etherStore.setLoadingWalletTransactions(true);
-  if (walletAddress.value) {
-    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
-      walletAddress.value
-    );
-
-    const allUserTransactions = await listAllTransactionByWalletAddress(
-      walletAddress.value
-    );
-
-    if (walletDeposits) {
-      depositList.value = walletDeposits;
-    }
-    if (allUserTransactions) {
-      lastWalletTransactions.value = allUserTransactions;
-    }
-  }
-  etherStore.setLoadingWalletTransactions(false);
-};
-
-const callWithdraw = async (amount: string) => {
-  if (amount) {
-    etherStore.setLoadingWalletTransactions(true);
-    const withdraw = await withdrawDeposit(amount);
-    if (withdraw) {
-      console.log("Saque realizado!");
-      await getWalletTransactions();
-    } else {
-      console.log("Não foi possível realizar o saque!");
-    }
-    etherStore.setLoadingWalletTransactions(false);
   }
 };
 
@@ -137,10 +88,6 @@ const checkForUnreleasedLocks = async (): Promise<void> => {
   }
 };
 
-if (walletAddress.value) {
-  await checkForUnreleasedLocks();
-}
-
 watch(walletAddress, async () => {
   await checkForUnreleasedLocks();
 });
@@ -151,6 +98,7 @@ watch(networkName, async () => {
 
 onMounted(async () => {
   await getNetworksLiquidity();
+  if (walletAddress.value) await checkForUnreleasedLocks();
 });
 </script>
 
@@ -181,18 +129,9 @@ onMounted(async () => {
     <div class="flex flex-col gap-10" v-if="!loadingRelease">
       <BuyConfirmedComponent
         :tokenAmount="tokenAmount"
+        :is-current-step="flowStep == Step.List"
         @make-another-transaction="flowStep = Step.Search"
       />
-      <div
-        class="text-3xl text-white leading-9 font-bold justify-center flex mt-4"
-      >
-        Gerenciar transações
-      </div>
-      <ListingComponent
-        :valid-deposits="depositList"
-        :wallet-transactions="lastWalletTransactions"
-        @deposit-withdrawn="callWithdraw"
-      ></ListingComponent>
     </div>
     <LoadingComponent
       v-if="loadingRelease"

@@ -7,6 +7,7 @@ import { ref, watch, onMounted } from "vue";
 import {
   listValidDepositTransactionsByWalletAddress,
   listAllTransactionByWalletAddress,
+  getActiveLockAmount,
 } from "@/blockchain/wallet";
 import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import type { ValidDeposit } from "@/model/ValidDeposit";
@@ -21,6 +22,7 @@ const loadingWithdraw = ref<boolean>(false);
 
 const depositList = ref<ValidDeposit[]>([]);
 const transactionsList = ref<WalletTransaction[]>([]);
+const activeLockAmount = ref<number>(0);
 
 const callWithdraw = async (amount: string) => {
   if (amount) {
@@ -52,6 +54,8 @@ const getWalletTransactions = async () => {
     const allUserTransactions = await listAllTransactionByWalletAddress(
       walletAddress.value
     );
+
+    activeLockAmount.value = await getActiveLockAmount(walletAddress.value);
 
     if (walletDeposits) {
       depositList.value = walletDeposits;
@@ -92,6 +96,7 @@ watch(networkName, async () => {
         v-if="!loadingWithdraw && walletAddress"
         :valid-deposits="depositList"
         :wallet-transactions="transactionsList"
+        :active-lock-amount="activeLockAmount"
         @deposit-withdrawn="callWithdraw"
       ></ListingComponent>
       <LoadingComponent

@@ -1,13 +1,81 @@
 <script setup lang="ts">
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
+import {
+  getActiveLockAmount,
+  listAllTransactionByWalletAddress,
+  listValidDepositTransactionsByWalletAddress,
+} from "@/blockchain/wallet";
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
+import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import { onMounted, ref, watch } from "vue";
+import ListingComponent from "../ListingComponent/ListingComponent.vue";
 
 // props
 const props = defineProps<{
   tokenAmount: number | undefined;
+  isCurrentStep: boolean;
 }>();
+
+const etherStore = useEtherStore();
+const { walletAddress } = storeToRefs(etherStore);
+
+const lastWalletTransactions = ref<WalletTransaction[]>([]);
+const depositList = ref<ValidDeposit[]>([]);
+const activeLockAmount = ref<number>(0);
+
+// methods
+
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
+  if (walletAddress.value) {
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+
+    const allUserTransactions = await listAllTransactionByWalletAddress(
+      walletAddress.value
+    );
+
+    activeLockAmount.value = await getActiveLockAmount(walletAddress.value);
+
+    if (walletDeposits) {
+      depositList.value = walletDeposits;
+    }
+    if (allUserTransactions) {
+      lastWalletTransactions.value = allUserTransactions;
+    }
+  }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+const callWithdraw = async (amount: string) => {
+  if (amount) {
+    etherStore.setLoadingWalletTransactions(true);
+    const withdraw = await withdrawDeposit(amount);
+    if (withdraw) {
+      console.log("Saque realizado!");
+      await getWalletTransactions();
+    } else {
+      console.log("Não foi possível realizar o saque!");
+    }
+    etherStore.setLoadingWalletTransactions(false);
+  }
+};
 
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);
+
+// observer
+watch(props, async (): Promise<void> => {
+  if (props.isCurrentStep) await getWalletTransactions();
+});
+
+onMounted(async () => {
+  await getWalletTransactions();
+});
 </script>
 
 <template>
@@ -33,10 +101,7 @@ const emit = defineEmits(["makeAnotherTransaction"]);
             cadastrar o BRZ em sua carteira.
           </p>
         </div>
-        <CustomButton
-          :text="'Cadastrar token na carteira'"
-          @buttonClicked="() => {}"
-        />
+        <CustomButton :text="'Cadastrar token'" @buttonClicked="() => {}" />
       </div>
       <button
         type="button"
@@ -45,6 +110,19 @@ const emit = defineEmits(["makeAnotherTransaction"]);
       >
         Fazer nova transação
       </button>
+    </div>
+    <div
+      class="flex justify-center mt-8 mb-6 text-white text-xl md:text-3xl font-bold"
+    >
+      Gerenciar transações
+    </div>
+    <div class="w-full max-w-xs md:max-w-lg">
+      <ListingComponent
+        :valid-deposits="depositList"
+        :wallet-transactions="lastWalletTransactions"
+        :active-lock-amount="activeLockAmount"
+        @deposit-withdrawn="callWithdraw"
+      ></ListingComponent>
     </div>
   </div>
 </template>
@@ -70,7 +148,7 @@ p {
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
+  @apply flex w-full max-w-xs md:max-w-lg flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
 }
 
 .last-release-info {

@@ -194,11 +194,7 @@ watch(walletAddress, (): void => {
           <span class="text-gray-900 font-normal text-sm mr-2"
             >Carregando liquidez das redes.</span
           >
-          <SpinnerComponent
-            width="4"
-            height="4"
-            fillColor="white"
-          ></SpinnerComponent>
+          <SpinnerComponent width="4" height="4"></SpinnerComponent>
         </div>
         <div
           class="flex justify-center"

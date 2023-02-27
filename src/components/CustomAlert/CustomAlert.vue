@@ -5,6 +5,13 @@ const props = defineProps<{
 }>();
 
 const alertText = ref<string>("");
+const alertPaddingLeft = ref<string>("18rem");
+
+if (props.type === "sell") {
+  alertPaddingLeft.value = "20rem";
+} else {
+  alertPaddingLeft.value = "18rem";
+}
 
 switch (props.type) {
   case "buy":
@@ -43,11 +50,12 @@ switch (props.type) {
 
 .modal {
   background-color: rgba(251, 191, 36, 1);
-  height: 8%;
+  height: 6%;
   width: 100%;
   border-radius: 10px;
   align-items: center;
   white-space: nowrap;
+  padding-left: v-bind(alertPaddingLeft);
 }
 .close {
   cursor: pointer;

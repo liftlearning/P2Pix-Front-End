@@ -52,7 +52,7 @@ const showAlert = ref<boolean>(true);
     </div>
     <CustomAlert
       v-if="showAlert"
-      :type="'sell'"
+      :type="'buy'"
       @close-alert="showAlert = false"
     />
   </div>

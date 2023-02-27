@@ -80,6 +80,9 @@ const filterLockStatus = async (
         transactionHash: transaction.transactionHash
           ? transaction.transactionHash
           : "",
+        transactionID: transaction.args?.lockID
+          ? String(transaction.args?.lockID)
+          : "",
       };
 
       return tx;

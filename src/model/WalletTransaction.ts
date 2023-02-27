@@ -7,4 +7,5 @@ export type WalletTransaction = {
   event: string;
   lockStatus: number;
   transactionHash: string;
+  transactionID?: string;
 };

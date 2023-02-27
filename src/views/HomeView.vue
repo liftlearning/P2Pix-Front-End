@@ -10,6 +10,7 @@ import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus, checkUnreleasedLock } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import { getUnreleasedLockById } from "@/blockchain/events";
 import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 
 enum Step {
@@ -30,6 +31,7 @@ const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
 const showBuyAlert = ref<boolean>(false);
+const paramLockID = window.history.state?.lockID;
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -89,17 +91,30 @@ const checkForUnreleasedLocks = async (): Promise<void> => {
   }
 };
 
-watch(walletAddress, async () => {
-  await checkForUnreleasedLocks();
-});
+if (paramLockID) {
+  const lockToRedirect = await getUnreleasedLockById(paramLockID as string);
+  if (lockToRedirect) {
+    lockID.value = lockToRedirect.lockID;
+    tokenAmount.value = lockToRedirect.pix.value;
+    pixTarget.value = Number(lockToRedirect.pix.pixKey);
+    flowStep.value = Step.Buy;
+  } else {
+    flowStep.value = Step.Search;
+  }
+} else {
+  watch(walletAddress, async () => {
+    await checkForUnreleasedLocks();
+  });
 
-watch(networkName, async () => {
-  if (walletAddress.value) await checkForUnreleasedLocks();
-});
+  watch(networkName, async () => {
+    if (walletAddress.value) await checkForUnreleasedLocks();
+  });
+}
 
 onMounted(async () => {
   await getNetworksLiquidity();
-  if (walletAddress.value) await checkForUnreleasedLocks();
+  if (walletAddress.value && !paramLockID) await checkForUnreleasedLocks();
+  window.history.state.lockID = "";
 });
 </script>
 

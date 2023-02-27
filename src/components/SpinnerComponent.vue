@@ -3,7 +3,6 @@
 const props = defineProps({
   width: String,
   height: String,
-  fillColor: String,
   show: Boolean,
 });
 
@@ -11,7 +10,7 @@ const getCustomClass = () => {
   return [
     `w-${props.width}`,
     `h-${props.height}`,
-    `fill-${props.fillColor}`,
+    `fill-white`,
     "text-gray-200",
     "animate-spin",
     "dark:text-gray-600",

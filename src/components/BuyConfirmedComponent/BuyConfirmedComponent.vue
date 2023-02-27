@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
+import CustomAlert from "../CustomAlert/CustomAlert.vue";
+import { ref } from "vue";
 
 // props
 const props = defineProps<{
@@ -8,6 +10,8 @@ const props = defineProps<{
 
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);
+
+const showAlert = ref<boolean>(true);
 </script>
 
 <template>
@@ -46,6 +50,11 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         Fazer nova transação
       </button>
     </div>
+    <CustomAlert
+      v-if="showAlert"
+      :type="'sell'"
+      @close-alert="showAlert = false"
+    />
   </div>
 </template>
 

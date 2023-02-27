@@ -155,10 +155,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <SearchComponent
+  <!-- <SearchComponent
     v-if="flowStep == Step.Search"
     @token-buy="confirmBuyClick"
-  />
+  /> -->
   <CustomModal
     v-if="flowStep == Step.Search && showModal"
     :isRedirectModal="true"
@@ -177,7 +177,7 @@ onMounted(async () => {
       :message="'A transação está sendo enviada para a rede'"
     />
   </div>
-  <div v-if="flowStep == Step.List">
+  <div v-if="flowStep == Step.Search">
     <div class="flex flex-col gap-10" v-if="!loadingRelease">
       <BuyConfirmedComponent
         :tokenAmount="tokenAmount"

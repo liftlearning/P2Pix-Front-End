@@ -5,10 +5,11 @@ import type { ValidDeposit } from "@/model/ValidDeposit";
 import type { WalletTransaction } from "@/model/WalletTransaction";
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import SpinnerComponent from "../SpinnerComponent.vue";
 import { decimalCount } from "@/utils/decimalCount";
 import { debounce } from "@/utils/debounce";
+import { useFloating, arrow, offset, flip, shift } from "@floating-ui/vue";
 
 const etherStore = useEtherStore();
 
@@ -31,6 +32,12 @@ const isCollapsibleOpen = ref<boolean>(false);
 const validDecimals = ref<boolean>(true);
 const validWithdrawAmount = ref<boolean>(true);
 const enableConfirmButton = ref<boolean>(false);
+const showInfoTooltip = ref<boolean>(false);
+const floatingArrow = ref(null);
+
+const reference = ref<HTMLElement | null>(null);
+const floating = ref<HTMLElement | null>(null);
+const infoText = ref<HTMLElement | null>(null);
 
 // Debounce methods
 const handleInputEvent = (event: any): void => {
@@ -123,6 +130,18 @@ const getEventName = (event: string | undefined): string => {
   return possibleEventName[event];
 };
 
+onMounted(() => {
+  useFloating(reference, floating, {
+    placement: "right",
+    middleware: [
+      offset(10),
+      flip(),
+      shift(),
+      arrow({ element: floatingArrow }),
+    ],
+  });
+});
+
 // watch props changes
 watch(props, async (): Promise<void> => {
   const itemsToShowQty = itemsToShow.value.length;
@@ -144,7 +163,7 @@ showInitialItems();
   </div>
   <div class="blur-container" v-if="!loadingWalletTransactions">
     <div
-      class="w-full bg-white p-6 rounded-lg"
+      class="w-full bg-white p-4 sm:p-6 rounded-lg"
       v-if="props.validDeposits.length > 0"
     >
       <div class="flex justify-between items-center">
@@ -155,30 +174,55 @@ showInitialItems();
           <p class="text-xl leading-7 font-semibold text-gray-900">
             {{ getRemaining() }} BRZ
           </p>
-          <div class="flex gap-2" v-if="activeLockAmount != 0">
-            <span class="text-xs leading-4 font-normal text-gray-400">{{
-              `com ${activeLockAmount} BRZ em lock`
+          <div class="flex gap-2 w-32 sm:w-44" v-if="activeLockAmount != 0">
+            <span class="text-xs font-normal text-gray-400" ref="infoText">{{
+              `com ${activeLockAmount.toFixed(2)} BRZ em lock`
             }}</span>
-            <img alt="info image" src="@/assets/info.svg" />
+            <div
+              class="absolute mt-[2px] md-view"
+              :style="{ left: `${(infoText?.clientWidth ?? 108) + 4}px` }"
+            >
+              <img
+                alt="info image"
+                src="@/assets/info.svg"
+                aria-describedby="tooltip"
+                ref="reference"
+                @mouseover="showInfoTooltip = true"
+                @mouseout="showInfoTooltip = false"
+              />
+              <div
+                role="tooltip"
+                ref="floating"
+                class="w-56 z-50 tooltip md-view"
+                v-if="showInfoTooltip"
+              >
+                Valor “em lock” significa que a quantia está aguardando
+                confirmação de compra e só estará disponível para saque caso a
+                transação expire.
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="pt-5">
         <div v-show="!isCollapsibleOpen" class="flex justify-end items-center">
           <div
             class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="[(isCollapsibleOpen = true)]"
           >
-            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+            <img
+              alt="Withdraw image"
+              src="@/assets/withdraw.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
             <span class="last-release-info">Sacar</span>
           </div>
         </div>
+      </div>
+      <div class="pt-5">
         <div v-show="isCollapsibleOpen" class="py-2 w-100">
           <p class="text-sm leading-5 font-medium">Valor do saque</p>
           <input
             type="number"
             name=""
-            id=""
             @input="debounce(handleInputEvent, 500)($event)"
             placeholder="0"
             class="text-2xl text-gray-900 w-full outline-none"
@@ -212,14 +256,18 @@ showInitialItems();
             class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >
-            <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+            <img
+              alt="Withdraw image"
+              src="@/assets/withdraw.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
             <span class="last-release-info">Sacar</span>
           </div>
         </div>
       </div>
     </div>
     <div
-      class="w-full bg-white p-6 rounded-lg"
+      class="w-full bg-white p-4 sm:p-6 rounded-lg"
       v-for="item in itemsToShow"
       :key="item.blockNumber"
     >
@@ -315,12 +363,9 @@ p {
 .text {
   @apply text-white text-center;
 }
-.blur-container-row {
-  @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
-}
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-auto;
+  @apply flex flex-col justify-center items-center px-4 py-3 sm:px-8 sm:py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-auto;
 }
 
 .grid-container {
@@ -328,7 +373,11 @@ p {
 }
 
 .last-release-info {
-  @apply font-medium text-base text-gray-900 justify-self-center;
+  @apply font-medium text-sm sm:text-base text-gray-900 justify-self-center;
+}
+
+.tooltip {
+  @apply bg-white text-gray-900 font-medium text-xs md:text-base px-3 py-2 rounded border-2 border-emerald-500 left-5 top-[-3rem];
 }
 
 .withdraw-button {
@@ -343,5 +392,11 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+@media screen and (max-width: 640px) {
+  .md-view {
+    display: none;
+  }
 }
 </style>

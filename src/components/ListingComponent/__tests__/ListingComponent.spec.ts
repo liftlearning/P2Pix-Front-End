@@ -82,6 +82,6 @@ describe("ListingComponent.vue", () => {
       },
     });
 
-    expect(wrapper.html()).toContain("com 50 BRZ em lock");
+    expect(wrapper.html()).toContain("com 50.00 BRZ em lock");
   });
 });

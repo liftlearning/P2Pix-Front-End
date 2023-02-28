@@ -33,9 +33,9 @@ switch (props.type) {
 </script>
 <template>
   <div
-    class="modal-overlay inset-0 absolute backdrop-blur-sm sm:backdrop-blur-none"
+    class="modal-overlay sm:h-12 h-full inset-0 absolute backdrop-blur-sm sm:backdrop-blur-none"
   >
-    <div class="modal px-12 pl-72 text-center flex justify-between">
+    <div class="modal px-12 pl-72 text-center sm:flex justify-between hidden">
       <div class="flex items-center">
         <p class="text-black tracking-tighter leading-tight my-2">
           {{ alertText }}
@@ -51,6 +51,44 @@ switch (props.type) {
         @click="$emit('close-alert')"
       />
     </div>
+    <div
+      class="modal-mobile px-7 py-3 text-center inline-block sm:hidden mt-24 h-48"
+      v-if="props.type !== 'redirect'"
+    >
+      <p class="text-black tracking-tighter leading-tight my-2 text-start mb-4">
+        {{ alertText }}
+      </p>
+      <button
+        @click="$emit('close-alert')"
+        class="border-2 border-solid border-amber-400 mt-2"
+      >
+        Ok
+      </button>
+    </div>
+    <div
+      class="modal-mobile px-5 text-center inline-block sm:hidden mt-24 h-40"
+      v-if="props.type === 'redirect'"
+    >
+      <p
+        class="text-black text-lg tracking-tighter leading-tight my-6 mx-2 text-justify font-semibold"
+      >
+        Retomar a última compra?
+      </p>
+      <div class="flex justify-around items-center px-2">
+        <button
+          @click="$emit('close-alert')"
+          class="border-2 border-solid border-white-400 mt-2 font-semibold"
+        >
+          Não
+        </button>
+        <button
+          @click="$emit('go-to-lock')"
+          class="border-2 border-solid border-white-400 mt-2 font-semibold"
+        >
+          Sim
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -59,7 +97,6 @@ switch (props.type) {
   justify-content: center;
   width: 100%;
   padding-top: 7rem;
-  height: 3rem;
   z-index: 10;
 }
 
@@ -71,6 +108,13 @@ switch (props.type) {
   align-items: center;
   white-space: nowrap;
   padding-left: v-bind(alertPaddingLeft);
+}
+
+.modal-mobile {
+  background-color: rgba(251, 191, 36, 1);
+  /* height: 200px; */
+  width: 300px;
+  border-radius: 10px;
 }
 .close {
   cursor: pointer;
@@ -103,5 +147,23 @@ button {
   border-radius: 10px;
   border: 2px solid white;
   margin-left: 1rem;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

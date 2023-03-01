@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import TransactionHistoryView from "../views/TransactionHistoryView.vue";
-import FaqView from "../views/FaqView.vue";
-import ManageBidsView from "../views/ManageBidsView.vue";
+import HomeView from "@/views/HomeView.vue";
+import FaqView from "@/views/FaqView.vue";
+import ManageBidsView from "@/views/ManageBidsView.vue";
 import SellerView from "@/views/SellerView.vue";
 
 const router = createRouter({
@@ -12,16 +11,17 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
+      props: true,
+    },
+    {
+      path: "/:lockID",
+      name: "redirect buy",
+      component: HomeView,
     },
     {
       path: "/seller",
       name: "seller",
       component: SellerView,
-    },
-    {
-      path: "/transaction_history",
-      name: "transaction history",
-      component: TransactionHistoryView,
     },
     {
       path: "/manage_bids",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomButton from "../CustomButton/CustomButton.vue";
+import CustomButton from "@/components/CustomButton/CustomButton.vue";
 import { debounce } from "@/utils/debounce";
 import { decimalCount } from "@/utils/decimalCount";
 
@@ -122,7 +122,7 @@ const handleInputEvent = (event: any): void => {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 
 .blur-container {

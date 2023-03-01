@@ -1,22 +1,87 @@
 <script setup lang="ts">
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
+import {
+  getActiveLockAmount,
+  listAllTransactionByWalletAddress,
+  listValidDepositTransactionsByWalletAddress,
+} from "@/blockchain/wallet";
 import CustomButton from "@/components/CustomButton/CustomButton.vue";
-import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
-import type { Event } from "ethers";
+import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
+import { useEtherStore } from "@/store/ether";
+import { storeToRefs } from "pinia";
+import { onMounted, ref, watch } from "vue";
+import ListingComponent from "../ListingComponent/ListingComponent.vue";
 
 // props
 const props = defineProps<{
-  lastWalletReleaseTransactions: Event[];
   tokenAmount: number | undefined;
+  isCurrentStep: boolean;
 }>();
+
+const etherStore = useEtherStore();
+const { walletAddress } = storeToRefs(etherStore);
+
+const lastWalletTransactions = ref<WalletTransaction[]>([]);
+const depositList = ref<ValidDeposit[]>([]);
+const activeLockAmount = ref<number>(0);
+
+// methods
+
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
+  if (walletAddress.value) {
+    const walletDeposits = await listValidDepositTransactionsByWalletAddress(
+      walletAddress.value
+    );
+
+    const allUserTransactions = await listAllTransactionByWalletAddress(
+      walletAddress.value
+    );
+
+    activeLockAmount.value = await getActiveLockAmount(walletAddress.value);
+
+    if (walletDeposits) {
+      depositList.value = walletDeposits;
+    }
+    if (allUserTransactions) {
+      lastWalletTransactions.value = allUserTransactions;
+    }
+  }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+const callWithdraw = async (amount: string) => {
+  if (amount) {
+    etherStore.setLoadingWalletTransactions(true);
+    const withdraw = await withdrawDeposit(amount);
+    if (withdraw) {
+      console.log("Saque realizado!");
+      await getWalletTransactions();
+    } else {
+      console.log("Não foi possível realizar o saque!");
+    }
+    etherStore.setLoadingWalletTransactions(false);
+  }
+};
 
 // Emits
 const emit = defineEmits(["makeAnotherTransaction"]);
+
+// observer
+watch(props, async (): Promise<void> => {
+  if (props.isCurrentStep) await getWalletTransactions();
+});
+
+onMounted(async () => {
+  await getWalletTransactions();
+});
 </script>
 
 <template>
   <div class="page">
     <div class="text-container">
-      <span class="text font-extrabold text-5xl max-w-[50rem]"
+      <span class="text font-extrabold sm:text-5xl text-xl max-w-[50rem]"
         >Os tokens já foram transferidos <br />
         para a sua carteira!
       </span>
@@ -30,15 +95,13 @@ const emit = defineEmits(["makeAnotherTransaction"]);
           <p class="text-2xl text-gray-900">{{ props.tokenAmount }} BRZ</p>
         </div>
         <div class="my-5">
-          <p>
-            <b>Não encontrou os tokens? </b>Clique no botão abaixo para <br />
+          <p class="text-sm">
+            <b>Não encontrou os tokens? </b><br />Clique no botão abaixo para
+            <br />
             cadastrar o BRZ em sua carteira.
           </p>
         </div>
-        <CustomButton
-          :text="'Cadastrar token na carteira'"
-          @buttonClicked="() => {}"
-        />
+        <CustomButton :text="'Cadastrar token'" @buttonClicked="() => {}" />
       </div>
       <button
         type="button"
@@ -48,17 +111,18 @@ const emit = defineEmits(["makeAnotherTransaction"]);
         Fazer nova transação
       </button>
     </div>
-    <div class="text-container mt-16">
-      <span class="text font-extrabold text-3xl max-w-[50rem]"
-        >Histórico de compras
-      </span>
+    <div
+      class="flex justify-center mt-8 mb-6 text-white text-xl md:text-3xl font-bold"
+    >
+      Gerenciar transações
     </div>
-    <div class="w-full max-w-4xl">
+    <div class="w-full max-w-xs md:max-w-lg">
       <ListingComponent
-        :walletTransactions="lastWalletReleaseTransactions"
-        :isManageMode="false"
-      >
-      </ListingComponent>
+        :valid-deposits="depositList"
+        :wallet-transactions="lastWalletTransactions"
+        :active-lock-amount="activeLockAmount"
+        @deposit-withdrawn="callWithdraw"
+      ></ListingComponent>
     </div>
   </div>
 </template>
@@ -77,14 +141,14 @@ p {
 }
 
 .text {
-  @apply text-gray-800 text-center;
+  @apply text-white text-center;
 }
 .blur-container-row {
   @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10 w-auto;
+  @apply flex w-full max-w-xs md:max-w-lg flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-10;
 }
 
 .last-release-info {
@@ -98,5 +162,23 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+.lg-view {
+  display: inline-block;
+}
+
+.sm-view {
+  display: none;
+}
+
+@media screen and (max-width: 500px) {
+  .lg-view {
+    display: none;
+  }
+
+  .sm-view {
+    display: inline-block;
+  }
 }
 </style>

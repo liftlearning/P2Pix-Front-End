@@ -89,4 +89,33 @@ export const MockEvents: Event[] = [
     getTransaction: vi.fn(),
     getTransactionReceipt: vi.fn(),
   },
+  {
+    blockNumber: 4,
+    blockHash: "0x8",
+    transactionIndex: 4,
+    removed: false,
+    address: "0x0",
+    data: "0x0",
+    topics: ["0x0", "0x0"],
+    transactionHash: "0x0",
+    logIndex: 4,
+    event: "LockReleased",
+    eventSignature: "LockReleased(address,uint256,address,uint256)",
+    args: [
+      "0x0",
+      {
+        type: "BigNumber",
+        hex: "0x00",
+      },
+      "0x0",
+      {
+        type: "BigNumber",
+        hex: "0x6c6b935b8bbd400000",
+      },
+    ],
+    getBlock: vi.fn(),
+    removeListener: vi.fn(),
+    getTransaction: vi.fn(),
+    getTransactionReceipt: vi.fn(),
+  },
 ];

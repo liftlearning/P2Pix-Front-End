@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import WantSellComponent from "../components/SellerSteps/WantSellComponent.vue";
-import SendNetwork from "../components/SellerSteps/SendNetwork.vue";
-import ValidationComponent from "../components/LoadingComponent.vue";
-import { approveTokens, addDeposit } from "../blockchain/sellerMethods";
+import WantSellComponent from "@/components/SellerSteps/WantSellComponent.vue";
+import SendNetwork from "@/components/SellerSteps/SendNetwork.vue";
+import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
+import { approveTokens, addDeposit } from "@/blockchain/sellerMethods";
 
 import { ref } from "vue";
 import { useEtherStore } from "@/store/ether";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 
 enum Step {
   Search,
@@ -21,13 +22,17 @@ const loading = ref<boolean>(false);
 
 const offerValue = ref<string>("");
 const pixKeyBuyer = ref<string>("");
+const showAlert = ref<boolean>(false);
 
 // Verificar tipagem
-const approveOffer = async (args: { offer: string; pixKey: string }) => {
+const approveOffer = async (args: {
+  offer: string;
+  postProcessedPixKey: string;
+}) => {
   loading.value = true;
   try {
     offerValue.value = args.offer;
-    pixKeyBuyer.value = args.pixKey;
+    pixKeyBuyer.value = args.postProcessedPixKey;
     await approveTokens(args.offer);
     flowStep.value = Step.Network;
     loading.value = false;
@@ -45,6 +50,7 @@ const sendNetwork = async () => {
       await addDeposit(String(offerValue.value), pixKeyBuyer.value);
       flowStep.value = Step.Sell;
       loading.value = false;
+      showAlert.value = true;
     }
   } catch (err) {
     console.log(err);
@@ -57,11 +63,16 @@ const sendNetwork = async () => {
 <template>
   <div v-if="flowStep == Step.Sell">
     <WantSellComponent v-if="!loading" @approve-tokens="approveOffer" />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"
     />
   </div>
+  <CustomAlert
+    v-if="flowStep == Step.Sell && showAlert"
+    :type="'sell'"
+    @close-alert="showAlert = false"
+  />
   <div v-if="flowStep == Step.Network">
     <SendNetwork
       :pixKey="pixKeyBuyer"
@@ -69,7 +80,7 @@ const sendNetwork = async () => {
       v-if="!loading"
       @send-network="sendNetwork"
     />
-    <ValidationComponent
+    <LoadingComponent
       v-if="loading"
       :message="'A transação está sendo enviada para a rede.'"
     />

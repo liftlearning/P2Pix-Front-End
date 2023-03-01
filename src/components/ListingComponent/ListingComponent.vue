@@ -1,26 +1,103 @@
 <script setup lang="ts">
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import { NetworkEnum } from "@/model/NetworkEnum";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
 import { useEtherStore } from "@/store/ether";
-import { formatEther } from "@ethersproject/units";
-import type { BigNumber, Event } from "ethers";
-import { ref, watch } from "vue";
-
-// props
-const props = defineProps<{
-  walletTransactions: (Event | ValidDeposit)[];
-  isManageMode: boolean;
-}>();
+import { storeToRefs } from "pinia";
+import { ref, watch, onMounted } from "vue";
+import SpinnerComponent from "../SpinnerComponent.vue";
+import { decimalCount } from "@/utils/decimalCount";
+import { debounce } from "@/utils/debounce";
+import { useFloating, arrow, offset, flip, shift } from "@floating-ui/vue";
 
 const etherStore = useEtherStore();
 
-const itemsToShow = ref<(Event | ValidDeposit)[]>([]);
+// props
+const props = defineProps<{
+  validDeposits: ValidDeposit[];
+  walletTransactions: WalletTransaction[];
+  activeLockAmount: number;
+}>();
 
-// Methods
-const isValidDeposit = (
-  deposit: Event | ValidDeposit
-): deposit is ValidDeposit => {
-  return (deposit as ValidDeposit).depositID !== undefined;
+const emit = defineEmits(["depositWithdrawn"]);
+
+const { loadingWalletTransactions } = storeToRefs(etherStore);
+const remaining = ref<number>(0.0);
+const itemsToShow = ref<WalletTransaction[]>([]);
+const withdrawAmount = ref<string>("");
+const withdrawButtonOpacity = ref<number>(0.6);
+const withdrawButtonCursor = ref<string>("not-allowed");
+const isCollapsibleOpen = ref<boolean>(false);
+const validDecimals = ref<boolean>(true);
+const validWithdrawAmount = ref<boolean>(true);
+const enableConfirmButton = ref<boolean>(false);
+const showInfoTooltip = ref<boolean>(false);
+const floatingArrow = ref(null);
+
+const reference = ref<HTMLElement | null>(null);
+const floating = ref<HTMLElement | null>(null);
+const infoText = ref<HTMLElement | null>(null);
+
+// Debounce methods
+const handleInputEvent = (event: any): void => {
+  const { value } = event.target;
+
+  if (decimalCount(String(value)) > 2) {
+    validDecimals.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validDecimals.value = true;
+
+  if (value > remaining.value) {
+    validWithdrawAmount.value = false;
+    enableConfirmButton.value = false;
+    return;
+  }
+  validWithdrawAmount.value = true;
+  enableConfirmButton.value = true;
+};
+
+const callWithdraw = () => {
+  emit("depositWithdrawn", withdrawAmount.value);
+};
+
+watch(enableConfirmButton, (): void => {
+  if (!enableConfirmButton.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
+
+watch(withdrawAmount, (): void => {
+  if (!withdrawAmount.value || !enableConfirmButton.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
+
+const getRemaining = (): number => {
+  if (props.validDeposits instanceof Array) {
+    // Here we are getting only the first element of the list because
+    // in this release only the BRL token is being used.
+    const deposit = props.validDeposits[0];
+    remaining.value = deposit ? deposit.remaining : 0;
+    return deposit ? deposit.remaining : 0;
+  }
+  return 0;
+};
+
+const getExplorer = (): string => {
+  return etherStore.networkName == NetworkEnum.ethereum
+    ? "Etherscan"
+    : "Polygonscan";
 };
 
 const showInitialItems = (): void => {
@@ -48,17 +125,25 @@ const getEventName = (event: string | undefined): string => {
 
   const possibleEventName: { [key: string]: string } = {
     DepositAdded: "Oferta",
-    LockAdded: "Compra",
-    LockReleased: "Reserva",
+    LockAdded: "Reserva",
+    LockReleased: "Compra",
+    DepositWithdrawn: "Retirada",
   };
 
   return possibleEventName[event];
 };
 
-const getAmountFormatted = (amount?: BigNumber): string => {
-  if (!amount) return "";
-  return formatEther(amount);
-};
+onMounted(() => {
+  useFloating(reference, floating, {
+    placement: "right",
+    middleware: [
+      offset(10),
+      flip(),
+      shift(),
+      arrow({ element: floatingArrow }),
+    ],
+  });
+});
 
 // watch props changes
 watch(props, async (): Promise<void> => {
@@ -71,79 +156,184 @@ watch(props, async (): Promise<void> => {
         : props.walletTransactions;
 });
 
-//emits
-const emit = defineEmits(["cancelDeposit", "withdrawDeposit"]);
-
-// initial itemsToShow value
+// initial itemsToShow valueb
 showInitialItems();
 </script>
 
 <template>
-  <div class="blur-container">
+  <div class="blur-container" v-if="loadingWalletTransactions">
+    <SpinnerComponent width="8" height="8"></SpinnerComponent>
+  </div>
+  <div class="blur-container" v-if="!loadingWalletTransactions">
     <div
-      class="grid grid-cols-4 grid-flow-row w-full px-6"
-      v-if="itemsToShow.length != 0"
+      class="w-full bg-white p-4 sm:p-6 rounded-lg"
+      v-if="props.validDeposits.length > 0"
     >
-      <span class="text-xs text-gray-50 font-medium justify-self-center"
-        >Valor</span
-      >
-      <span class="text-xs text-gray-50 font-medium justify-self-center"
-        >Data</span
-      >
-      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
-        props.isManageMode ? "Cancelar oferta" : "Tipo de transação"
-      }}</span>
-      <span class="text-xs text-gray-50 font-medium justify-self-center">{{
-        props.isManageMode ? "Retirar tokens" : "Checar transação"
-      }}</span>
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-sm leading-5 font-medium text-gray-600">
+            Saldo disponível
+          </p>
+          <p class="text-xl leading-7 font-semibold text-gray-900">
+            {{ getRemaining() }} BRZ
+          </p>
+          <div class="flex gap-2 w-32 sm:w-56" v-if="activeLockAmount != 0">
+            <span class="text-xs font-normal text-gray-400" ref="infoText">{{
+              `com ${activeLockAmount.toFixed(2)} BRZ em lock`
+            }}</span>
+            <div
+              class="absolute mt-[2px] md-view"
+              :style="{ left: `${(infoText?.clientWidth ?? 108) + 4}px` }"
+            >
+              <img
+                alt="info image"
+                src="@/assets/info.svg"
+                aria-describedby="tooltip"
+                ref="reference"
+                @mouseover="showInfoTooltip = true"
+                @mouseout="showInfoTooltip = false"
+              />
+              <div
+                role="tooltip"
+                ref="floating"
+                class="w-56 z-50 tooltip md-view"
+                v-if="showInfoTooltip"
+              >
+                Valor “em lock” significa que a quantia está aguardando
+                confirmação de compra e só estará disponível para saque caso a
+                transação expire.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-show="!isCollapsibleOpen" class="flex justify-end items-center">
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            @click="[(isCollapsibleOpen = true)]"
+          >
+            <img
+              alt="Withdraw image"
+              src="@/assets/withdraw.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
+            <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
+      </div>
+      <div class="pt-5">
+        <div v-show="isCollapsibleOpen" class="py-2 w-100">
+          <p class="text-sm leading-5 font-medium">Valor do saque</p>
+          <input
+            type="number"
+            name=""
+            @input="debounce(handleInputEvent, 500)($event)"
+            placeholder="0"
+            class="text-2xl text-gray-900 w-full outline-none"
+            v-model="withdrawAmount"
+          />
+        </div>
+        <div class="flex justify-center" v-if="!validDecimals">
+          <span class="text-red-500 font-normal text-sm"
+            >Por favor utilize no máximo 2 casas decimais</span
+          >
+        </div>
+        <div class="flex justify-center" v-else-if="!validWithdrawAmount">
+          <span class="text-red-500 font-normal text-sm"
+            >Saldo insuficiente</span
+          >
+        </div>
+        <hr v-show="isCollapsibleOpen" class="pb-3" />
+        <div
+          v-show="isCollapsibleOpen"
+          class="flex justify-between items-center"
+        >
+          <h1
+            @click="[(isCollapsibleOpen = false)]"
+            class="text-black font-medium cursor-pointer"
+          >
+            Cancelar
+          </h1>
+
+          <div
+            class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
+            @click="callWithdraw"
+          >
+            <img
+              alt="Withdraw image"
+              src="@/assets/withdraw.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
+            <span class="last-release-info">Sacar</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div
-      class="grid grid-cols-4 grid-flow-row w-full bg-white px-6 py-4 rounded-lg"
-      v-for="(item, index) in itemsToShow"
+      class="w-full bg-white p-4 sm:p-6 rounded-lg"
+      v-for="item in itemsToShow"
       :key="item.blockNumber"
     >
-      <span class="last-release-info">
-        {{
-          isValidDeposit(item)
-            ? item.remaining
-            : getAmountFormatted(item.args?.amount)
-        }}
-        BRZ
-      </span>
-
-      <span class="last-release-info transaction-date"> 20 out 2022 </span>
-
-      <span class="last-release-info" v-if="!props.isManageMode">
-        {{ getEventName((item as Event).event) }}
-      </span>
-
-      <div
-        v-if="!props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="openEtherscanUrl((item as Event)?.transactionHash)"
-      >
-        <span class="last-release-info">Etherscan</span>
-        <img alt="Redirect image" src="@/assets/redirect.svg" />
-      </div>
-
-      <div
-        v-if="props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="emit('cancelDeposit', (item as ValidDeposit).depositID, index)"
-      >
-        <span class="last-release-info">Cancelar</span>
-        <img alt="Cancel image" src="@/assets/cancel.svg" />
-      </div>
-
-      <div
-        v-if="props.isManageMode"
-        class="flex gap-2 cursor-pointer items-center justify-self-center"
-        @click="
-          emit('withdrawDeposit', (item as ValidDeposit).depositID, index)
-        "
-      >
-        <span class="last-release-info">Retirar</span>
-        <img alt="Withdraw image" src="@/assets/withdraw.svg" />
+      <div class="item-container">
+        <div class="flex flex-col self-start">
+          <span class="text-xs sm:text-sm leading-5 font-medium text-gray-600">
+            {{ getEventName(item.event) }}
+          </span>
+          <span
+            class="text-xl sm:text-xl leading-7 font-semibold text-gray-900"
+          >
+            {{ item.amount }}
+            BRZ
+          </span>
+        </div>
+        <div>
+          <div
+            class="bg-amber-300 status-text"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
+          >
+            Em Aberto
+          </div>
+          <div
+            class="bg-[#94A3B8] status-text"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 2"
+          >
+            Expirado
+          </div>
+          <div
+            class="bg-emerald-300 status-text"
+            v-if="
+              (getEventName(item.event) == 'Reserva' && item.lockStatus == 3) ||
+              getEventName(item.event) != 'Reserva'
+            "
+          >
+            Finalizado
+          </div>
+          <div
+            class="flex gap-2 cursor-pointer items-center justify-self-center w-full"
+            @click="openEtherscanUrl(item.transactionHash)"
+            v-if="getEventName(item.event) != 'Reserva' || item.lockStatus != 1"
+          >
+            <span class="last-release-info">{{ getExplorer() }}</span>
+            <img
+              alt="Redirect image"
+              src="@/assets/redirect.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
+          </div>
+          <div
+            class="flex gap-2 justify-self-center w-full"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
+          >
+            <RouterLink
+              :to="{
+                name: 'home',
+                force: true,
+                state: { lockID: item.transactionID },
+              }"
+              class="router-button"
+              >Continuar</RouterLink
+            >
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -162,11 +352,11 @@ showInitialItems();
       </button>
       <span class="text-gray-300">
         ({{ itemsToShow.length }} de {{ props.walletTransactions.length }}
-        {{ isManageMode ? "ofertas" : "transações" }})
+        transações )
       </span>
     </div>
 
-    <span class="font-bold text-gray-900" v-if="itemsToShow.length == 0">
+    <span class="font-bold text-gray-300" v-if="itemsToShow.length == 0">
       Não há nenhuma transação anterior
     </span>
   </div>
@@ -185,15 +375,19 @@ p {
   @apply flex flex-col items-center justify-center gap-4;
 }
 
-.text {
-  @apply text-gray-800 text-center;
+.item-container {
+  @apply flex justify-between items-center;
 }
-.blur-container-row {
-  @apply flex flex-row justify-center items-center px-8 py-6 gap-2 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md mt-8 w-1/3;
+
+.status-text {
+  @apply text-xs sm:text-base font-medium text-gray-900 rounded-lg text-center mb-2 px-2 py-1 mt-4;
+}
+.text {
+  @apply text-white text-center;
 }
 
 .blur-container {
-  @apply flex flex-col justify-center items-center px-8 py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-auto;
+  @apply flex flex-col justify-center items-center px-4 py-3 sm:px-8 sm:py-6 gap-4 rounded-lg shadow-md shadow-gray-600 backdrop-blur-md w-auto;
 }
 
 .grid-container {
@@ -201,7 +395,20 @@ p {
 }
 
 .last-release-info {
-  @apply font-medium text-base text-gray-900 justify-self-center;
+  @apply font-medium text-xs sm:text-sm text-gray-900 justify-self-center;
+}
+
+.tooltip {
+  @apply bg-white text-gray-900 font-medium text-xs md:text-base px-3 py-2 rounded border-2 border-emerald-500 left-5 top-[-3rem];
+}
+
+.router-button {
+  @apply rounded-lg border-amber-300 border-2 px-3 py-2 text-gray-900 font-semibold sm:text-base text-xs hover:bg-transparent w-full text-center;
+}
+
+.withdraw-button {
+  opacity: v-bind(withdrawButtonOpacity);
+  cursor: v-bind(withdrawButtonCursor);
 }
 
 input[type="number"] {
@@ -211,5 +418,11 @@ input[type="number"] {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+@media screen and (max-width: 640px) {
+  .md-view {
+    display: none;
+  }
 }
 </style>

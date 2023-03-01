@@ -1,6 +1,6 @@
 import { useEtherStore } from "@/store/ether";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 
 import { updateWalletStatus } from "./wallet";
 import {

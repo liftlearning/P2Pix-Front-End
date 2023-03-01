@@ -1,14 +1,17 @@
 import { useEtherStore } from "@/store/ether";
 import { Contract, ethers } from "ethers";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 import { formatEther } from "ethers/lib/utils";
 import { getContract } from "./provider";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import { getP2PixAddress, getTokenAddress } from "./addresses";
+import { NetworkEnum } from "@/model/NetworkEnum";
+import type { UnreleasedLock } from "@/model/UnreleasedLock";
+import type { Pix } from "@/model/Pix";
 
 const getNetworksLiquidity = async (): Promise<void> => {
   const etherStore = useEtherStore();
-  console.log("Loading events");
 
   const goerliProvider = new ethers.providers.JsonRpcProvider(
     import.meta.env.VITE_GOERLI_API_URL,
@@ -20,28 +23,34 @@ const getNetworksLiquidity = async (): Promise<void> => {
   ); // mumbai provider
 
   const p2pContractGoerli = new ethers.Contract(
-    "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    getP2PixAddress(NetworkEnum.ethereum),
     p2pix.abi,
     goerliProvider
   );
   const p2pContractMumbai = new ethers.Contract(
-    "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    getP2PixAddress(NetworkEnum.polygon),
     p2pix.abi,
     mumbaiProvider
   );
 
-  const depositListGoerli = await getValidDeposits(p2pContractGoerli);
+  etherStore.setLoadingNetworkLiquidity(true);
+  const depositListGoerli = await getValidDeposits(
+    getTokenAddress(NetworkEnum.ethereum),
+    p2pContractGoerli
+  );
 
-  const depositListMumbai = await getValidDeposits(p2pContractMumbai);
+  const depositListMumbai = await getValidDeposits(
+    getTokenAddress(NetworkEnum.polygon),
+    p2pContractMumbai
+  );
 
   etherStore.setDepositsValidListGoerli(depositListGoerli);
-  console.log(depositListGoerli);
-
   etherStore.setDepositsValidListMumbai(depositListMumbai);
-  console.log(depositListMumbai);
+  etherStore.setLoadingNetworkLiquidity(false);
 };
 
 const getValidDeposits = async (
+  token: string,
   contract?: Contract
 ): Promise<ValidDeposit[]> => {
   let p2pContract: Contract;
@@ -56,29 +65,62 @@ const getValidDeposits = async (
   const eventsDeposits = await p2pContract.queryFilter(filterDeposits);
 
   if (!contract) p2pContract = getContract(); // get metamask provider contract
+  const depositList: { [key: string]: ValidDeposit } = {};
 
-  const depositList = await Promise.all(
+  await Promise.all(
     eventsDeposits.map(async (deposit) => {
-      const mappedDeposit = await p2pContract.mapDeposits(
-        deposit.args?.depositID
+      // Get liquidity only for the selected token
+      if (deposit.args?.token != token) return null;
+
+      const mappedBalance = await p2pContract.getBalance(
+        deposit.args?.seller,
+        token
       );
+
+      const mappedPixTarget = await p2pContract.getPixTarget(
+        deposit.args?.seller,
+        token
+      );
+
       let validDeposit: ValidDeposit | null = null;
 
-      if (mappedDeposit.valid) {
+      if (mappedBalance._hex) {
         validDeposit = {
+          token: token,
           blockNumber: deposit.blockNumber,
-          depositID: deposit.args?.depositID,
-          remaining: Number(formatEther(mappedDeposit.remaining)),
-          seller: mappedDeposit.seller,
-          pixKey: mappedDeposit.pixTarget,
+          remaining: Number(formatEther(mappedBalance._hex)),
+          seller: deposit.args?.seller,
+          pixKey: Number(mappedPixTarget._hex),
         };
       }
 
-      return validDeposit;
+      if (validDeposit)
+        depositList[deposit.args?.seller + token] = validDeposit;
     })
   );
 
-  return depositList.filter((deposit) => deposit) as ValidDeposit[];
+  return Object.values(depositList);
 };
 
-export { getValidDeposits, getNetworksLiquidity };
+const getUnreleasedLockById = async (
+  lockID: string
+): Promise<UnreleasedLock> => {
+  const p2pContract = getContract();
+  const pixData: Pix = {
+    pixKey: "",
+  };
+
+  const lock = await p2pContract.mapLocks(lockID);
+
+  const pixTarget = lock.pixTarget;
+  const amount = formatEther(lock?.amount);
+  pixData.pixKey = String(Number(pixTarget));
+  pixData.value = Number(amount);
+
+  return {
+    lockID: lockID,
+    pix: pixData,
+  };
+};
+
+export { getValidDeposits, getNetworksLiquidity, getUnreleasedLockById };

@@ -1,15 +1,16 @@
 import { useEtherStore } from "@/store/ether";
 
 import { getContract, getProvider } from "./provider";
-import { getP2PixAddress } from "./addresses";
+import { getP2PixAddress, getTokenAddress } from "./addresses";
 
-import p2pix from "../utils/smart_contract_files/P2PIX.json";
+import p2pix from "@/utils/smart_contract_files/P2PIX.json";
 
 import { BigNumber, ethers } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
 const addLock = async (
-  depositId: BigNumber,
+  seller: string,
+  token: string,
   amount: number
 ): Promise<string> => {
   const etherStore = useEtherStore();
@@ -17,7 +18,8 @@ const addLock = async (
   const p2pContract = getContract();
 
   const lock = await p2pContract.lock(
-    depositId, // BigNumber
+    seller,
+    token,
     etherStore.walletAddress, // String "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (Example)
     ethers.constants.AddressZero, // String "0x0000000000000000000000000000000000000000"
     0,
@@ -29,11 +31,11 @@ const addLock = async (
   const lock_rec = await lock.wait();
   const [t] = lock_rec.events;
 
-  return t.args.lockID;
+  return String(t.args.lockID);
 };
 
 const releaseLock = async (
-  pixKey: string,
+  pixKey: number,
   amount: number,
   e2eId: string,
   lockId: string
@@ -43,7 +45,7 @@ const releaseLock = async (
   );
 
   const messageToSign = ethers.utils.solidityKeccak256(
-    ["string", "uint256", "bytes32"],
+    ["uint160", "uint256", "bytes32"],
     [
       pixKey,
       parseEther(String(amount)),
@@ -61,7 +63,7 @@ const releaseLock = async (
   const p2pContract = new ethers.Contract(getP2PixAddress(), p2pix.abi, signer);
 
   const release = await p2pContract.release(
-    lockId,
+    BigNumber.from(lockId),
     ethers.constants.AddressZero,
     ethers.utils.formatBytes32String(e2eId),
     sig.r,
@@ -82,10 +84,14 @@ const cancelDeposit = async (depositId: BigNumber): Promise<any> => {
   return cancel;
 };
 
-const withdrawDeposit = async (depositId: BigNumber): Promise<any> => {
+const withdrawDeposit = async (amount: string): Promise<any> => {
   const contract = getContract();
 
-  const withdraw = await contract.withdraw(depositId, []);
+  const withdraw = await contract.withdraw(
+    getTokenAddress(),
+    parseEther(String(amount)),
+    []
+  );
   await withdraw.wait();
 
   return withdraw;

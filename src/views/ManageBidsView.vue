@@ -2,75 +2,115 @@
 import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
-import type { BigNumber } from "ethers";
+import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 import { ref, watch, onMounted } from "vue";
-import { cancelDeposit, withdrawDeposit } from "@/blockchain/buyerMethods";
-import { listValidDepositTransactionsByWalletAddress } from "@/blockchain/wallet";
+import {
+  listValidDepositTransactionsByWalletAddress,
+  listAllTransactionByWalletAddress,
+  getActiveLockAmount,
+} from "@/blockchain/wallet";
+import { withdrawDeposit } from "@/blockchain/buyerMethods";
 import type { ValidDeposit } from "@/model/ValidDeposit";
+import type { WalletTransaction } from "@/model/WalletTransaction";
+
+import router from "@/router/index";
 
 const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
-const depositList = ref<ValidDeposit[]>([]);
+const loadingWithdraw = ref<boolean>(false);
+const showAlert = ref<boolean>(false);
 
-onMounted(async () => {
+const depositList = ref<ValidDeposit[]>([]);
+const transactionsList = ref<WalletTransaction[]>([]);
+const activeLockAmount = ref<number>(0);
+
+const callWithdraw = async (amount: string) => {
+  if (amount) {
+    loadingWithdraw.value = true;
+    let withdraw;
+    try {
+      withdraw = await withdrawDeposit(amount);
+    } catch {
+      loadingWithdraw.value = false;
+    }
+
+    if (withdraw) {
+      console.log("Saque realizado!");
+      await getWalletTransactions();
+      showAlert.value = true;
+    } else {
+      console.log("Não foi possível realizar o saque!");
+    }
+    loadingWithdraw.value = false;
+  }
+};
+
+const getWalletTransactions = async () => {
+  etherStore.setLoadingWalletTransactions(true);
   if (walletAddress.value) {
     const walletDeposits = await listValidDepositTransactionsByWalletAddress(
       walletAddress.value
     );
+
+    const allUserTransactions = await listAllTransactionByWalletAddress(
+      walletAddress.value
+    );
+
+    activeLockAmount.value = await getActiveLockAmount(walletAddress.value);
+
     if (walletDeposits) {
       depositList.value = walletDeposits;
     }
+    if (allUserTransactions) {
+      transactionsList.value = allUserTransactions;
+    }
   }
+  etherStore.setLoadingWalletTransactions(false);
+};
+
+onMounted(async () => {
+  if (!walletAddress.value) {
+    router.push({ name: "home" });
+  }
+  await getWalletTransactions();
 });
 
-const handleCancelDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await cancelDeposit(depositID);
-  if (response) {
-    console.log("Depósito cancelado com sucesso.");
-    depositList.value.splice(index, 1);
-  }
-};
-
-const handleWithDrawDeposit = async (depositID: BigNumber, index: number) => {
-  const response = await withdrawDeposit(depositID);
-  if (response) {
-    console.log("Token retirado com sucesso.");
-    depositList.value.splice(index, 1);
-  }
-};
-
 watch(walletAddress, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
+  await getWalletTransactions();
 });
 
 watch(networkName, async () => {
-  await listValidDepositTransactionsByWalletAddress(walletAddress.value)
-    .then((res) => {
-      if (res) depositList.value = res;
-    })
-    .catch(() => {
-      depositList.value = [];
-    });
+  await getWalletTransactions();
 });
 </script>
 
 <template>
+  <CustomAlert
+    v-if="showAlert"
+    :type="'withdraw'"
+    @close-alert="showAlert = false"
+  />
   <div class="page">
-    <div class="header">Gerenciar ofertas</div>
+    <div class="header" v-if="!loadingWithdraw && !walletAddress">
+      Por Favor Conecte Sua Carteira
+    </div>
+    <div class="header" v-if="!loadingWithdraw && walletAddress">
+      Gerenciar Ofertas
+    </div>
     <div class="w-full max-w-4xl">
       <ListingComponent
-        :wallet-transactions="depositList"
-        :is-manage-mode="true"
-        @cancel-deposit="handleCancelDeposit"
-        @withdraw-deposit="handleWithDrawDeposit"
+        v-if="!loadingWithdraw && walletAddress"
+        :valid-deposits="depositList"
+        :wallet-transactions="transactionsList"
+        :active-lock-amount="activeLockAmount"
+        @deposit-withdrawn="callWithdraw"
       ></ListingComponent>
+      <LoadingComponent
+        v-if="loadingWithdraw"
+        :message="'A transação está sendo enviada para a rede. Em breve os tokens serão depositados em sua carteira.'"
+      />
     </div>
   </div>
 </template>
@@ -81,6 +121,6 @@ watch(networkName, async () => {
 }
 
 .header {
-  @apply text-3xl text-gray-900 leading-9 font-bold justify-center flex;
+  @apply text-3xl text-white leading-9 font-bold justify-center flex;
 }
 </style>

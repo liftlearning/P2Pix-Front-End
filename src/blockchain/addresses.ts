@@ -1,26 +1,26 @@
 import { useEtherStore } from "@/store/ether";
 import { NetworkEnum } from "@/model/NetworkEnum";
 
-const getTokenAddress = (): string => {
+const getTokenAddress = (network?: NetworkEnum): string => {
   const etherStore = useEtherStore();
 
   const possibleTokenAddresses: { [key: string]: string } = {
-    Ethereum: "0x294003F602c321627152c6b7DED3EAb5bEa853Ee",
-    Polygon: "0x294003F602c321627152c6b7DED3EAb5bEa853Ee",
+    Ethereum: "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
+    Polygon: "0xC86042E9F2977C62Da8c9dDF7F9c40fde4796A29",
   };
 
-  return possibleTokenAddresses[etherStore.networkName];
+  return possibleTokenAddresses[network ? network : etherStore.networkName];
 };
 
-const getP2PixAddress = (): string => {
+const getP2PixAddress = (network?: NetworkEnum): string => {
   const etherStore = useEtherStore();
 
   const possibleP2PixAddresses: { [key: string]: string } = {
-    Ethereum: "0x5f3EFA9A90532914545CEf527C530658af87e196",
-    Polygon: "0x5f3EFA9A90532914545CEf527C530658af87e196",
+    Ethereum: "0x2414817FF64A114d91eCFA16a834d3fCf69103d4",
+    Polygon: "0x4A2886EAEc931e04297ed336Cc55c4eb7C75BA00",
   };
 
-  return possibleP2PixAddresses[etherStore.networkName];
+  return possibleP2PixAddresses[network ? network : etherStore.networkName];
 };
 
 const getProviderUrl = (): string => {

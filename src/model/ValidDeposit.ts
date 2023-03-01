@@ -1,10 +1,8 @@
-import type { BigNumber } from "ethers";
-
 export type ValidDeposit = {
-  depositID: BigNumber;
+  token: string;
   blockNumber: number;
   remaining: number;
   seller: string;
-  pixKey: string;
-  pixTarget?: string;
+  pixKey: number;
+  open?: boolean;
 };

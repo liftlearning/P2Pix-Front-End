@@ -3,50 +3,37 @@ import ListingComponent from "@/components/ListingComponent/ListingComponent.vue
 import { createPinia, setActivePinia } from "pinia";
 import { expect } from "vitest";
 import { MockValidDeposits } from "@/model/mock/ValidDepositMock";
-import { MockEvents } from "@/model/mock/EventMock";
+import { MockWalletTransactions } from "@/model/mock/WalletTransactionMock";
+import { useEtherStore } from "@/store/ether";
 
 describe("ListingComponent.vue", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    useEtherStore().setLoadingWalletTransactions(false);
   });
 
-  test("Test Headers on List in Manage Mode", () => {
+  test("Test Message when an empty array is received", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
+        validDeposits: [],
+        walletTransactions: [],
+        activeLockAmount: 0,
       },
     });
 
-    expect(wrapper.html()).toContain("Valor");
-    expect(wrapper.html()).toContain("Data");
-    expect(wrapper.html()).toContain("Cancelar oferta");
-    expect(wrapper.html()).toContain("Retirar tokens");
-  });
-
-  test("Test Headers on List in Unmanage Mode", () => {
-    const wrapper = mount(ListingComponent, {
-      props: {
-        walletTransactions: MockEvents,
-        isManageMode: false,
-      },
-    });
-
-    expect(wrapper.html()).toContain("Valor");
-    expect(wrapper.html()).toContain("Data");
-    expect(wrapper.html()).toContain("Tipo de transação");
-    expect(wrapper.html()).toContain("Checar transação");
+    expect(wrapper.html()).toContain("Não há nenhuma transação anterior");
   });
 
   test("Test number of elements in the list first render", () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: MockEvents,
-        isManageMode: false,
+        validDeposits: [],
+        walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
 
-    const elements = wrapper.findAll(".transaction-date");
+    const elements = wrapper.findAll(".item-container");
 
     expect(elements).toHaveLength(3);
   });
@@ -54,47 +41,47 @@ describe("ListingComponent.vue", () => {
   test("Test load more button behavior", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: false,
+        validDeposits: MockValidDeposits,
+        walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
     const btn = wrapper.find("button");
 
-    let elements = wrapper.findAll(".transaction-date");
+    let elements = wrapper.findAll(".item-container");
     expect(elements).toHaveLength(3);
 
     await btn.trigger("click");
 
-    elements = wrapper.findAll(".transaction-date");
+    elements = wrapper.findAll(".item-container");
 
     expect(elements).toHaveLength(5);
-  });
-
-  test("Test cancel offer button emit", async () => {
-    const wrapper = mount(ListingComponent, {
-      props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
-      },
-    });
-    wrapper.vm.$emit("cancelDeposit");
-
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.emitted("cancelDeposit")).toBeTruthy();
   });
 
   test("Test withdraw offer button emit", async () => {
     const wrapper = mount(ListingComponent, {
       props: {
-        walletTransactions: MockValidDeposits,
-        isManageMode: true,
+        validDeposits: MockValidDeposits,
+        walletTransactions: MockWalletTransactions,
+        activeLockAmount: 0,
       },
     });
-    wrapper.vm.$emit("withdrawDeposit");
+    wrapper.vm.$emit("depositWithdrawn");
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted("withdrawDeposit")).toBeTruthy();
+    expect(wrapper.emitted("depositWithdrawn")).toBeTruthy();
+  });
+
+  test("Test should render lock info when active lock amount is greater than 0", () => {
+    const wrapper = mount(ListingComponent, {
+      props: {
+        validDeposits: MockValidDeposits,
+        walletTransactions: [],
+        activeLockAmount: 50,
+      },
+    });
+
+    expect(wrapper.html()).toContain("com 50.00 BRZ em lock");
   });
 });

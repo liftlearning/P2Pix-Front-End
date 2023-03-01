@@ -59,19 +59,13 @@ const handleInputEvent = (event: any): void => {
   enableConfirmButton.value = true;
 };
 
-const callWithdraw = async () => {
-  if (withdrawAmount.value) {
-    const withdraw = await withdrawDeposit(withdrawAmount.value);
-    if (withdraw) {
-      console.log(withdraw);
-      alert("Saque realizado!");
-      emit("depositWithdrawn");
-    }
-  }
+const callWithdraw = () => {
+  emit("depositWithdrawn", withdrawAmount.value);
 };
 
 watch(withdrawAmount, (): void => {
-  if (!withdrawAmount.value) {
+  console.log(enableConfirmButton.value)
+  if (!withdrawAmount.value || !enableConfirmButton.value) {
     withdrawButtonOpacity.value = 0.7;
     withdrawButtonCursor.value = "not-allowed";
   } else {
@@ -252,7 +246,6 @@ showInitialItems();
           </h1>
 
           <div
-            v-if="enableConfirmButton"
             class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >

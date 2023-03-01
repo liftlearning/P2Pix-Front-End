@@ -6,15 +6,15 @@ const props = defineProps<{
 
 const alertText = ref<string>("");
 const alertPaddingLeft = ref<string>("18rem");
-const alertPaddingTop = ref<string>("0rem");
 
 if (props.type === "sell") {
   alertPaddingLeft.value = "30%";
 } else if (props.type === "buy") {
   alertPaddingLeft.value = "30%";
+} else if (props.type === "withdraw") {
+  alertPaddingLeft.value = "40%";
 } else if (props.type === "redirect") {
   alertPaddingLeft.value = "35%";
-  alertPaddingTop.value = "8rem";
 }
 
 switch (props.type) {
@@ -28,6 +28,9 @@ switch (props.type) {
     break;
   case "redirect":
     alertText.value = "Existe uma compra em aberto. Continuar?";
+    break;
+  case "withdraw":
+    alertText.value = "Tudo certo! Saque realizado com sucesso!";
     break;
 }
 </script>
@@ -147,23 +150,5 @@ button {
   border-radius: 10px;
   border: 2px solid white;
   margin-left: 1rem;
-}
-
-.lg-view {
-  display: inline-block;
-}
-
-.sm-view {
-  display: none;
-}
-
-@media screen and (max-width: 500px) {
-  .lg-view {
-    display: none;
-  }
-
-  .sm-view {
-    display: inline-block;
-  }
 }
 </style>

@@ -63,8 +63,17 @@ const callWithdraw = () => {
   emit("depositWithdrawn", withdrawAmount.value);
 };
 
+watch(enableConfirmButton, (): void => {
+  if (!enableConfirmButton.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
+
 watch(withdrawAmount, (): void => {
-  console.log(enableConfirmButton.value)
   if (!withdrawAmount.value || !enableConfirmButton.value) {
     withdrawButtonOpacity.value = 0.7;
     withdrawButtonCursor.value = "not-allowed";

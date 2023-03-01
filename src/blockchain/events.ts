@@ -7,6 +7,8 @@ import { getContract } from "./provider";
 import type { ValidDeposit } from "@/model/ValidDeposit";
 import { getP2PixAddress, getTokenAddress } from "./addresses";
 import { NetworkEnum } from "@/model/NetworkEnum";
+import type { UnreleasedLock } from "@/model/UnreleasedLock";
+import type { Pix } from "@/model/Pix";
 
 const getNetworksLiquidity = async (): Promise<void> => {
   const etherStore = useEtherStore();
@@ -100,4 +102,25 @@ const getValidDeposits = async (
   return Object.values(depositList);
 };
 
-export { getValidDeposits, getNetworksLiquidity };
+const getUnreleasedLockById = async (
+  lockID: string
+): Promise<UnreleasedLock> => {
+  const p2pContract = getContract();
+  const pixData: Pix = {
+    pixKey: "",
+  };
+
+  const lock = await p2pContract.mapLocks(lockID);
+
+  const pixTarget = lock.pixTarget;
+  const amount = formatEther(lock?.amount);
+  pixData.pixKey = String(Number(pixTarget));
+  pixData.value = Number(amount);
+
+  return {
+    lockID: lockID,
+    pix: pixData,
+  };
+};
+
+export { getValidDeposits, getNetworksLiquidity, getUnreleasedLockById };

@@ -11,6 +11,12 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
+      props: true,
+    },
+    {
+      path: "/:lockID",
+      name: "redirect buy",
+      component: HomeView,
     },
     {
       path: "/seller",

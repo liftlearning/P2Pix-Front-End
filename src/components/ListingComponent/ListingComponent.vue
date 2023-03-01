@@ -59,19 +59,22 @@ const handleInputEvent = (event: any): void => {
   enableConfirmButton.value = true;
 };
 
-const callWithdraw = async () => {
-  if (withdrawAmount.value) {
-    const withdraw = await withdrawDeposit(withdrawAmount.value);
-    if (withdraw) {
-      console.log(withdraw);
-      alert("Saque realizado!");
-      emit("depositWithdrawn");
-    }
-  }
+const callWithdraw = () => {
+  emit("depositWithdrawn", withdrawAmount.value);
 };
 
+watch(enableConfirmButton, (): void => {
+  if (!enableConfirmButton.value) {
+    withdrawButtonOpacity.value = 0.7;
+    withdrawButtonCursor.value = "not-allowed";
+  } else {
+    withdrawButtonOpacity.value = 1;
+    withdrawButtonCursor.value = "pointer";
+  }
+});
+
 watch(withdrawAmount, (): void => {
-  if (!withdrawAmount.value) {
+  if (!withdrawAmount.value || !enableConfirmButton.value) {
     withdrawButtonOpacity.value = 0.7;
     withdrawButtonCursor.value = "not-allowed";
   } else {
@@ -174,7 +177,7 @@ showInitialItems();
           <p class="text-xl leading-7 font-semibold text-gray-900">
             {{ getRemaining() }} BRZ
           </p>
-          <div class="flex gap-2 w-32 sm:w-44" v-if="activeLockAmount != 0">
+          <div class="flex gap-2 w-32 sm:w-56" v-if="activeLockAmount != 0">
             <span class="text-xs font-normal text-gray-400" ref="infoText">{{
               `com ${activeLockAmount.toFixed(2)} BRZ em lock`
             }}</span>
@@ -252,7 +255,6 @@ showInitialItems();
           </h1>
 
           <div
-            v-if="enableConfirmButton"
             class="withdraw-button flex gap-2 items-center justify-self-center border-2 p-2 border-amber-300 rounded-md"
             @click="callWithdraw"
           >
@@ -272,22 +274,23 @@ showInitialItems();
       :key="item.blockNumber"
     >
       <div class="item-container">
-        <div>
-          <p class="text-sm leading-5 font-medium text-gray-600">
+        <div class="flex flex-col self-start">
+          <span class="text-xs sm:text-sm leading-5 font-medium text-gray-600">
             {{ getEventName(item.event) }}
-          </p>
-          <p class="text-xl leading-7 font-semibold text-gray-900">
+          </span>
+          <span
+            class="text-xl sm:text-xl leading-7 font-semibold text-gray-900"
+          >
             {{ item.amount }}
             BRZ
-          </p>
-          <p class="text-xs leading-4 font-medium text-gray-600"></p>
+          </span>
         </div>
         <div>
           <div
             class="bg-amber-300 status-text"
             v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
           >
-            Ativo
+            Em Aberto
           </div>
           <div
             class="bg-[#94A3B8] status-text"
@@ -305,11 +308,30 @@ showInitialItems();
             Finalizado
           </div>
           <div
-            class="flex gap-2 cursor-pointer items-center justify-self-center"
+            class="flex gap-2 cursor-pointer items-center justify-self-center w-full"
             @click="openEtherscanUrl(item.transactionHash)"
+            v-if="getEventName(item.event) != 'Reserva' || item.lockStatus != 1"
           >
             <span class="last-release-info">{{ getExplorer() }}</span>
-            <img alt="Redirect image" src="@/assets/redirect.svg" />
+            <img
+              alt="Redirect image"
+              src="@/assets/redirect.svg"
+              class="w-3 h-3 sm:w-4 sm:h-4"
+            />
+          </div>
+          <div
+            class="flex gap-2 justify-self-center w-full"
+            v-if="getEventName(item.event) == 'Reserva' && item.lockStatus == 1"
+          >
+            <RouterLink
+              :to="{
+                name: 'home',
+                force: true,
+                state: { lockID: item.transactionID },
+              }"
+              class="router-button"
+              >Continuar</RouterLink
+            >
           </div>
         </div>
       </div>
@@ -358,7 +380,7 @@ p {
 }
 
 .status-text {
-  @apply text-base font-medium text-gray-900 rounded-lg text-center mb-2 p-1;
+  @apply text-xs sm:text-base font-medium text-gray-900 rounded-lg text-center mb-2 px-2 py-1 mt-4;
 }
 .text {
   @apply text-white text-center;
@@ -373,11 +395,15 @@ p {
 }
 
 .last-release-info {
-  @apply font-medium text-sm sm:text-base text-gray-900 justify-self-center;
+  @apply font-medium text-xs sm:text-sm text-gray-900 justify-self-center;
 }
 
 .tooltip {
   @apply bg-white text-gray-900 font-medium text-xs md:text-base px-3 py-2 rounded border-2 border-emerald-500 left-5 top-[-3rem];
+}
+
+.router-button {
+  @apply rounded-lg border-amber-300 border-2 px-3 py-2 text-gray-900 font-semibold sm:text-base text-xs hover:bg-transparent w-full text-center;
 }
 
 .withdraw-button {

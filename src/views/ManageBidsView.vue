@@ -3,6 +3,7 @@ import { useEtherStore } from "@/store/ether";
 import { storeToRefs } from "pinia";
 import ListingComponent from "@/components/ListingComponent/ListingComponent.vue";
 import LoadingComponent from "@/components/LoadingComponent/LoadingComponent.vue";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 import { ref, watch, onMounted } from "vue";
 import {
   listValidDepositTransactionsByWalletAddress,
@@ -19,6 +20,7 @@ const etherStore = useEtherStore();
 
 const { walletAddress, networkName } = storeToRefs(etherStore);
 const loadingWithdraw = ref<boolean>(false);
+const showAlert = ref<boolean>(false);
 
 const depositList = ref<ValidDeposit[]>([]);
 const transactionsList = ref<WalletTransaction[]>([]);
@@ -37,6 +39,7 @@ const callWithdraw = async (amount: string) => {
     if (withdraw) {
       console.log("Saque realizado!");
       await getWalletTransactions();
+      showAlert.value = true;
     } else {
       console.log("Não foi possível realizar o saque!");
     }
@@ -84,6 +87,11 @@ watch(networkName, async () => {
 </script>
 
 <template>
+  <CustomAlert
+    v-if="showAlert"
+    :type="'withdraw'"
+    @close-alert="showAlert = false"
+  />
   <div class="page">
     <div class="header" v-if="!loadingWithdraw && !walletAddress">
       Por Favor Conecte Sua Carteira

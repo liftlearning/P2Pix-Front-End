@@ -5,13 +5,13 @@ import BuyConfirmedComponent from "@/components/BuyConfirmedComponent/BuyConfirm
 import { ref, onMounted, watch } from "vue";
 import { useEtherStore } from "@/store/ether";
 import QrCodeComponent from "@/components/QrCodeComponent.vue";
-import CustomModal from "@/components/CustomModal/CustomModal.vue";
 import { storeToRefs } from "pinia";
 import { addLock, releaseLock } from "@/blockchain/buyerMethods";
 import { updateWalletStatus, checkUnreleasedLock } from "@/blockchain/wallet";
 import { getNetworksLiquidity } from "@/blockchain/events";
 import type { ValidDeposit } from "@/model/ValidDeposit";
-import router from "@/router";
+import { getUnreleasedLockById } from "@/blockchain/events";
+import CustomAlert from "@/components/CustomAlert/CustomAlert.vue";
 
 enum Step {
   Search,
@@ -30,6 +30,8 @@ const tokenAmount = ref<number>();
 const lockID = ref<string>("");
 const loadingRelease = ref<boolean>(false);
 const showModal = ref<boolean>(false);
+const showBuyAlert = ref<boolean>(false);
+const paramLockID = window.history.state?.lockID;
 
 const confirmBuyClick = async (
   selectedDeposit: ValidDeposit,
@@ -59,6 +61,7 @@ const confirmBuyClick = async (
 
 const releaseTransaction = async (e2eId: string) => {
   flowStep.value = Step.List;
+  showBuyAlert.value = true;
   loadingRelease.value = true;
 
   if (lockID.value && tokenAmount.value && pixTarget.value) {
@@ -88,17 +91,30 @@ const checkForUnreleasedLocks = async (): Promise<void> => {
   }
 };
 
-watch(walletAddress, async () => {
-  await checkForUnreleasedLocks();
-});
+if (paramLockID) {
+  const lockToRedirect = await getUnreleasedLockById(paramLockID as string);
+  if (lockToRedirect) {
+    lockID.value = lockToRedirect.lockID;
+    tokenAmount.value = lockToRedirect.pix.value;
+    pixTarget.value = Number(lockToRedirect.pix.pixKey);
+    flowStep.value = Step.Buy;
+  } else {
+    flowStep.value = Step.Search;
+  }
+} else {
+  watch(walletAddress, async () => {
+    await checkForUnreleasedLocks();
+  });
 
-watch(networkName, async () => {
-  if (walletAddress.value) await checkForUnreleasedLocks();
-});
+  watch(networkName, async () => {
+    if (walletAddress.value) await checkForUnreleasedLocks();
+  });
+}
 
 onMounted(async () => {
   await getNetworksLiquidity();
-  if (walletAddress.value) await checkForUnreleasedLocks();
+  if (walletAddress.value && !paramLockID) await checkForUnreleasedLocks();
+  window.history.state.lockID = "";
 });
 </script>
 
@@ -107,11 +123,18 @@ onMounted(async () => {
     v-if="flowStep == Step.Search"
     @token-buy="confirmBuyClick"
   />
-  <CustomModal
+  <CustomAlert
     v-if="flowStep == Step.Search && showModal"
-    :isRedirectModal="true"
-    @close-modal="showModal = false"
+    :type="'redirect'"
+    @close-alert="showModal = false"
     @go-to-lock="flowStep = Step.Buy"
+  />
+  <CustomAlert
+    v-if="
+      flowStep == Step.List && showBuyAlert && !loadingLock && !loadingRelease
+    "
+    :type="'buy'"
+    @close-alert="showBuyAlert = false"
   />
   <div v-if="flowStep == Step.Buy">
     <QrCodeComponent
